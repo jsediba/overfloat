@@ -11,7 +11,9 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true,
+      "window": {
+        "all":true
+      },
       "shell": {
         "all": false,
         "open": true
@@ -19,12 +21,10 @@
     },
     "windows": [
       {
-        "fullscreen": false,
-        "resizable": true,
-        "alwaysOnTop": true,
         "title": "overfloat",
-        "width": 300,
-        "height": 200
+        "width": 800,
+        "height": 600,
+        "visible": false
       }
     ],
     "security": {
