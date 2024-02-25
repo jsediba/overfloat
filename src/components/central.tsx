@@ -1,25 +1,27 @@
 import 'react';
 import { useEffect } from 'react';
 import { WebviewWindow } from '@tauri-apps/api/window';
-import { emit } from '@tauri-apps/api/event';
+import { emit, listen } from '@tauri-apps/api/event';
+import { invoke } from '@tauri-apps/api';
 
 const Central = () => {
     const newWindow = (keybind: string) => {
-        const webview = new WebviewWindow("counter_"+keybind, { url: 'http://localhost:1420/' + "counter_"+keybind, visible: false, height: 100, width: 200, alwaysOnTop: true, decorations: true, title: '['+keybind+']'});
+        const webview = new WebviewWindow("counter_"+keybind, { url: 'http://localhost:1420/' + "counter?keybind="+keybind, visible: false, height: 100, width: 200, alwaysOnTop: true, decorations: true, title: '['+keybind+']'});
         webview.once('tauri://created', () => { console.log('Window ' + ("counter_"+keybind) + ' created')});
         webview.once('tauri://error', function (e) { console.log(e) });
     };
 
     useEffect(() => {
-        document.addEventListener('keydown', handleKeyPress)
-    
+        const unlisten = listen('overfloat://GlobalKeyPress', (event) => { console.log(event); emit("overfloat://KeybindPropagation", { message: event.payload.message.split('(')[0]})});
+        
         return () => {
-          document.removeEventListener('keydown', handleKeyPress)
+          unlisten.then(f => f());
         }
     }, [])
 
     const handleKeyPress = async (e : KeyboardEvent) => {
-        emit('overfloat://KeybindPropagation', e.key);
+        invoke ('setup_keybinds');
+        emit('', e.key);
     }
 
 
@@ -32,18 +34,18 @@ const Central = () => {
             </div>
             <div className='row'>
                 <div className='col'>
-                    <button onClick={() => newWindow('a')}>[a]</button>
+                    <button onClick={() => newWindow('A')}>[a]</button>
                 </div>
                 <div className='col'>
-                    <button onClick={() => newWindow('s')}>[s]</button>
+                    <button onClick={() => newWindow('S')}>[s]</button>
                 </div>
             </div>
             <div className='row'>
                 <div className='col'>
-                    <button onClick={() => newWindow('d')}>[d]</button>
+                    <button onClick={() => newWindow('D')}>[d]</button>
                 </div>
                 <div className='col'>
-                    <button onClick={() => newWindow('f')}>[f]</button>
+                    <button onClick={() => newWindow('F')}>[f]</button>
 
                 </div>
             </div>

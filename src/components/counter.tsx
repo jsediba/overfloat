@@ -3,24 +3,31 @@ import { useState, useEffect } from 'react'
 import { listen } from '@tauri-apps/api/event'
 import { appWindow } from '@tauri-apps/api/window'
 
-type CounterProps = {
-    keybind: string
-}
 
-const Counter = ({ keybind } : CounterProps) : React.JSX.Element =>  {
+
+const Counter = () : React.JSX.Element =>  {
     useEffect(() => {
         appWindow.show();
+        
+        const unlisten = listen('overfloat://KeybindPropagation', (event) => handle_keypress(event));
+        
+        return () => {
+            unlisten.then(f => f())
+        }
     }, [])
-
+    
+    const queryParameters = new URLSearchParams(window.location.search);
+    const [keybind, setKeybind] = useState<string|null>(queryParameters.get("keybind"));
     const [counter, setCounter] = useState<number>(0);
 
     const handle_keypress = async (event : any) => {
-        if(event.payload == keybind){
+        console.log(event)
+        if(event.payload.message == keybind){
             setCounter((prev : number)=>{console.log(prev); return (prev+1)});
         }
     }
 
-    listen('overfloat://KeybindPropagation', (event) => handle_keypress(event));
+    
 
     return (
         <div className='container'>

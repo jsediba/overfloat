@@ -7,10 +7,7 @@ const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Central />} />
-      <Route path="/counter_a" element={<Counter keybind="a"/>} />
-      <Route path="/counter_s" element={<Counter keybind="s"/>} />
-      <Route path="/counter_d" element={<Counter keybind="d"/>} />
-      <Route path="/counter_f" element={<Counter keybind="f"/>} />
+      <Route path="/counter" element={<Counter/>} />
     </Routes>
   );
 }
