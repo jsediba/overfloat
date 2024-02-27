@@ -3,8 +3,6 @@ import { useEffect } from 'react';
 import { emit, listen } from '@tauri-apps/api/event';
 import { WebviewWindow } from '@tauri-apps/api/window';
 
-import Central from '../overfloat_modules/central/central';
-import Counter from '../overfloat_modules/central/subpages/counter';
 
 type KeypressEvent = {
   payload: {

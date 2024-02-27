@@ -2,6 +2,8 @@ import 'react';
 import { useState, useEffect } from 'react'
 import { listen } from '@tauri-apps/api/event'
 import { appWindow } from '@tauri-apps/api/window'
+import { register } from '@tauri-apps/api/globalShortcut';
+import { invoke } from '@tauri-apps/api';
 
 
 
@@ -10,7 +12,9 @@ const Counter = () : React.JSX.Element =>  {
         appWindow.show();
         
         const unlisten = listen('overfloat://KeybindPropagation', (event) => handle_keypress(event));
-        
+        register('A', () => {console.log("TauriGlobalShortcuts: A"); invoke('send_a');})
+
+
         return () => {
             unlisten.then(f => f())
         }

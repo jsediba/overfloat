@@ -4,6 +4,7 @@
 use mki::{Action};
 use tauri::{self, Manager, CustomMenuItem, SystemTray, SystemTrayMenu, SystemTrayEvent};
 use std::{fs, path, string};
+use rdev::{Key, EventType};
 
 #[derive(Clone, serde::Serialize)]
 struct PayloadKeypress {
@@ -15,6 +16,12 @@ struct PayloadCreateWindow {
   title: String,
   id: String,
   path: String,
+}
+
+#[tauri::command]
+async fn send_a() {
+    println!("Sending A");
+    let _res = rdev::simulate(&EventType::KeyPress(Key::KeyA));
 }
 
 fn get_module_names() -> Vec<string::String>{
@@ -49,8 +56,26 @@ fn main() {
             let handle = app.handle();
 
             //Keybind event firing
-            mki::bind_any_key(Action::handle_kb(move |key| handle.emit_all("overfloat://GlobalKeyPress", PayloadKeypress { message: format!("{}", key)}).unwrap()));
-            //mki::register_hotkey(&[Keyboard::LeftShift, Keyboard::B], move || {handle.emit_all("TestEvent", Payload{ message: format!("Event from MKI:")}).unwrap()});
+            mki::bind_any_key(Action::handle_kb(move |key| {
+                println!("MKI Keypress: {:?}", key); 
+                handle.emit_all("overfloat://GlobalKeyPress", PayloadKeypress { message: format!("{}", key)}).unwrap();
+            }));
+            
+            
+            fn callback(event: rdev::Event) {
+                match event.event_type {
+                  EventType::KeyPress(key) => println!("RDEV Keypress: {:?}\t{:?}", key, event.time),
+                  _ => (),
+              }
+            }
+          
+
+            tauri::async_runtime::spawn(async move {
+                if let Err(error) = rdev::listen(callback) {
+                    println!("Error: {:?}", error)
+                }
+            });
+            
             Ok(())
         })
         .system_tray(SystemTray::new().with_menu(tray_menu))
@@ -62,14 +87,14 @@ fn main() {
             }
             "central" => {
                 app.emit_all("overfloat://CreateWindow", PayloadCreateWindow { title: "Central".to_string(), id: "central".to_string(), path: "central".to_string()}).unwrap();
-                println!("Fired");
             }
             _ => {}
             }
         }
         _ => {}
         })
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![send_a])
+        .device_event_filter(tauri::DeviceEventFilter::Never)
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
     
