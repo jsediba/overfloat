@@ -3,8 +3,8 @@ import { useEffect } from 'react';
 import { emit, listen } from '@tauri-apps/api/event';
 import { WebviewWindow } from '@tauri-apps/api/window';
 
-import Central from './components/central';
-import Counter from './components/counter';
+import Central from '../overfloat_modules/central/central';
+import Counter from '../overfloat_modules/central/subpages/counter';
 
 type KeypressEvent = {
   payload: {
@@ -34,7 +34,7 @@ const Overfloat = () => {
   };
 
   const create_window_handler = (event : CreateWindowEvent) => {
-    console.log(event);
+    console.log("ASKED TO OPEN WINDOW ", event);
     new_window(event.payload.title, event.payload.id, event.payload.path);
   }
 
@@ -44,6 +44,7 @@ const Overfloat = () => {
       
     return () => {
       unlisten_keypress.then(f => f());
+      unlisten_create_window.then(f => f());
     }
   }, []);
 

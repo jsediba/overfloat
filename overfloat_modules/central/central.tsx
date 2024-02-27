@@ -7,7 +7,7 @@ import { emit, listen } from '@tauri-apps/api/event';
 
 const Central = () => {
     const newWindow = (keybind: string) => {
-        const webview = new WebviewWindow("counter_"+keybind, { url: 'http://localhost:1420/' + "counter?keybind="+keybind, visible: false, height: 100, width: 200, alwaysOnTop: true, decorations: true, title: '['+keybind+']', contentProtected: false});
+        const webview = new WebviewWindow("counter_"+keybind, { url: 'http://localhost:1420/' + "central/counter?keybind="+keybind, visible: true, height: 100, width: 200, alwaysOnTop: true, decorations: true, title: '['+keybind+']'});
         webview.once('tauri://created', () => { console.log('Window ' + ("counter_"+keybind) + ' created')});
         webview.once('tauri://error', function (e) { console.log(e) });
     };
