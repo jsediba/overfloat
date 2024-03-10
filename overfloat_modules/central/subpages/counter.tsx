@@ -12,7 +12,7 @@ const Counter = () : React.JSX.Element =>  {
         appWindow.show();
         
         const unlisten = listen('overfloat://KeybindPropagation', (event) => handle_keypress(event));
-        register('A', () => {console.log("TauriGlobalShortcuts: A"); invoke('send_a');})
+        //register('A', () => {console.log("TauriGlobalShortcuts: A"); invoke('send_a');})
 
 
         return () => {

@@ -2,8 +2,9 @@ import 'react';
 import { Routes, Route } from "react-router-dom";
 import Overfloat from './Overfloat';
 
-const ROUTES =  import.meta.glob('../overfloat_modules/*/[a-z[]*.tsx', { eager: true});
-const SUB_ROUTES = import.meta.glob('../overfloat_modules/*/subpages/[a-z[]*.tsx', { eager: true});
+
+const ROUTES : Record<string, any> =  import.meta.glob('../overfloat_modules/*/[a-z[]*.tsx', { eager: true});
+const SUB_ROUTES : Record<string, any>= import.meta.glob('../overfloat_modules/*/subpages/[a-z[]*.tsx', { eager: true});
 
 
 

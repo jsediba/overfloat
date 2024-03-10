@@ -22,6 +22,9 @@
         "all": false,
         "open": true
       },
+      "dialog":{
+        "all": true
+      },
       "fs": {
         "all":true
       },

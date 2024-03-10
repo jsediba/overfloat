@@ -2,6 +2,7 @@ import 'react';
 import { useEffect } from 'react';
 import { emit, listen } from '@tauri-apps/api/event';
 import { WebviewWindow } from '@tauri-apps/api/window';
+import { unregisterAll } from '@tauri-apps/api/globalShortcut';
 
 
 type KeypressEvent = {
@@ -39,7 +40,7 @@ const Overfloat = () => {
   useEffect(() => {
     const unlisten_keypress = listen('overfloat://GlobalKeyPress', (event : KeypressEvent) => keypress_handler(event));
     const unlisten_create_window = listen('overfloat://CreateWindow', (event : CreateWindowEvent) => create_window_handler(event));
-      
+    unregisterAll();
     return () => {
       unlisten_keypress.then(f => f());
       unlisten_create_window.then(f => f());
