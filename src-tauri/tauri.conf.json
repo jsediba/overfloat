@@ -35,9 +35,8 @@
     "windows": [
       {
         "title": "overfloat",
-        "width": 800,
-        "height": 600,
-        "visible": false
+        "visible": true,
+        "label": "main"
       }
     ],
     "security": {

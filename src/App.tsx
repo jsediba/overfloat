@@ -10,7 +10,6 @@ const SUB_ROUTES : Record<string, any>= import.meta.glob('../overfloat_modules/*
 
 const routes = Object.keys(ROUTES).map((route) => {
   const path = route.replace(/..\/overfloat_modules\/(.*)\/.*.tsx/g, '/$1');
-  console.log(typeof(ROUTES[route]))
   return { path, Element: ROUTES[route].default} 
 })
 

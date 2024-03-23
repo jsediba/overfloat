@@ -31,6 +31,7 @@ struct PayloadFileChange {
   path: String,
 }
 
+#[tauri::command]
 fn get_module_names() -> Vec<string::String>{
     let mut modules = Vec::new(); 
     for entry in fs::read_dir("../overfloat_modules").unwrap(){
@@ -140,7 +141,7 @@ fn main() {
                     EventType::KeyPress(key) => {
                             //println!("RDEV Keypress: {:?}\t{:?}", key, event.time);
                             
-                            handle.emit_all("overfloat://GlobalKeyPress", PayloadKeypress { message: key_to_string(key)}).unwrap();        
+                            handle.emit_all("overfloat://GlobalKeyPress", PayloadKeypress { message: key_to_string(key)}).unwrap();   
                         },
                     _ => {},
                 }
@@ -173,7 +174,7 @@ fn main() {
         }
         _ => {}
         })
-        .invoke_handler(tauri::generate_handler![watch_file])
+        .invoke_handler(tauri::generate_handler![get_module_names, watch_file])
         .device_event_filter(tauri::DeviceEventFilter::Always)
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

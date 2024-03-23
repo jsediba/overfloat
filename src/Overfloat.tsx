@@ -1,26 +1,29 @@
-import 'react';
-import { useEffect } from 'react';
-import { emit, listen } from '@tauri-apps/api/event';
-import { WebviewWindow } from '@tauri-apps/api/window';
-import { unregisterAll } from '@tauri-apps/api/globalShortcut';
-
+import "react";
+import { useEffect, useState } from "react";
+import { listen } from "@tauri-apps/api/event";
+import { ModuleManager } from "./components/ModuleManager";
+import TrayHandler from "./components/ModuleTrayHandler";
+import { EventHandler } from "./components/EventHandler";
 
 type KeypressEvent = {
-  payload: {
-      message: string
-  }
+    payload: {
+        message: string;
+    };
 };
 
 type CreateWindowEvent = {
-  payload: {
-    title: string,
-    id : string,
-    path: string,
-  }
+    payload: {
+        title: string;
+        id: string;
+        path: string;
+    };
 };
 
 const Overfloat = () => {
+    const eventHandler = EventHandler.getInstance();
+    return <TrayHandler />;
 
+    /*
   const new_window = (title: string, id: string, path: string) => {
     const webview = new WebviewWindow(id, { url: 'http://localhost:1420/' + path, visible: true, height: 300, width: 500, alwaysOnTop: true, decorations: true, title: title});
     webview.once('tauri://created', () => { console.log('Window ' + id + ' created')});
@@ -46,11 +49,11 @@ const Overfloat = () => {
       unlisten_create_window.then(f => f());
     }
   }, []);
-
-
+  
   return (
     <div>This is the main background window</div>
-  );
-}
+    );
+  */
+};
 
 export default Overfloat;
