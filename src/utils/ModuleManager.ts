@@ -1,14 +1,14 @@
 import { OverfloatModule } from "./OverfloatModule";
 import { invoke } from "@tauri-apps/api";
 
-class _ModuleManager{
-    private static instance: _ModuleManager;
+export class ModuleManager{
+    private static instance: ModuleManager;
     private overfloatModules = new Map<string, OverfloatModule>();
     private subscribers: Set<Function>;
     
     private constructor(){
+		this.subscribers = new Set<Function>();
         this.setupModules()
-        this.subscribers = new Set<Function>();
     }
 
     public subscribe(subscriber: Function): void {
@@ -35,16 +35,14 @@ class _ModuleManager{
         return this.overfloatModules;
     }
 
-    public static getInstance(): _ModuleManager {
-        if (!this.instance) {
+    public static getInstance(): ModuleManager {
+        if (!ModuleManager.instance) {
             console.log("Creating new ModuleManager at ", Date.now());
-            this.instance = new _ModuleManager();
+            ModuleManager.instance = new ModuleManager();
         }
 
-        return this.instance;
+        return ModuleManager.instance;
     }
 
 }
-
-export const ModuleManager = Object.freeze(_ModuleManager.getInstance());
 

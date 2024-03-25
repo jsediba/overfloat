@@ -33,20 +33,19 @@ export type ChangeKeybindEventPayload = {
 
 export class KeybindEventHandler {
     private static instance: KeybindEventHandler;
-    private shortcuts: Map<string, Map<string, Shortcut>>;
-    private keybinds: Map<string, Set<Function>>;
+    private keybindManager: KeybindManager;
 
     public static getInstance(): KeybindEventHandler {
-        if (!this.instance) {
+        if (!KeybindEventHandler.instance) {
             console.log("Creating new KeybindEventHandler");
-            this.instance = new KeybindEventHandler();
+            KeybindEventHandler.instance = new KeybindEventHandler();
         }
 
-        return this.instance;
+        return KeybindEventHandler.instance;
     }
     private constructor() {
-        this.shortcuts = KeybindManager.getShortcuts();
-        this.keybinds = KeybindManager.getKeybinds();
+        this.keybindManager = KeybindManager.getInstance();
+
 
         listen("Overfloat://AddShortcut", (event: OverfloatEvent<AddShortcutEventPayload>) => this.addShortcut(event))
         listen("Overfloat://RemoveShortcut", (event: OverfloatEvent<RemoveShortcutEventPayload>) => this.removeShortcut(event))
@@ -54,14 +53,6 @@ export class KeybindEventHandler {
         listen("Overfloat://AddKeybind", (event: OverfloatEvent<AddKeybindEventPayload>) => this.addKeybind(event));
         listen("Overfloat://RemoveKeybind", (event: OverfloatEvent<AddKeybindEventPayload>) => this.removeKeybind(event));
         listen("Overfloat://ChangeKeybind", (event: OverfloatEvent<ChangeKeybindEventPayload>) => this.changeKeybind(event));
-
-
-        KeybindManager.subscribe(this.updateKeybinds);
-    }
-
-    private updateKeybinds() {
-        this.shortcuts = KeybindManager.getShortcuts();
-        this.keybinds = KeybindManager.getKeybinds();
     }
 
     private getModuleName(windowLabel: string):string {
@@ -70,22 +61,22 @@ export class KeybindEventHandler {
     }
 
     private addShortcut(event: OverfloatEvent<AddShortcutEventPayload>) {
-        KeybindManager.addShortcut(this.getModuleName(event.windowLabel),event.payload.id, event.payload.name, event.payload.description, event.payload.callback, event.payload.defaultKeybind);
+        this.keybindManager.addShortcut(this.getModuleName(event.windowLabel),event.payload.id, event.payload.name, event.payload.description, event.payload.callback, event.payload.defaultKeybind);
     }
 
     private removeShortcut(event: OverfloatEvent<RemoveShortcutEventPayload>) {
-        KeybindManager.removeShortcut(this.getModuleName(event.windowLabel), event.payload.id);
+        this.keybindManager.removeShortcut(this.getModuleName(event.windowLabel), event.payload.id);
     }
 
     private addKeybind(event:OverfloatEvent<AddKeybindEventPayload>){
-        KeybindManager.addKeybind(this.getModuleName(event.windowLabel), event.payload.id, event.payload.keybind)
+        this.keybindManager.addKeybind(this.getModuleName(event.windowLabel), event.payload.id, event.payload.keybind)
     }
 
     private removeKeybind(event:OverfloatEvent<AddKeybindEventPayload>){
-        KeybindManager.removeKeybind(this.getModuleName(event.windowLabel), event.payload.id, event.payload.keybind)
+        this.keybindManager.removeKeybind(this.getModuleName(event.windowLabel), event.payload.id, event.payload.keybind)
     }
 
     private changeKeybind(event:OverfloatEvent<ChangeKeybindEventPayload>){
-        KeybindManager.changeKeybind(this.getModuleName(event.windowLabel), event.payload.id, event.payload.oldKeybind, event.payload.newKeybind);
+        this.keybindManager.changeKeybind(this.getModuleName(event.windowLabel), event.payload.id, event.payload.oldKeybind, event.payload.newKeybind);
     }
 }

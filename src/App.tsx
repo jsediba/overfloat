@@ -2,6 +2,7 @@ import 'react';
 import { Routes, Route } from "react-router-dom";
 import ModuleWindow from "./components/ModuleWindow";
 import KeybindWindow from './components/KeybindWindow';
+import { ModuleManager } from './utils/ModuleManager';
 
 
 const ROUTES : Record<string, any> =  import.meta.glob('../overfloat_modules/*/[a-z[]*.tsx', { eager: true});

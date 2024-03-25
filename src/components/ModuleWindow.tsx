@@ -7,22 +7,23 @@ import { listen } from '@tauri-apps/api/event'
 
 
 const TrayHandler: React.FC = () => {
-    const [modules, setModules] = useState<Map<string, OverfloatModule>>(ModuleManager.getModules());
+    const [modules, setModules] = useState<Map<string, OverfloatModule>>(ModuleManager.getInstance().getModules());
 
 
     useEffect(() => {
         const updateModules = () => {
-            setModules(new Map<string, OverfloatModule>(ModuleManager.getModules()));
+            setModules(new Map<string, OverfloatModule>(ModuleManager.getInstance().getModules()));
         };
-        
-        WindowEventHandler.getInstance();
-        ModuleManager.subscribe(updateModules);
 
+        WindowEventHandler.getInstance();
+        
+        ModuleManager.getInstance().subscribe(updateModules);
+        
         const unlisten = listen('overfloat://GlobalKeyPress', (event) => {console.log(event)});
 
         
         return () => {
-            ModuleManager.unsubscribe(updateModules);
+            ModuleManager.getInstance().unsubscribe(updateModules);
 
             unlisten.then(f => f())
 

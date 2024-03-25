@@ -3,17 +3,17 @@ import { KeybindManager, Shortcut } from "../utils/KeybindManager";
 import ModuleKeybindDisplay from "./ModuleKeybindDisplay";
 
 const KeybindWindow: React.FC = () => {
-    const [shortcuts, setShortcuts] = useState<Map<string, Map<string, Shortcut>>>(KeybindManager.getShortcuts());
+    const [shortcuts, setShortcuts] = useState<Map<string, Map<string, Shortcut>>>(KeybindManager.getInstance().getShortcuts());
     
     useEffect(() => {
         const updateModules = () => {
-            setShortcuts(new Map<string, Map<string, Shortcut>>(KeybindManager.getShortcuts()));
+            setShortcuts(new Map<string, Map<string, Shortcut>>(KeybindManager.getInstance().getShortcuts()));
         };
         
-        KeybindManager.subscribe(updateModules);
+        KeybindManager.getInstance().subscribe(updateModules);
 
         return () => {
-            KeybindManager.unsubscribe(updateModules);
+            KeybindManager.getInstance().unsubscribe(updateModules);
         };
     }, []);
 

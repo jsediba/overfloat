@@ -32,29 +32,24 @@ export type SubwindowOpenEventPayload = {
 
 export class WindowEventHandler {
     private static instance: WindowEventHandler;
-    private modules: Map<string, OverfloatModule>;
+    private moduleManager: ModuleManager;
 
     public static getInstance(): WindowEventHandler {
-        if (!this.instance) {
+        if (!WindowEventHandler.instance) {
             console.log("Creating new WindowEventHandler");
-            this.instance = new WindowEventHandler();
+            WindowEventHandler.instance = new WindowEventHandler();
         }
 
-        return this.instance;
+        return WindowEventHandler.instance;
     }
 
     private constructor() {
-        this.modules = ModuleManager.getModules();
-        ModuleManager.subscribe(this.updateModules);
-
+        this.moduleManager = ModuleManager.getInstance();
         listen("Overfloat://MainWindowModification", (event: OverfloatEvent<MainWindowEventPayload>) => this.mainWindowModification(event));
         listen("Overfloat://SubwindowModification", (event: OverfloatEvent<SubwindowModificationEventPayload>) => this.subwindowModification(event));
-        listen("Overfloat://SubwindowOpen", (event: OverfloatEvent<SubwindowOpenEventPayload>) => this.subwindowOpen(event));
+        listen("Overfloat://SubwindowOpen", (event: OverfloatEvent<SubwindowOpenEventPayload>) => this.subwindowOpen(event));  
     }
 
-    private updateModules() {
-        this.modules = ModuleManager.getModules();
-    }
 
     private getModuleName(windowLabel: string):string {
         const moduleName = windowLabel.replace(/module\/([^/]*)(\/.*)?/g, '$1');
@@ -63,7 +58,7 @@ export class WindowEventHandler {
 
     private mainWindowModification(event: OverfloatEvent<MainWindowEventPayload>) {
         console.log(event);
-        const module = this.modules.get(this.getModuleName(event.windowLabel));
+        const module = this.moduleManager.getModules().get(this.getModuleName(event.windowLabel));
         switch (event.payload.eventType) {
             case WindowEventType.Show:
                 module?.showMainWindow();
@@ -78,7 +73,7 @@ export class WindowEventHandler {
     }
 
     private subwindowModification(event: OverfloatEvent<SubwindowModificationEventPayload>) {
-        const module = this.modules.get(this.getModuleName(event.windowLabel));
+        const module = this.moduleManager.getModules().get(this.getModuleName(event.windowLabel));
 
         switch (event.payload.type) {
             case WindowEventType.Show:
@@ -94,7 +89,7 @@ export class WindowEventHandler {
     }
 
     private subwindowOpen(event: OverfloatEvent<SubwindowOpenEventPayload>) {
-        const module = this.modules.get(this.getModuleName(event.windowLabel));
+        const module = this.moduleManager.getModules().get(this.getModuleName(event.windowLabel));
         module?.openSubwindow(event.payload.componentName, event.payload.title, event.payload.params);
     }
 }

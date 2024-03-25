@@ -6,8 +6,8 @@ export type Shortcut = {
     boundKeys: Set<string>;
 };
 
-class _KeybindManager {
-    private static instance: _KeybindManager;
+export class KeybindManager {
+    private static instance: KeybindManager;
     private shortcuts = new Map<string, Map<string, Shortcut>>();
     private keybinds = new Map<string, Set<Function>>();
     private subscribers: Set<Function>;
@@ -31,13 +31,13 @@ class _KeybindManager {
         }
     }
 
-    public static getInstance(): _KeybindManager {
-        if (!this.instance) {
+    public static getInstance(): KeybindManager {
+        if (!KeybindManager.instance) {
             console.log("Creating new KeybindManager");
-            this.instance = new _KeybindManager();
+            KeybindManager.instance = new KeybindManager();
         }
 
-        return this.instance;
+        return KeybindManager.instance;
     }
 
     public addShortcut(module: string, id: string, name: string, description: string, callback: Function, defaultKeybind?: string) {
@@ -124,5 +124,3 @@ class _KeybindManager {
         return this.keybinds;
     }
 }
-
-export const KeybindManager = Object.freeze(_KeybindManager.getInstance());
