@@ -1,6 +1,6 @@
 import { WebviewWindow } from "@tauri-apps/api/window";
 
-const _LOCAL_URL = "http://localhost:1420/";
+const _LOCAL_URL = "http://localhost:1420/module/";
 
 export interface NameValuePairs {
     [key: string]: string | number;
@@ -37,7 +37,7 @@ export class OverfloatModule {
     public showMainWindow(title?: string) {
         if (this.mainWindow == null) {
             const windowTitle = title === undefined ? this.moduleName : title;
-            const windowLabel: string = this.moduleName;
+            const windowLabel: string = "module/" + this.moduleName;
             const windowUrl: string = _LOCAL_URL + this.moduleName;
             this.mainWindow = new WebviewWindow(windowLabel, {
                 title: windowTitle,
@@ -98,7 +98,7 @@ export class OverfloatModule {
         }
 
         const windowUrl = _LOCAL_URL + this.moduleName + "/" + component_name + paramsString;
-        const windowLabel = this.moduleName + "/" + component_name + "_" + id;
+        const windowLabel = "module/" + this.moduleName + "/" + component_name + "_" + id;
         const windowTitle = title === undefined ? windowLabel : title;
         const webview = new WebviewWindow(windowLabel, {
             title: windowTitle,

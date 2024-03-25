@@ -2,14 +2,14 @@ import 'react';
 import { useEffect } from 'react';
 import { WebviewWindow } from '@tauri-apps/api/window';
 import { emit, listen } from '@tauri-apps/api/event';
-import { ModuleManager } from '../../src/components/ModuleManager';
+import { ModuleManager } from '../../src/utils/ModuleManager';
 
 
 
 const Central = () => {
 
     const newWindow = (keybind: string) => {
-        emit("Overfloat://WindowModification", {keybind: keybind})
+        emit("Overfloat://SubwindowOpen", {componentName: "Counter", title: "Counter "+keybind, params:{keybind:keybind}});
     };
 
 

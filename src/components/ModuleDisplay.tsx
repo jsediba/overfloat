@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react'
-import { OverfloatModule } from './OverfloatModule';
+import { OverfloatModule } from '../utils/OverfloatModule';
 import { WebviewWindow } from '@tauri-apps/api/window';
-import { listen } from '@tauri-apps/api/event'
 
 
 interface ModuleDisplayProps {
@@ -23,11 +22,8 @@ const ModuleDisplay: React.FC<ModuleDisplayProps> = (props: ModuleDisplayProps) 
   
       module.subscribe(updateModuleWindows);
     
-      const unlisten = listen('overfloat://GlobalKeyPress', () => {console.log(module.getSubwindows())});
-
       return () => {
           module.unsubscribe(updateModuleWindows);
-          unlisten.then(f => f())
         }
     }, [])
 
@@ -38,9 +34,9 @@ const ModuleDisplay: React.FC<ModuleDisplayProps> = (props: ModuleDisplayProps) 
             </div>
             <div className="container">
 
-            {Array.from(subwindows).map(([key, window]) => (
-                <div key={key}>
-                    Id: {key}
+            {Array.from(subwindows).map(([label, window]) => (
+                <div key={label}>
+                    Id: {label}
                     Window Label: {window.label}
                 </div>
             ))}

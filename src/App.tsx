@@ -1,6 +1,7 @@
 import 'react';
 import { Routes, Route } from "react-router-dom";
-import Overfloat from './Overfloat';
+import ModuleWindow from "./components/ModuleWindow";
+import KeybindWindow from './components/KeybindWindow';
 
 
 const ROUTES : Record<string, any> =  import.meta.glob('../overfloat_modules/*/[a-z[]*.tsx', { eager: true});
@@ -9,21 +10,21 @@ const SUB_ROUTES : Record<string, any>= import.meta.glob('../overfloat_modules/*
 
 
 const routes = Object.keys(ROUTES).map((route) => {
-  const path = route.replace(/..\/overfloat_modules\/(.*)\/.*.tsx/g, '/$1');
+  const path = route.replace(/..\/overfloat_modules\/(.*)\/.*.tsx/g, '/module/$1');
   return { path, Element: ROUTES[route].default} 
 })
 
 const subroutes = Object.keys(SUB_ROUTES).map((route) => {
-    const path = route.replace(/..\/overfloat_modules\/(.*)\/subpages\/(.*).tsx/g, '/$1/$2');
+    const path = route.replace(/..\/overfloat_modules\/(.*)\/subpages\/(.*).tsx/g, '/module/$1/$2');
     return {path, Element: SUB_ROUTES[route].default}
 })
 
-console.log(subroutes)
 
 const App = () => {
   return (
     <Routes>
-      <Route path="/" element={<Overfloat />} />
+      <Route path="/overfloat" element={<ModuleWindow />} />
+      <Route path="/overfloat_keybinds" element={<KeybindWindow />} />
       {routes.map(({path, Element}) => (
         <Route key={path} path={path} element={<Element />} />
       ))}

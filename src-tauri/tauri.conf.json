@@ -34,9 +34,16 @@
     },
     "windows": [
       {
-        "title": "overfloat",
+        "title": "Overfloat",
         "visible": true,
-        "label": "main"
+        "label": "overfloat",
+        "url": "/overfloat"
+      },
+      {
+        "title": "Overfloat Keybinds",
+        "visible": true,
+        "label": "overfloat_keybinds",
+        "url": "/overfloat_keybinds"
       }
     ],
     "security": {

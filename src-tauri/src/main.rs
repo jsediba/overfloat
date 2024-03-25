@@ -13,16 +13,11 @@ use futures::{
 use notify::{event::ModifyKind, Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
 use std::path::Path;
 
+
+
 #[derive(Clone, serde::Serialize)]
 struct PayloadKeypress {
   message: String,
-}
-
-#[derive(Clone, serde::Serialize)]
-struct PayloadCreateWindow {
-  title: String,
-  id: String,
-  path: String,
 }
 
 #[derive(Clone, serde::Serialize)]
@@ -100,6 +95,30 @@ async fn async_watch(path: String, handle: tauri::AppHandle) -> notify::Result<(
     Ok(())
 }
 
+fn tray_toggle_window(handle: tauri::AppHandle, window_label: &str, tray_item_id: &str, tray_item_title: &str){
+    match handle.get_window(window_label) {
+        Some(window) => {
+            match window.is_visible() {
+                Ok(visible) =>{
+                    if visible{
+                        match window.hide(){
+                            Ok(_) => { handle.tray_handle().get_item(tray_item_id).set_title(tray_item_title).unwrap();}
+                            Err(_) => {}
+                        }
+                    } else {
+                        match window.show(){
+                            Ok(_) => { handle.tray_handle().get_item(tray_item_id).set_title(format!("{}{}", "✔ ", tray_item_title)).unwrap();}
+                            Err(_) => {}
+                        }
+                    }
+                }
+                Err(_) => {}
+            }
+        }
+        None => {}
+    }
+}
+
 fn main() {
     /*
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
@@ -114,11 +133,10 @@ fn main() {
         tray_menu.as_ref().add_item(m);
     }
     */
-    let central = CustomMenuItem::new("central".to_string(), "Central");
-    let file_watcher = CustomMenuItem::new("file_watcher".to_string(), "File Watcher");
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let tray_menu = SystemTrayMenu::new().add_item(central).add_item(file_watcher).add_native_item(SystemTrayMenuItem::Separator).add_item(quit);
-
+    let overfloat = CustomMenuItem::new("Overfloat".to_string(), "✔ Overfloat");
+    let keybind_manager = CustomMenuItem::new("KeybindManager".to_string(), "✔ Keybind Manager");
+    let quit = CustomMenuItem::new("Quit".to_string(), "Quit");
+    let tray_menu = SystemTrayMenu::new().add_item(overfloat).add_item(keybind_manager).add_native_item(SystemTrayMenuItem::Separator).add_item(quit);
 
 
     tauri::Builder::default()
@@ -160,14 +178,16 @@ fn main() {
         .on_system_tray_event(|app, event| match event {
         SystemTrayEvent::MenuItemClick { id, .. } => {
             match id.as_str() {
-            "quit" => {
+            "Quit" => {
                 std::process::exit(0);
             }
-            "file_watcher" => {
-                app.emit_all("overfloat://CreateWindow", PayloadCreateWindow { title: "File Watcher".to_string(), id: "file_watcher".to_string(), path: "file_watcher".to_string()}).unwrap();
+            "Overfloat" => {
+                tray_toggle_window(app.clone(), "overfloat", "Overfloat", "Overfloat")
+                //app.emit_to("overfloat", "Overfloat://ToggleOverfloatWindow", {}).unwrap();
             }
-            "central" => {
-                app.emit_all("overfloat://CreateWindow", PayloadCreateWindow { title: "Central".to_string(), id: "central".to_string(), path: "central".to_string()}).unwrap();
+            "KeybindManager" => {
+                tray_toggle_window(app.clone(), "overfloat_keybinds", "KeybindManager", "Keybind Manager")
+                //app.emit_to("overfloat_keybinds", "Overfloat://ToggleKeybindWindow", {}).unwrap();
             }
             _ => {}
             }
