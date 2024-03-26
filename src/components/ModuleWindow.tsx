@@ -14,20 +14,16 @@ const TrayHandler: React.FC = () => {
         const updateModules = () => {
             setModules(new Map<string, OverfloatModule>(ModuleManager.getInstance().getModules()));
         };
-
-        WindowEventHandler.getInstance();
         
+        WindowEventHandler.getInstance();   
         ModuleManager.getInstance().subscribe(updateModules);
         
         const unlisten = listen('overfloat://GlobalKeyPress', (event) => {console.log(event)});
+        updateModules();
 
-        
         return () => {
             ModuleManager.getInstance().unsubscribe(updateModules);
-
             unlisten.then(f => f())
-
-
         };
     }, []);
 

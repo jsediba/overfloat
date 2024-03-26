@@ -1,6 +1,10 @@
 use rdev;
+use tauri::Manager;
+use std::collections::HashMap;
 
-pub fn key_to_string(key: rdev::Key) -> String {
+const RDEV_KEY_COUNT: usize = 106;
+
+fn key_to_string(key: rdev::Key) -> String {
     match key{
         rdev::Key::Alt => String::from("Alt"),
         rdev::Key::AltGr => String::from("AltGr"),
@@ -108,5 +112,42 @@ pub fn key_to_string(key: rdev::Key) -> String {
         rdev::Key::KpDelete => String::from("KpDelete"),
         rdev::Key::Function => String::from("Function"),
         _ => String::from("Unknown"),
+    }
+}
+
+#[derive(Clone, serde::Serialize)]
+struct PayloadKeypress {
+  message: String,
+}
+
+pub struct KeyboardState{
+    pressed: HashMap<&'static str, bool>
+
+}
+
+impl KeyboardState{
+    pub fn new() -> KeyboardState {
+        KeyboardState{pressed: HashMap::new()}
+    }
+
+    pub fn handle_key_press_event(&mut self, handle: tauri::AppHandle, event: rdev::Event){
+        match event.event_type {
+            rdev::EventType::KeyPress(key) => {self.keydown(handle, key)},
+            rdev::EventType::KeyRelease(key) => {self.keyup(handle, key)},
+            _ => {},
+        }
+    }
+
+    fn keydown(&mut self, handle: tauri::AppHandle, key: rdev::Key){
+        let key_string: String = key_to_string(key);
+        let pressed = self.pressed.entry("asd").or_insert(false);
+
+        if *pressed {return;}
+
+        //handle.emit_to('overfloat_keybinds')
+    }
+
+    fn keyup(&mut self, handle: tauri::AppHandle, key: rdev::Key){
+        
     }
 }

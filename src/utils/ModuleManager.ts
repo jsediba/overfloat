@@ -20,6 +20,7 @@ export class ModuleManager{
       }
     
       private notifySubscribers(): void {
+        console.log("Notifying subscribers");
         for (const subscriber of this.subscribers) {
           subscriber();
         }

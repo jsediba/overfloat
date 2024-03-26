@@ -1,30 +1,14 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-mod keybinds;
-use keybinds::key_to_string;
 use tauri::{CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem};
 use std::{fs, path, string};
-use rdev::EventType;
-use futures::{
-    channel::mpsc::{channel, Receiver},
-    SinkExt, StreamExt,
-};
-use notify::{event::ModifyKind, Config, Event, RecommendedWatcher, RecursiveMode, Watcher};
-use std::path::Path;
+use rdev;
 
+mod keybinds;
 
+mod filewatch;
 
-#[derive(Clone, serde::Serialize)]
-struct PayloadKeypress {
-  message: String,
-}
-
-#[derive(Clone, serde::Serialize)]
-struct PayloadFileChange {
-  message: String,
-  path: String,
-}
 
 #[tauri::command]
 fn get_module_names() -> Vec<string::String>{
@@ -45,55 +29,15 @@ fn get_module_names() -> Vec<string::String>{
     modules
 }
 
-fn create_async_watcher() -> notify::Result<(RecommendedWatcher, Receiver<notify::Result<Event>>)> {
-    let (mut tx, rx) = channel(1);
-
-    // Automatically select the best implementation for your platform.
-    // You can also access each implementation directly e.g. INotifyWatcher.
-    let watcher = RecommendedWatcher::new(
-        move |res| {
-            futures::executor::block_on(async {
-                tx.send(res).await.unwrap();
-            })
-        },
-        Config::default(),
-    )?;
-
-    Ok((watcher, rx))
-}
-
 #[tauri::command]
 async fn watch_file(path: String, handle: tauri::AppHandle){
     tauri::async_runtime::spawn(async {
-        if let Err(e) = async_watch(path, handle).await {
+        if let Err(e) = filewatch::async_watch(path, handle).await {
             println!("error: {:?}", e)
         }
     });
 }
 
-async fn async_watch(path: String, handle: tauri::AppHandle) -> notify::Result<()> {
-    let (mut watcher, mut rx) = create_async_watcher()?;
-
-    let file_path = Path::new(&path);
-
-    // Add a path to be watched. All files and directories at that path and
-    // below will be monitored for changes.
-    watcher.watch(file_path, RecursiveMode::NonRecursive)?;
-
-    while let Some(res) = rx.next().await {
-        match res {
-            Ok(event) => {
-                if event.kind == notify::EventKind::Modify(ModifyKind::Any) {
-                    println!("modified: {:?}", event);
-                    handle.emit_all("overfloat://FileChange", PayloadFileChange { path: {format!("{}", path)}, message: format!("File {} changed", path)}).unwrap();
-                }
-            },
-            Err(e) => println!("watch error: {:?}", e),
-        }
-    }
-
-    Ok(())
-}
 
 fn tray_toggle_window(handle: tauri::AppHandle, window_label: &str, tray_item_id: &str, tray_item_title: &str){
     match handle.get_window(window_label) {
@@ -119,6 +63,7 @@ fn tray_toggle_window(handle: tauri::AppHandle, window_label: &str, tray_item_id
     }
 }
 
+
 fn main() {
     /*
     let quit = CustomMenuItem::new("quit".to_string(), "Quit");
@@ -138,6 +83,7 @@ fn main() {
     let quit = CustomMenuItem::new("Quit".to_string(), "Quit");
     let tray_menu = SystemTrayMenu::new().add_item(overfloat).add_item(keybind_manager).add_native_item(SystemTrayMenuItem::Separator).add_item(quit);
 
+    let mut keyboard_state = keybinds::KeyboardState::new();
 
     tauri::Builder::default()
         .setup(|app| {
@@ -155,14 +101,8 @@ fn main() {
             //fn callback(event: rdev::Event) {
             
             let callback = move |event: rdev::Event| {
-                match event.event_type {
-                    EventType::KeyPress(key) => {
-                            //println!("RDEV Keypress: {:?}\t{:?}", key, event.time);
-                            
-                            handle.emit_all("overfloat://GlobalKeyPress", PayloadKeypress { message: key_to_string(key)}).unwrap();   
-                        },
-                    _ => {},
-                }
+                //handle_key_press_event(handle.clone(), keyboard_state, event);
+                keyboard_state.handle_key_press_event(handle.clone(), event)
             };
             
             tauri::async_runtime::spawn(async move {

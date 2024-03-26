@@ -21,7 +21,8 @@ const ModuleDisplay: React.FC<ModuleDisplayProps> = (props: ModuleDisplayProps) 
     };
   
       module.subscribe(updateModuleWindows);
-    
+      updateModuleWindows();
+      
       return () => {
           module.unsubscribe(updateModuleWindows);
         }
