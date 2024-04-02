@@ -8,15 +8,15 @@ export interface NameValuePairs {
 
 export class OverfloatModule {
     private moduleName: string;
+    private subscribers: Set<Function>;
+    
     private mainWindow: WebviewWindow | null = null;
     private subwindows: Map<string, WebviewWindow> = new Map<string, WebviewWindow>();
     private subwindowsIds: Map<string, number> = new Map<string, number>();
-    private subscribers: Set<Function>;
 
     public constructor(moduleName: string) {
         this.moduleName = moduleName;
         this.subscribers = new Set<Function>();
-        console.log("Creating new module " + moduleName);
 
     }
 
@@ -46,7 +46,7 @@ export class OverfloatModule {
                 height: 300,
                 width: 500,
                 alwaysOnTop: true,
-                decorations: true,
+                decorations: false,
             });
             this.mainWindow.once("tauri://destroyed", () => {
                 this.mainWindow = null;
@@ -74,15 +74,13 @@ export class OverfloatModule {
             return;
         }
 
-        this.mainWindow.close();
+        this.mainWindow.emit("Overfloat://Close");
         this.mainWindow = null;
 
         this.notifySubscribers();
     }
 
     public openSubwindow(component_name: string, title?: string, params?: NameValuePairs) {
-        console.log("Subwindow open started");
-
         let id: number;
         if (this.subwindowsIds.has(component_name)) {
             // @ts-expect-error
@@ -107,18 +105,17 @@ export class OverfloatModule {
             height: 300,
             width: 500,
             alwaysOnTop: true,
-            decorations: true,
+            decorations: false,
         });
 
         webview.once("tauri://destroyed", () => {
-            this.subwindows.delete(windowLabel);
             this.notifySubscribers();
         });
+
 
         this.subwindows.set(windowLabel, webview);
         this.subwindowsIds.set(component_name, id);
 
-        console.log("After opening size is:" + this.subwindows.size);
         this.notifySubscribers();
     }
 
@@ -151,6 +148,7 @@ export class OverfloatModule {
             return;
         }
 
+
         this.subwindows.get(label)?.hide();
 
         this.notifySubscribers();
@@ -161,10 +159,14 @@ export class OverfloatModule {
             return;
         }
 
-        this.subwindows.get(label)?.close();
+        this.subwindows.get(label)?.emit("Overfloat://Close");
         this.subwindows.delete(label);
 
         this.notifySubscribers();
+    }
+
+    public getModuleName(): String{
+        return this.moduleName;
     }
 
     public getMainWindow(): WebviewWindow | null {

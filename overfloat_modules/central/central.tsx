@@ -1,44 +1,55 @@
-import 'react';
-import { useEffect } from 'react';
-import { WebviewWindow } from '@tauri-apps/api/window';
-import { emit, listen } from '@tauri-apps/api/event';
-import { ModuleManager } from '../../src/utils/ModuleManager';
+import "react";
+import { useEffect } from "react";
+import { openSubwindow } from "../../src/services/api";
+import { TitleBar } from "../../src/services/TitleBar";
 
-
+/*
+export type AddShortcutEventPayload = {
+    id: string,
+    name: string,
+    description: string,
+    callback: Function,
+    defaultKeybind?: string
+}
+*/
 
 const Central = () => {
 
+    useEffect(() => {
+        return () => {
+        }
+    }, []);
+
+
     const newWindow = (keybind: string) => {
-        emit("Overfloat://SubwindowOpen", {componentName: "Counter", title: "Counter "+keybind, params:{keybind:keybind}});
+        openSubwindow('counter', `Counter ${keybind}`, {"keybind": keybind});
+        console.log("opening new subwindow");
     };
 
-
     return (
-        <div className='container'>
-            <div className='row'>
-                <div className='col'>
-                    Test Control Central
+        <div className="container">
+            <TitleBar/>
+            <div className="row">
+                <div className="col">Test Control Central</div>
+            </div>
+            <div className="row">
+                <div className="col">
+                    <button onClick={() => newWindow("A")}>[a]</button>
+                </div>
+                <div className="col">
+                    <button onClick={() => newWindow("S")}>[s]</button>
                 </div>
             </div>
-            <div className='row'>
-                <div className='col'>
-                    <button onClick={() => newWindow('A')}>[a]</button>
+            <div className="row">
+                <div className="col">
+                    <button onClick={() => newWindow("D")}>[d]</button>
                 </div>
-                <div className='col'>
-                    <button onClick={() => newWindow('S')}>[s]</button>
-                </div>
-            </div>
-            <div className='row'>
-                <div className='col'>
-                    <button onClick={() => newWindow('D')}>[d]</button>
-                </div>
-                <div className='col'>
-                    <button onClick={() => newWindow('F')}>[f]</button>
-
+                <div className="col">
+                    <button onClick={() => newWindow("F")}>[f]</button>
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Central;

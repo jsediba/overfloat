@@ -1,11 +1,9 @@
 use rdev;
-use tauri::Manager;
 use std::collections::HashMap;
-
-const RDEV_KEY_COUNT: usize = 106;
+use tauri::Manager;
 
 fn key_to_string(key: rdev::Key) -> String {
-    match key{
+    match key {
         rdev::Key::Alt => String::from("Alt"),
         rdev::Key::AltGr => String::from("AltGr"),
         rdev::Key::Backspace => String::from("Backspace"),
@@ -115,39 +113,79 @@ fn key_to_string(key: rdev::Key) -> String {
     }
 }
 
+const RDEV_MODIFIER_KEYS: [rdev::Key; 8] = [
+    rdev::Key::MetaLeft,
+    rdev::Key::MetaRight,
+    rdev::Key::ControlLeft,
+    rdev::Key::ControlRight,
+    rdev::Key::Alt,
+    rdev::Key::AltGr,
+    rdev::Key::ShiftLeft,
+    rdev::Key::ShiftRight,
+];
+
 #[derive(Clone, serde::Serialize)]
 struct PayloadKeypress {
-  message: String,
+    key: String,
 }
 
-pub struct KeyboardState{
-    pressed: HashMap<&'static str, bool>
-
+pub struct KeyboardState {
+    pressed_keys: HashMap<rdev::Key, bool>,
 }
 
-impl KeyboardState{
+impl KeyboardState {
     pub fn new() -> KeyboardState {
-        KeyboardState{pressed: HashMap::new()}
-    }
-
-    pub fn handle_key_press_event(&mut self, handle: tauri::AppHandle, event: rdev::Event){
-        match event.event_type {
-            rdev::EventType::KeyPress(key) => {self.keydown(handle, key)},
-            rdev::EventType::KeyRelease(key) => {self.keyup(handle, key)},
-            _ => {},
+        KeyboardState {
+            pressed_keys: HashMap::new(),
         }
     }
 
-    fn keydown(&mut self, handle: tauri::AppHandle, key: rdev::Key){
-        let key_string: String = key_to_string(key);
-        let pressed = self.pressed.entry("asd").or_insert(false);
-
-        if *pressed {return;}
-
-        //handle.emit_to('overfloat_keybinds')
+    pub fn handle_key_press_event(&mut self, handle: tauri::AppHandle, event: rdev::Event) {
+        match event.event_type {
+            rdev::EventType::KeyPress(key) => self.keydown(handle, key),
+            rdev::EventType::KeyRelease(key) => self.keyup(handle, key),
+            _ => {}
+        }
     }
 
-    fn keyup(&mut self, handle: tauri::AppHandle, key: rdev::Key){
-        
+    fn keydown(&mut self, handle: tauri::AppHandle, key: rdev::Key) {
+        let pressed_keys = &mut self.pressed_keys;
+
+        let pressed = pressed_keys.entry(key).or_insert(false);
+
+        if !*pressed {
+            *pressed = true;
+
+            if !RDEV_MODIFIER_KEYS.contains(&key) {
+                let mut result_string: String = String::new();
+
+                for modifier_key in RDEV_MODIFIER_KEYS {
+                    match pressed_keys.get(&modifier_key) {
+                        Some(modifier_pressed) => {
+                            if *modifier_pressed {
+                                result_string =
+                                    format!("{}{}+", result_string, key_to_string(modifier_key));
+                            }
+                        }
+                        None => {}
+                    }
+                }
+
+                result_string = format!("{}{}", result_string, key_to_string(key));
+                handle.emit_to(
+                    "overfloat_keybinds",
+                    "Overfloat://GlobalKeypress",
+                    PayloadKeypress { key: result_string },
+                ).unwrap();
+            }
+        }
+    }
+
+    fn keyup(&mut self, _handle: tauri::AppHandle, key: rdev::Key) {
+        let pressed = self.pressed_keys.entry(key).or_insert(true);
+
+        if *pressed {
+            *pressed = false;
+        }
     }
 }

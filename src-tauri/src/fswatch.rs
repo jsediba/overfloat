@@ -8,39 +8,50 @@ use futures::{
 
 use notify::Watcher;
 
-
 #[derive(Clone, serde::Serialize)]
 struct PayloadFileChange {
-  message: String,
-  path: String,
+    path: String,
+    kind: String,
 }
 
-pub async fn async_watch(path: String, handle: tauri::AppHandle) -> notify::Result<()> {
+pub async fn async_watch(
+    handle: tauri::AppHandle,
+    path: String,
+    window_label: String,
+    id: String,
+) -> notify::Result<()> {
     let (mut watcher, mut rx) = create_async_watcher()?;
 
     let file_path = Path::new(&path);
 
     // Add a path to be watched. All files and directories at that path and
     // below will be monitored for changes.
-    watcher.watch(file_path, notify::RecursiveMode::NonRecursive)?;
+
+    watcher.watch(file_path, notify::RecursiveMode::Recursive)?;
 
     while let Some(res) = rx.next().await {
         match res {
             Ok(event) => {
-                if event.kind == notify::EventKind::Modify(notify::event::ModifyKind::Any) {
-                    println!("modified: {:?}", event);
-                    //handle.emit_all("", {});
-                    handle.emit_all("overfloat://FileChange", PayloadFileChange { path: {format!("{}", path)}, message: format!("File {} changed", path)}).unwrap();
+                let _ = handle.emit_to(
+                    window_label.as_str(),
+                    format!("Overfloat://FSEvent/{}", id).as_str(),
+                    PayloadFileChange {
+                        path: event.paths.first().unwrap().to_string_lossy().to_string(),
+                        kind: format!("{:?}", event.kind),
+                    },
+                );
                 }
-            },
-            Err(e) => println!("watch error: {:?}", e),
+            Err(_) => {}
         }
     }
 
     Ok(())
 }
 
-fn create_async_watcher() -> notify::Result<(notify::RecommendedWatcher, Receiver<notify::Result<notify::Event>>)> {
+fn create_async_watcher() -> notify::Result<(
+    notify::RecommendedWatcher,
+    Receiver<notify::Result<notify::Event>>,
+)> {
     let (mut tx, rx) = channel(1);
 
     // Automatically select the best implementation for your platform.

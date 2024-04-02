@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
-import { OverfloatModule } from "../utils/OverfloatModule";
-import { ModuleManager } from "../utils/ModuleManager";
+import { OverfloatModule } from "../../utils/OverfloatModule";
+import { ModuleManager } from "../../utils/ModuleManager";
 import ModuleDisplay from "./ModuleDisplay";
-import { WindowEventHandler } from "../utils/WindowEventHandler";
-import { listen } from '@tauri-apps/api/event'
+import { WindowEventHandler } from "../../utils/WindowEventHandler";
+import { invoke } from "@tauri-apps/api";
 
 
-const TrayHandler: React.FC = () => {
+const ModuleWindow: React.FC = () => {
     const [modules, setModules] = useState<Map<string, OverfloatModule>>(ModuleManager.getInstance().getModules());
 
 
@@ -18,26 +18,26 @@ const TrayHandler: React.FC = () => {
         WindowEventHandler.getInstance();   
         ModuleManager.getInstance().subscribe(updateModules);
         
-        const unlisten = listen('overfloat://GlobalKeyPress', (event) => {console.log(event)});
+        invoke('watch_file', {path: "C:/Users/Urcier/linuxstuff/bp/test"}).then((res) => console.log(res));
+
         updateModules();
 
         return () => {
             ModuleManager.getInstance().unsubscribe(updateModules);
-            unlisten.then(f => f())
         };
     }, []);
 
     return (
-        <div>
-            <button onClick={() => {modules.get('central')?.showMainWindow()}}>Open Central</button>
+        <div className="container">
+            <div className="h2">Modules</div>
             {Array.from(modules).map(([name, module]) => (
                 <div key={name}>
-                    Module: {name}
                     <ModuleDisplay module={module} />
+                    <hr/>
                 </div>
             ))}
         </div>
     );
 };
 
-export default TrayHandler;
+export default ModuleWindow;

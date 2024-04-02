@@ -3,8 +3,9 @@ import { invoke } from "@tauri-apps/api";
 
 export class ModuleManager{
     private static instance: ModuleManager;
-    private overfloatModules = new Map<string, OverfloatModule>();
     private subscribers: Set<Function>;
+    
+    private overfloatModules = new Map<string, OverfloatModule>();
     
     private constructor(){
 		this.subscribers = new Set<Function>();
@@ -20,7 +21,6 @@ export class ModuleManager{
       }
     
       private notifySubscribers(): void {
-        console.log("Notifying subscribers");
         for (const subscriber of this.subscribers) {
           subscriber();
         }
@@ -38,7 +38,6 @@ export class ModuleManager{
 
     public static getInstance(): ModuleManager {
         if (!ModuleManager.instance) {
-            console.log("Creating new ModuleManager at ", Date.now());
             ModuleManager.instance = new ModuleManager();
         }
 

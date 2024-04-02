@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Shortcut } from '../utils/KeybindManager';
+import { Shortcut } from '../../utils/KeybindManager';
 
 interface ModuleKeybindDisplayProps {
     shortcuts: Map<string, Shortcut>;

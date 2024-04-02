@@ -16,7 +16,8 @@
     },
     "allowlist": {
       "window": {
-        "all":true
+        "all":true,
+        "startDragging": true
       },
       "shell": {
         "all": false,
@@ -34,10 +35,10 @@
     },
     "windows": [
       {
-        "title": "Overfloat",
+        "title": "Overfloat Modules",
         "visible": true,
-        "label": "overfloat",
-        "url": "/overfloat"
+        "label": "overfloat_modules",
+        "url": "/overfloat_modules"
       },
       {
         "title": "Overfloat Keybinds",

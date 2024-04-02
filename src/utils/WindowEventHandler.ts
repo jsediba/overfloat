@@ -1,6 +1,7 @@
 import { listen } from "@tauri-apps/api/event";
 import { ModuleManager } from "./ModuleManager";
-import { NameValuePairs, OverfloatModule } from "./OverfloatModule";
+import { NameValuePairs } from "./OverfloatModule";
+import { WebviewWindow } from "@tauri-apps/api/window";
 
 export type OverfloatEvent<T> = {
     event: string;
@@ -19,15 +20,15 @@ export type MainWindowEventPayload = {
     eventType: WindowEventType;
 };
 
-export type SubwindowModificationEventPayload = {
-    type: WindowEventType;
-    label: string;
-};
-
 export type SubwindowOpenEventPayload = {
     componentName: string;
     title?: string;
     params?: NameValuePairs;
+};
+
+export type SubwindowModificationEventPayload = {
+    eventType: WindowEventType;
+    label: string;
 };
 
 export class WindowEventHandler {
@@ -36,7 +37,6 @@ export class WindowEventHandler {
 
     public static getInstance(): WindowEventHandler {
         if (!WindowEventHandler.instance) {
-            console.log("Creating new WindowEventHandler");
             WindowEventHandler.instance = new WindowEventHandler();
         }
 
@@ -45,20 +45,34 @@ export class WindowEventHandler {
 
     private constructor() {
         this.moduleManager = ModuleManager.getInstance();
-        listen("Overfloat://MainWindowModification", (event: OverfloatEvent<MainWindowEventPayload>) => this.mainWindowModification(event));
-        listen("Overfloat://SubwindowModification", (event: OverfloatEvent<SubwindowModificationEventPayload>) => this.subwindowModification(event));
-        listen("Overfloat://SubwindowOpen", (event: OverfloatEvent<SubwindowOpenEventPayload>) => this.subwindowOpen(event));  
+        listen(
+            "Overfloat://MainWindowModification",
+            (event: OverfloatEvent<MainWindowEventPayload>) =>
+                this.mainWindowModification(event)
+        );
+        listen(
+            "Overfloat://SubwindowOpen",
+            (event: OverfloatEvent<SubwindowOpenEventPayload>) =>
+                this.subwindowOpen(event)
+        );
+        listen(
+            "Overfloat://SubwindowModification",
+            (event: OverfloatEvent<SubwindowModificationEventPayload>) =>
+                this.subwindowModification(event)
+        );
     }
 
-
-    private getModuleName(windowLabel: string):string {
-        const moduleName = windowLabel.replace(/module\/([^/]*)(\/.*)?/g, '$1');
-        return moduleName
+    private getModuleName(windowLabel: string): string {
+        const moduleName = windowLabel.replace(/module\/([^/]*)(\/.*)?/g, "$1");
+        return moduleName;
     }
 
-    private mainWindowModification(event: OverfloatEvent<MainWindowEventPayload>) {
-        console.log(event);
-        const module = this.moduleManager.getModules().get(this.getModuleName(event.windowLabel));
+    private mainWindowModification(
+        event: OverfloatEvent<MainWindowEventPayload>
+    ) {
+        const module = this.moduleManager
+            .getModules()
+            .get(this.getModuleName(event.windowLabel));
         switch (event.payload.eventType) {
             case WindowEventType.Show:
                 module?.showMainWindow();
@@ -68,14 +82,30 @@ export class WindowEventHandler {
                 break;
             case WindowEventType.Close:
                 module?.closeMainWindow();
+                WebviewWindow.getByLabel(event.windowLabel)?.emit("Overfloat://Close");
                 break;
         }
     }
 
-    private subwindowModification(event: OverfloatEvent<SubwindowModificationEventPayload>) {
-        const module = this.moduleManager.getModules().get(this.getModuleName(event.windowLabel));
+    private subwindowOpen(event: OverfloatEvent<SubwindowOpenEventPayload>) {
+        const module = this.moduleManager
+            .getModules()
+            .get(this.getModuleName(event.windowLabel));
+        module?.openSubwindow(
+            event.payload.componentName,
+            event.payload.title,
+            event.payload.params
+        );
+    }
 
-        switch (event.payload.type) {
+    private subwindowModification(
+        event: OverfloatEvent<SubwindowModificationEventPayload>
+    ) {
+        const module = this.moduleManager
+            .getModules()
+            .get(this.getModuleName(event.windowLabel));
+
+        switch (event.payload.eventType) {
             case WindowEventType.Show:
                 module?.showSubwindow(event.payload.label);
                 break;
@@ -84,12 +114,8 @@ export class WindowEventHandler {
                 break;
             case WindowEventType.Close:
                 module?.closeSubwindow(event.payload.label);
+                WebviewWindow.getByLabel(event.payload.label)?.emit("Overfloat://Close");
                 break;
         }
-    }
-
-    private subwindowOpen(event: OverfloatEvent<SubwindowOpenEventPayload>) {
-        const module = this.moduleManager.getModules().get(this.getModuleName(event.windowLabel));
-        module?.openSubwindow(event.payload.componentName, event.payload.title, event.payload.params);
     }
 }

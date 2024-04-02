@@ -20,7 +20,7 @@ const FileWatcher = () => {
 
     const set_file = async () => {
         const selected_file = await open({
-            directory: false,
+            directory: true,
             multiple: false,
             title: "Select a file to monitor."
         })
