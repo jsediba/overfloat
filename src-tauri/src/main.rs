@@ -2,14 +2,15 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use rdev;
+use mki;
 use std::{fs, path, string};
 use tauri::{
-    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem
+    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
 };
 
-mod keybinds;
-
 mod fswatch;
+mod inputsim;
+mod keybinds;
 
 #[tauri::command]
 fn get_module_names() -> Vec<string::String> {
@@ -31,7 +32,6 @@ fn get_module_names() -> Vec<string::String> {
     modules
 }
 
-
 #[tauri::command]
 async fn watch_path(handle: tauri::AppHandle, path: String, window_label: String, id: String) {
     tauri::async_runtime::spawn(async move {
@@ -39,6 +39,11 @@ async fn watch_path(handle: tauri::AppHandle, path: String, window_label: String
             println!("error: {:?}", e)
         }
     });
+}
+
+#[tauri::command]
+fn input_simulation(simulation_steps: Vec<inputsim::SimulationStep>) {
+    inputsim::simulate_inputs(simulation_steps);
 }
 
 fn tray_toggle_window(
@@ -112,18 +117,19 @@ fn main() {
 
             //Keybind event firing
             /*
-            mki::bind_any_key(Action::handle_kb(move |key| {
+            mki::bind_any_key(mki::Action::handle_kb(move |key| {
                 println!("MKI Keypress: {:?}", key);
-                handle.emit_all("overfloat://GlobalKeyPress", PayloadKeypress { message: format!("{} from mki", key)}).unwrap();
             }));
             */
-
             //fn callback(event: rdev::Event) {
 
-
+            
             let callback = move |event: rdev::Event| {
-                //handle_key_press_event(handle.clone(), keyboard_state, event);
-                keyboard_state.handle_key_press_event(handle.clone(), event)
+                match event.event_type {
+                    rdev::EventType::KeyPress(_) => keyboard_state.handle_key_press_event(handle.clone(), event),
+                    rdev::EventType::KeyRelease(_) => keyboard_state.handle_key_press_event(handle.clone(), event),
+                    _ => {}
+                }
             };
 
             tauri::async_runtime::spawn(async move {
@@ -131,6 +137,7 @@ fn main() {
                     println!("Error: {:?}", error)
                 }
             });
+            
 
             Ok(())
         })
@@ -156,7 +163,11 @@ fn main() {
             },
             _ => {}
         })
-        .invoke_handler(tauri::generate_handler![get_module_names, watch_path])
+        .invoke_handler(tauri::generate_handler![
+            get_module_names,
+            watch_path,
+            input_simulation
+        ])
         .device_event_filter(tauri::DeviceEventFilter::Always)
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

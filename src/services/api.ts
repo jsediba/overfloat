@@ -204,3 +204,13 @@ export function watchPath(id:string, path:string, callback: () => void){
     invoke("watch_path", {path: path, windowLabel: appWindow.label, id:id});
     listen("Overfloat://FSEvent/"+id, (event) => {console.log(event); callback()});
 }
+
+/*
+export async function clipboardRead(){
+    return readText();
+}
+
+export async function clipboardWrite(text: string){
+    return writeText(text);
+}
+*/

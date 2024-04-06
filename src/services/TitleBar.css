@@ -1,12 +1,10 @@
 .titlebar {
-    height: 30px;
     background-color: rgb(51, 51, 51);
     color: white;
     user-select: none;
     cursor:default;
     display: flex;
     justify-content: flex-end;
-    position: fixed;
     top: 0;
     left: 0;
     right: 0;

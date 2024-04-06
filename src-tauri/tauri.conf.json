@@ -16,20 +16,20 @@
     },
     "allowlist": {
       "window": {
-        "all":true,
+        "all": true,
         "startDragging": true
       },
       "shell": {
         "all": false,
         "open": true
       },
-      "dialog":{
+      "dialog": {
         "all": true
       },
       "fs": {
-        "all":true
+        "all": true
       },
-      "globalShortcut": {
+      "clipboard": {
         "all": true
       }
     },

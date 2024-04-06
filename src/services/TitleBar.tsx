@@ -35,7 +35,7 @@ export const TitleBar: React.FC = () => {
     }, [])
 
     return (
-        <div data-tauri-drag-region={true} className="titlebar">
+        <div data-tauri-drag-region={true} className="titlebar container-fluid mb-2">
             <div data-tauri-drag-region={true} className="titlebar-title">
                 {windowTitle}
             </div>

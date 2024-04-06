@@ -141,6 +141,7 @@ impl KeyboardState {
     }
 
     pub fn handle_key_press_event(&mut self, handle: tauri::AppHandle, event: rdev::Event) {
+        println!("{:?}", event.name);
         match event.event_type {
             rdev::EventType::KeyPress(key) => self.keydown(handle, key),
             rdev::EventType::KeyRelease(key) => self.keyup(handle, key),
