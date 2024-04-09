@@ -1,5 +1,5 @@
 .titlebar {
-    background-color: rgb(51, 51, 51);
+    background-color: rgb(50, 50, 50);
     color: white;
     user-select: none;
     cursor:default;
@@ -30,8 +30,4 @@
   
   .titlebar-button:hover {
     background: rgba(255, 255, 255, 0.2);
-  }
-  
-  .button-icon{
-    filter: invert(100%);
   }

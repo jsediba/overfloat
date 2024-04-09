@@ -1,15 +1,12 @@
 import { WebviewWindow, appWindow } from "@tauri-apps/api/window";
 import { UnlistenFn, listen, once } from "@tauri-apps/api/event";
 import { invoke } from "@tauri-apps/api";
+import { readText, writeText } from "@tauri-apps/api/clipboard";
 import { WindowEventType } from "../utils/WindowEventHandler";
 import { NameValuePairs } from "../utils/OverfloatModule";
 
-function modules() {
-    return WebviewWindow.getByLabel("overfloat_modules");
-}
-
-function keybinds() {
-    return WebviewWindow.getByLabel("overfloat_keybinds");
+function mainWindow() {
+    return WebviewWindow.getByLabel("Overfloat");
 }
 
 export function openMainWindow() {
@@ -17,19 +14,19 @@ export function openMainWindow() {
 }
 
 export function showMainWindow() {
-    modules()?.emit("Overfloat://MainWindowModification", {
+    mainWindow()?.emit("Overfloat://MainWindowModification", {
         eventType: WindowEventType.Show,
     });
 }
 
 export function hideMainWindow() {
-    modules()?.emit("Overfloat://MainWindowModification", {
+    mainWindow()?.emit("Overfloat://MainWindowModification", {
         eventType: WindowEventType.Hide,
     });
 }
 
 export function closeMainWindow() {
-    modules()?.emit("Overfloat://MainWindowModification", {
+    mainWindow()?.emit("Overfloat://MainWindowModification", {
         eventType: WindowEventType.Close,
     });
 }
@@ -39,7 +36,7 @@ export function openSubwindow(
     title?: string,
     parameters?: NameValuePairs
 ) {
-    modules()?.emit("Overfloat://SubwindowOpen", {
+    mainWindow()?.emit("Overfloat://SubwindowOpen", {
         componentName: componentName,
         title: title,
         params: parameters,
@@ -47,9 +44,9 @@ export function openSubwindow(
 }
 
 export function showSubwindow(label: string = appWindow.label) {
-    modules()?.emit("Overfloat://SubwindowModification", {
+    mainWindow()?.emit("Overfloat://SubwindowModification", {
         eventType: WindowEventType.Show,
-        label: label
+        label: label,
     });
 }
 
@@ -59,41 +56,36 @@ export function getParameter(name: string): string {
 }
 
 export function hideSubwindow(label: string = appWindow.label) {
-    modules()?.emit("Overfloat://SubwindowModification", {
+    mainWindow()?.emit("Overfloat://SubwindowModification", {
         eventType: WindowEventType.Hide,
-        label: label
+        label: label,
     });
-    console.log("Hiding Subwindow: "+ label);
+    console.log("Hiding Subwindow: " + label);
 }
 
 export function closeSubwindow(label: string = appWindow.label) {
-    modules()?.emit("Overfloat://SubwindowModification", {
+    mainWindow()?.emit("Overfloat://SubwindowModification", {
         eventType: WindowEventType.Close,
-        label: label
+        label: label,
     });
 
     WebviewWindow.getByLabel(label)?.emit("Overfloat://Close");
 }
 
-
 const _SHORTCUT_PREFIX: string = appWindow.label + "/";
-
 
 class _ShortcutManager {
     private static instance: _ShortcutManager;
     private listeners: Map<string, Promise<UnlistenFn>>;
-    private shortcutIds: Set<string>;
 
     private constructor() {
         console.log("Creating new ShortcutManager");
         this.listeners = new Map<string, Promise<UnlistenFn>>();
-        this.shortcutIds = new Set<string>();
 
         once("Overfloat://Close", () => {
-            this.removeAllShortcuts();
+            this.listeners.forEach((listener) => listener.then((f) => f()));
             appWindow.close();
-        })
-
+        });
     }
 
     public static getInstance(): _ShortcutManager {
@@ -108,19 +100,16 @@ class _ShortcutManager {
         id: string,
         name: string,
         description: string,
-        callback: ()=>void,
+        callback: () => void,
         defaultKeybinds?: string[]
     ): boolean {
         const shortcut_id: string = _SHORTCUT_PREFIX + id;
 
-        if (
-            this.listeners.has(shortcut_id) ||
-            this.shortcutIds.has(shortcut_id)
-        ) {
+        if (this.listeners.has(shortcut_id)) {
             return false;
         }
 
-        keybinds()?.emit("Overfloat://AddShortcut", {
+        mainWindow()?.emit("Overfloat://AddShortcut", {
             windowLabel: appWindow.label,
             id: shortcut_id,
             name: name,
@@ -128,48 +117,48 @@ class _ShortcutManager {
             defaultKeybinds: defaultKeybinds,
         });
 
-        this.shortcutIds.add(shortcut_id);
-        this.listeners.set(
-            shortcut_id,
-            listen("Overfloat://Shortcut/" + shortcut_id, (event) => {
+        const unlisten = listen(
+            "Overfloat://Shortcut/" + shortcut_id,
+            (event) => {
                 console.log(event);
                 callback();
-            })
+            }
         );
+
+        console.log(
+            "Setting unlistener: " + unlisten + " for id: " + shortcut_id
+        );
+
+        this.listeners.set(shortcut_id, unlisten);
 
         return true;
     }
 
     public removeShortcut(id: string) {
         const shortcut_id: string = _SHORTCUT_PREFIX + id;
-        keybinds()?.emit("Overfloat://RemoveShortcut", {
+        mainWindow()?.emit("Overfloat://RemoveShortcut", {
             id: shortcut_id,
         });
 
-        this.shortcutIds.delete(shortcut_id);
         const listener = this.listeners.get(shortcut_id);
         this.listeners.delete(shortcut_id);
-        
-        listener?.then((f) => f());
+
+        listener?.then((f) => {
+            console.log("Removing shortcut: " + shortcut_id);
+            f();
+        });
 
     }
 
     public removeAllShortcuts() {
-        console.log("Manager Remove All Shortcuts");
-        const shortcut_ids = new Set<string>(this.shortcutIds);
-
-        shortcut_ids.forEach((shortcut_id) => {
-            console.log(
-                "Manager Remove: " +
-                    shortcut_id.substring(_SHORTCUT_PREFIX.length)
-            );
+        this.listeners.forEach((_, shortcut_id) => {
             this.removeShortcut(shortcut_id.substring(_SHORTCUT_PREFIX.length));
         });
     }
 
     public addKeybind(shortcut_id: string, keybind: string) {
         const id: string = _SHORTCUT_PREFIX + shortcut_id;
-        keybinds()?.emit("Overfloat://AddKeybind", {
+        mainWindow()?.emit("Overfloat://AddKeybind", {
             shortcut_id: id,
             keybind: keybind,
         });
@@ -181,7 +170,7 @@ class _ShortcutManager {
         newKeybind: string
     ) {
         const id: string = _SHORTCUT_PREFIX + shortcut_id;
-        keybinds()?.emit("Overfloat://ChangeKeybind", {
+        mainWindow()?.emit("Overfloat://ChangeKeybind", {
             shortcut_id: id,
             oldKeybind: oldKeybind,
             newKeybind: newKeybind,
@@ -190,7 +179,7 @@ class _ShortcutManager {
 
     public removeKeybind(shortcut_id: string, keybind: string) {
         const id: string = _SHORTCUT_PREFIX + shortcut_id;
-        keybinds()?.emit("Overfloat://RemoveKeybind", {
+        mainWindow()?.emit("Overfloat://RemoveKeybind", {
             shortcut_id: id,
             keybind: keybind,
         });
@@ -199,18 +188,18 @@ class _ShortcutManager {
 
 export const ShortcutManager = Object.freeze(_ShortcutManager.getInstance());
 
-
-export function watchPath(id:string, path:string, callback: () => void){
-    invoke("watch_path", {path: path, windowLabel: appWindow.label, id:id});
-    listen("Overfloat://FSEvent/"+id, (event) => {console.log(event); callback()});
+export function watchPath(id: string, path: string, callback: () => void) {
+    invoke("watch_path", { path: path, windowLabel: appWindow.label, id: id });
+    listen("Overfloat://FSEvent/" + id, (event) => {
+        console.log(event);
+        callback();
+    });
 }
 
-/*
-export async function clipboardRead(){
+export async function clipboardRead() {
     return readText();
 }
 
-export async function clipboardWrite(text: string){
+export async function clipboardWrite(text: string) {
     return writeText(text);
 }
-*/

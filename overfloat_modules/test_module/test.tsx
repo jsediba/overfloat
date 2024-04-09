@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ShortcutManager, watchPath } from "../../src/services/api";
+import { ShortcutManager, clipboardRead, clipboardWrite, watchPath } from "../../src/services/api";
 import { TitleBar } from "../../src/services/TitleBar";
 import {
     inputSimulation,
@@ -21,7 +21,7 @@ const TestComponent = () => {
                 setText((prev: string) => {
                     return prev + "TEST";
                 }),
-            ["ShiftLeft+A"]
+            ["ShiftLeft+A", "B"]
         );
 
         ShortcutManager.addShortcut(
@@ -51,6 +51,12 @@ const TestComponent = () => {
                 <div>{text}</div>
                 <button onClick={() => testSimulation()}>
                     TEST SIMULATION
+                </button>
+                <button onClick={() => clipboardRead().then((res) => console.log(res))}>
+                    Get Clipboard
+                </button>
+                <button onClick={() => clipboardWrite("Set from Overfloat")}>
+                    Set Clipboard
                 </button>
             </div>
         </div>

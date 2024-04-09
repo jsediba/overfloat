@@ -35,16 +35,13 @@
     },
     "windows": [
       {
-        "title": "Overfloat Modules",
-        "visible": true,
-        "label": "overfloat_modules",
-        "url": "/overfloat_modules"
-      },
-      {
-        "title": "Overfloat Keybinds",
-        "visible": true,
-        "label": "overfloat_keybinds",
-        "url": "/overfloat_keybinds"
+        "title": "Overfloat",
+        "visible": false,
+        "label": "Overfloat",
+        "url": "/overfloat",
+        "decorations": false,
+        "resizable": false,
+        "alwaysOnTop": true
       }
     ],
     "security": {

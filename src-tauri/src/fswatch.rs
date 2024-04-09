@@ -6,7 +6,7 @@ use futures::{
     SinkExt, StreamExt,
 };
 
-use notify::Watcher;
+use notify::{event, Watcher};
 
 #[derive(Clone, serde::Serialize)]
 struct PayloadFileChange {
@@ -27,9 +27,12 @@ pub async fn async_watch(
     // Add a path to be watched. All files and directories at that path and
     // below will be monitored for changes.
 
+
+
     watcher.watch(file_path, notify::RecursiveMode::Recursive)?;
 
     while let Some(res) = rx.next().await {
+        println!("{:?}", res);
         match res {
             Ok(event) => {
                 let _ = handle.emit_to(
@@ -40,8 +43,8 @@ pub async fn async_watch(
                         kind: format!("{:?}", event.kind),
                     },
                 );
-                }
-            Err(_) => {}
+            }
+            Err(e) => {println!("{:?}", e)}
         }
     }
 

@@ -1,11 +1,15 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use rdev;
 use mki;
-use std::{fs, path, string};
+use rdev;
+use std::{
+    fs::{self, File},
+    io::Write,
+    path, string,
+};
 use tauri::{
-    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTrayMenuItemHandle,
 };
 
 mod fswatch;
@@ -33,7 +37,89 @@ fn get_module_names() -> Vec<string::String> {
 }
 
 #[tauri::command]
+fn hide_app(handle: tauri::AppHandle){
+    let tray_item_handle: SystemTrayMenuItemHandle = handle.tray_handle().get_item("Overfloat");
+    let _ = tray_item_handle.set_title("Overfloat");
+    match handle.get_window("Overfloat"){
+        Some(window) => {let _ = window.hide();}
+        None => {}
+    }
+}
+
+#[tauri::command]
+fn get_config() -> String {
+    let path = std::path::Path::new("../config/config.json");
+
+    match fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(error) => {
+            println!("Couldn't read config file: {}", error);
+            String::new()
+        }
+    }
+}
+
+#[tauri::command]
+fn save_config(config_json: String) {
+    if let Some(parent) = std::path::Path::new("../config/config.json").parent() {
+        if let Err(err) = std::fs::create_dir_all(parent) {
+            panic!("Error while creating directories for config file: {}", err);
+        }
+    }
+
+    match fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open("../config/config.json")
+    {
+        Ok(mut file) => match file.write_all(config_json.as_bytes()) {
+            Ok(_) => {}
+            Err(error) => println!("Error while writing into a config file: {}", error),
+        },
+        Err(error) => println!("Error while opening a config file{}", error),
+    };
+}
+
+#[tauri::command]
+fn get_profiles() -> String {
+    let path = std::path::Path::new("../config/profiles.json");
+
+    match fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(error) => {
+            println!("Couldn't read profile file: {}", error);
+            String::new()
+        }
+    }
+}
+
+#[tauri::command]
+fn save_profiles(profiles_json: String) {
+    if let Some(parent) = std::path::Path::new("../config/profiles.json").parent() {
+        if let Err(err) = std::fs::create_dir_all(parent) {
+            panic!("Error while creating directories for profile file: {}", err);
+        }
+    }
+
+    match fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open("../config/profiles.json")
+    {
+        Ok(mut file) => match file.write_all(profiles_json.as_bytes()) {
+            Ok(_) => {}
+            Err(error) => println!("Error while writing into a profile file: {}", error),
+        },
+        Err(error) => println!("Error while opening a profile file{}", error),
+    };
+}
+
+#[tauri::command]
 async fn watch_path(handle: tauri::AppHandle, path: String, window_label: String, id: String) {
+    println!("label: {:?}", window_label);
+    println! {"id: {:?}", id};
     tauri::async_runtime::spawn(async move {
         if let Err(e) = fswatch::async_watch(handle, path, window_label, id).await {
             println!("error: {:?}", e)
@@ -99,13 +185,11 @@ fn main() {
         tray_menu.as_ref().add_item(m);
     }
     */
-    let module_manager = CustomMenuItem::new("ModuleManager".to_string(), "✔ Module Manager");
-    let keybind_manager = CustomMenuItem::new("KeybindManager".to_string(), "✔ Keybind Manager");
+    let module_manager = CustomMenuItem::new("Overfloat".to_string(), "✔ Overfloat");
 
     let quit = CustomMenuItem::new("Quit".to_string(), "Quit");
     let tray_menu = SystemTrayMenu::new()
         .add_item(module_manager)
-        .add_item(keybind_manager)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
@@ -123,13 +207,14 @@ fn main() {
             */
             //fn callback(event: rdev::Event) {
 
-            
-            let callback = move |event: rdev::Event| {
-                match event.event_type {
-                    rdev::EventType::KeyPress(_) => keyboard_state.handle_key_press_event(handle.clone(), event),
-                    rdev::EventType::KeyRelease(_) => keyboard_state.handle_key_press_event(handle.clone(), event),
-                    _ => {}
+            let callback = move |event: rdev::Event| match event.event_type {
+                rdev::EventType::KeyPress(_) => {
+                    keyboard_state.handle_key_press_event(handle.clone(), event)
                 }
+                rdev::EventType::KeyRelease(_) => {
+                    keyboard_state.handle_key_press_event(handle.clone(), event)
+                }
+                _ => {}
             };
 
             tauri::async_runtime::spawn(async move {
@@ -137,7 +222,6 @@ fn main() {
                     println!("Error: {:?}", error)
                 }
             });
-            
 
             Ok(())
         })
@@ -147,18 +231,9 @@ fn main() {
                 "Quit" => {
                     std::process::exit(0);
                 }
-                "ModuleManager" => tray_toggle_window(
-                    app.clone(),
-                    "overfloat_modules",
-                    "ModuleManager",
-                    "Module Manager",
-                ),
-                "KeybindManager" => tray_toggle_window(
-                    app.clone(),
-                    "overfloat_keybinds",
-                    "KeybindManager",
-                    "Keybind Manager",
-                ),
+                "Overfloat" => {
+                    tray_toggle_window(app.clone(), "Overfloat", "Overfloat", "Overfloat")
+                }
                 _ => {}
             },
             _ => {}
@@ -166,7 +241,12 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_module_names,
             watch_path,
-            input_simulation
+            input_simulation,
+            get_profiles,
+            save_profiles,
+            get_config,
+            save_config,
+            hide_app,
         ])
         .device_event_filter(tauri::DeviceEventFilter::Always)
         .run(tauri::generate_context!())

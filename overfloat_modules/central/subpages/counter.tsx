@@ -2,12 +2,10 @@ import "react";
 import { useState, useEffect } from "react";
 import { ShortcutManager, getParameter } from "../../../src/services/api";
 import { TitleBar } from "../../../src/services/TitleBar";
-import { appWindow } from "@tauri-apps/api/window";
 
 const Counter = (): React.JSX.Element => {
     const keybind = getParameter("keybind");
 
-    
     useEffect(() => {
         ShortcutManager.addShortcut(
             "count_up",
@@ -18,6 +16,7 @@ const Counter = (): React.JSX.Element => {
         );
 
         return () => {
+            ShortcutManager.removeShortcut("count_up");
         };
     }, []);
 
@@ -27,9 +26,7 @@ const Counter = (): React.JSX.Element => {
         setCounter((prev: number) => {
             return prev + 1;
         });
-        console.log(appWindow.listeners);
     };
-
 
     return (
         <div>
