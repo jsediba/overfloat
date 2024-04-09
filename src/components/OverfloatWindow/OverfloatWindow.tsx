@@ -1,24 +1,24 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import useStateRef from "react-usestateref";
 import { OverfloatModule } from "../../utils/OverfloatModule";
 import { ModuleManager } from "../../utils/ModuleManager";
-import ActiveModuleDisplay from "./ActiveModuleDisplay";
-import InactiveModuleDisplay from "./InactiveModuleDisplay";
 import { WindowEventHandler } from "../../utils/WindowEventHandler";
 import { KeybindManager } from "../../utils/KeybindManager";
 import { KeybindEventHandler } from "../../utils/KeybindEventHandler";
-import "./css/ModuleWindow.css";
+import "./css/OverfloatWindow.css";
 import { PhysicalSize, appWindow } from "@tauri-apps/api/window";
 import TitleBar from "./TitleBar";
 import { createGlobalStyle } from "styled-components";
-import TrayModule from "./TrayModule";
+import TrayModule from "../Tray/TrayModule";
+import ModuleSettings from "../Modules/ModuleSettings";
+import ShortcutSettings from "../Shortcuts/ShortcutSettings";
+import { invoke } from "@tauri-apps/api";
 
 enum Submenu {
     None,
     Modules,
     Shortcuts,
 }
-
 
 const GlobalStyle = createGlobalStyle`body{background-color: rgb(75,75,75);
     user-select: none;
@@ -39,6 +39,8 @@ const OverfloatWindow: React.FC = () => {
                 )
             );
         };
+
+        appWindow.once("tauri://close-requested", () => invoke("quit_app"));
 
         const setupWindow = async () => {
             await appWindow.setSize(new PhysicalSize(60, 600));
@@ -66,7 +68,7 @@ const OverfloatWindow: React.FC = () => {
         const shownSubmenu = refShownSubmenu.current;
 
         if (shownSubmenu == Submenu.None) {
-            await appWindow.setSize(new PhysicalSize(600, window.innerHeight));
+            await appWindow.setSize(new PhysicalSize(1000, window.innerHeight));
             setShownSubmenu(submenu);
         } else if (shownSubmenu == submenu) {
             setShownSubmenu(Submenu.None);
@@ -76,11 +78,10 @@ const OverfloatWindow: React.FC = () => {
         }
     };
 
-
     return (
         <div className="container-fluid p-0">
             <GlobalStyle />
-            <TitleBar/>
+            <TitleBar />
             <div className="row m-0">
                 <div className="tray col-auto p-0">
                     <button
@@ -112,16 +113,7 @@ const OverfloatWindow: React.FC = () => {
                             ? "detail col bg-secondary"
                             : "d-none"
                     }>
-                    <h2>Module Settings</h2>
-                    <select id="profileSelect" onChange={(event) => ModuleManager.getInstance().loadProfile(event.target.value)}>
-                        {ModuleManager.getInstance()
-                            .getProfiles()
-                            .map((profileName, index) => (
-                                <option value={profileName} key={index}>
-                                    {profileName}
-                                </option>
-                            ))}
-                    </select>
+                    <ModuleSettings />
                 </div>
                 <div
                     className={
@@ -129,7 +121,7 @@ const OverfloatWindow: React.FC = () => {
                             ? "detail col bg-secondary"
                             : "d-none"
                     }>
-                    <h2>Keybind Settings</h2>
+                    <ShortcutSettings activeModules={activeModules} />
                 </div>
             </div>
         </div>

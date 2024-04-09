@@ -47,6 +47,11 @@ fn hide_app(handle: tauri::AppHandle){
 }
 
 #[tauri::command]
+fn quit_app(handle: tauri::AppHandle){
+    handle.exit(0);
+}
+
+#[tauri::command]
 fn get_config() -> String {
     let path = std::path::Path::new("../config/config.json");
 
@@ -229,7 +234,7 @@ fn main() {
         .on_system_tray_event(|app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
                 "Quit" => {
-                    std::process::exit(0);
+                    app.exit(0);
                 }
                 "Overfloat" => {
                     tray_toggle_window(app.clone(), "Overfloat", "Overfloat", "Overfloat")
@@ -247,6 +252,7 @@ fn main() {
             get_config,
             save_config,
             hide_app,
+            quit_app,
         ])
         .device_event_filter(tauri::DeviceEventFilter::Always)
         .run(tauri::generate_context!())

@@ -1,6 +1,6 @@
 import 'react';
 import { Routes, Route } from "react-router-dom";
-import OverfloatWindow from "./components/ModuleWindow/OverfloatWindow";
+import OverfloatWindow from "./components/OverfloatWindow/OverfloatWindow";
 
 
 const ROUTES : Record<string, any> =  import.meta.glob('../overfloat_modules/*/[a-z[]*.tsx', { eager: true});

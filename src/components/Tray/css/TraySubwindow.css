@@ -1,0 +1,22 @@
+.subwindow-button {
+    color: white;
+    line-height: 28px;
+    vertical-align: top;
+    height: 28px;
+    min-height: 28px;
+    width: 56px;
+    padding: 0px;
+    border: none;
+}
+
+.subwindow-button-inactive {
+    background-color: rgb(50, 50, 50);
+}
+
+.subwindow-button-active {
+    background-color: rgb(100, 100, 100);
+}
+
+.subwindow-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
