@@ -13,6 +13,17 @@ import TrayModule from "../Tray/TrayModule";
 import ModuleSettings from "../Modules/ModuleSettings";
 import ShortcutSettings from "../Shortcuts/ShortcutSettings";
 import { invoke } from "@tauri-apps/api";
+import { listen } from "@tauri-apps/api/event";
+
+type TauriResizeEventType = {
+    event: string,
+    id: number,
+    payload: {
+        height: number,
+        width: number
+    }
+    windowLabel: string
+}
 
 enum Submenu {
     None,
@@ -24,12 +35,29 @@ const GlobalStyle = createGlobalStyle`body{background-color: rgb(75,75,75);
     user-select: none;
    -moz-user-select: none;
    -ms-user-select: none;
-   -webkit-user-select: none;`;
+   -webkit-user-select: none;}
+   ::-webkit-scrollbar {
+    height: 100%;
+    width: 0;
+    background-color: transparent;
+}`;
 
 const OverfloatWindow: React.FC = () => {
     const [activeModules, setActiveModules] = useState<
         Map<string, OverfloatModule>
     >(new Map<string, OverfloatModule>());
+
+    const [, setRolledUp, refRolledUp] = useStateRef<boolean>(false);
+
+    const updateRolledUp = (rolledUp: boolean) => {
+        setRolledUp(rolledUp);
+        appWindow.setSize(
+            new PhysicalSize(
+                refShownSubmenu.current == Submenu.None ? 60 : 1000,
+                refRolledUp.current ? 20 : 600
+            )
+        );
+    };
 
     useEffect(() => {
         const updateModules = () => {
@@ -39,6 +67,19 @@ const OverfloatWindow: React.FC = () => {
                 )
             );
         };
+
+        const unlisten = listen("tauri://resize", (event:TauriResizeEventType) => {
+            const targetSize = new PhysicalSize(
+                refShownSubmenu.current == Submenu.None ? 60 : 1000,
+                refRolledUp.current ? 20 : 600
+            );
+            const eventSize = new PhysicalSize(event.payload.width, event.payload.height);
+            if(eventSize != targetSize){
+                console.log("RESIZE");
+                appWindow.setSize(targetSize);
+            }
+                
+        });
 
         appWindow.once("tauri://close-requested", () => invoke("quit_app"));
 
@@ -58,6 +99,7 @@ const OverfloatWindow: React.FC = () => {
         return () => {
             ModuleManager.getInstance().unsubscribe(updateModules);
             KeybindManager.getInstance().unsubscribe(updateModules);
+            unlisten.then((f) => f());
         };
     }, []);
 
@@ -68,11 +110,11 @@ const OverfloatWindow: React.FC = () => {
         const shownSubmenu = refShownSubmenu.current;
 
         if (shownSubmenu == Submenu.None) {
-            await appWindow.setSize(new PhysicalSize(1000, window.innerHeight));
+            await appWindow.setSize(new PhysicalSize(1000, 600));
             setShownSubmenu(submenu);
         } else if (shownSubmenu == submenu) {
             setShownSubmenu(Submenu.None);
-            await appWindow.setSize(new PhysicalSize(60, window.innerHeight));
+            await appWindow.setSize(new PhysicalSize(60, 600));
         } else {
             setShownSubmenu(submenu);
         }
@@ -81,7 +123,7 @@ const OverfloatWindow: React.FC = () => {
     return (
         <div className="container-fluid p-0">
             <GlobalStyle />
-            <TitleBar />
+            <TitleBar updateRolledUp={updateRolledUp} />
             <div className="row m-0">
                 <div className="tray col-auto p-0">
                     <button

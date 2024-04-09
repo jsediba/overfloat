@@ -3,18 +3,22 @@ import "./css/TitleBar.css";
 import { invoke } from "@tauri-apps/api";
 import { PhysicalSize, appWindow } from "@tauri-apps/api/window";
 
+type TitleBarProps = {
+    updateRolledUp: (rolledUp: boolean) => void;
+}
 
-const TitleBar: React.FC = () => {
+const TitleBar: React.FC<TitleBarProps> = (props: TitleBarProps) => {
+    const updateRolledUp = props["updateRolledUp"];
 
     const [rolledUp, setRolledUp] = useState<boolean>(false);
 
     const rollUp = async () => {
-        await appWindow.setSize(new PhysicalSize(window.innerWidth, 20));
+        updateRolledUp(true);
         setRolledUp(true);
     };
 
     const rollDown = async () => {
-        await appWindow.setSize(new PhysicalSize(window.innerWidth, 600));
+        updateRolledUp(false);
         setRolledUp(false);
     };
 

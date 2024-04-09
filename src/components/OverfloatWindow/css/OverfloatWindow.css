@@ -61,3 +61,18 @@
     overflow-x: hidden;
     overflow-y: auto;
 }
+
+.detail::-webkit-scrollbar {
+    width: auto;
+}
+
+.detail::-webkit-scrollbar-track {
+    width: 10px;
+    background: rgb(75, 75, 75);
+}
+
+.detail::-webkit-scrollbar-thumb {
+    width: 10px;
+    background: rgb(50, 50, 50);
+    border-radius: 6px;
+}
