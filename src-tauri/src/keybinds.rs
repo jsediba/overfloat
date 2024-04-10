@@ -173,7 +173,7 @@ impl KeyboardState {
 
                 result_string = format!("{}{}", result_string, key_to_string(key));
                 handle.emit_to(
-                    "overfloat",
+                    "Overfloat",
                     "Overfloat://GlobalKeypress",
                     PayloadKeypress { key: result_string },
                 ).unwrap();

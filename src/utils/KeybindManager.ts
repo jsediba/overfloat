@@ -150,9 +150,6 @@ export class KeybindManager {
             ?.getWindowShortcuts(windowLabel)
             ?.get(id);
 
-
-        console.log("Shortcut is: "+shortcut);
-
         if (shortcut == undefined) return;
 
         const keybinds = [...shortcut.getBoundKeys()];

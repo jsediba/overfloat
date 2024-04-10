@@ -6,6 +6,7 @@ import {
 } from "@tauri-apps/api/window";
 import { SerializedShortcut, Shortcut } from "./Shortcut";
 import { KeybindManager } from "./KeybindManager";
+import { ModuleManager } from "./ModuleManager";
 
 const _LOCAL_URL = "http://localhost:1420/module/";
 
@@ -100,6 +101,7 @@ export class OverfloatModule {
         });
 
         webview.once("tauri://created", () => resolveCreated());
+        webview.once("tauri://close-requested", () => this.closeModule());
         webview.once("tauri://destroyed", () => resolveDestroyed());
 
         this.mainWindow = {
@@ -148,15 +150,13 @@ export class OverfloatModule {
         y: number = 0,
         height: number = 300,
         width: number = 500,
-        skipNotify: boolean = false
+        skipNotify: boolean = false,
     ): Promise<Window> {
-        let id: number;
-        if (this.subwindowsIds.has(componentName)) {
-            // @ts-expect-error
-            id = this.subwindowsIds.get(componentName) + 1;
-        } else {
-            id = 0;
-        }
+
+
+        let id: number | undefined = this.subwindowsIds.get(componentName);
+        if (id == undefined) id = 0;
+        else id = id + 1;
 
         let paramsString: string = "";
 
@@ -192,6 +192,9 @@ export class OverfloatModule {
         });
 
         webview.once("tauri://created", () => resolveCreated());
+        webview.once("tauri://close-requested", () =>
+            this.closeSubwindow(webview.label, true)
+        );
         webview.once("tauri://destroyed", () => {
             this.notifySubscribers();
             resolveDestroyed();
@@ -286,6 +289,7 @@ export class OverfloatModule {
         promises.push(this.mainWindow.destroyedPromise);
         this.mainWindow.webview.emit("Overfloat://Close");
         await Promise.all(promises).then();
+        ModuleManager.getInstance().deactivateModule(this.moduleName);
         if (!skipNotify) this.notifySubscribers();
     }
 

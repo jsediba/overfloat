@@ -36,7 +36,7 @@ const TraySubwindows: React.FC<TraySubwindowsProps> = (
         return null;
     } else {
         return (
-            <div>
+            <div className="m-0">
                 <button
                     className={
                         subwindowsVisible

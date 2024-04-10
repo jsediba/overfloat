@@ -67,7 +67,6 @@ export class ModuleManager {
                 promises.push(subwindow.destroyedPromise);
             });
             this.closeModule(moduleName, true);
-            this.activeModules.delete(moduleName);
         });
 
         await Promise.all(promises).then(() => {});
@@ -77,7 +76,9 @@ export class ModuleManager {
     }
 
     async loadProfile(profileName: string) {
-        if (!(profileName in this.profiles)) return;
+        if (!(profileName in this.profiles)) {
+            console.log("LOAD PROFILE DONE");
+            return};
 
         await this.closeAllModules();
 
@@ -176,7 +177,6 @@ export class ModuleManager {
 
     public closeModule(moduleName: string, skipNotify: boolean = false) {
         this.activeModules.get(moduleName)?.closeModule(true);
-        this.activeModules.delete(moduleName);
         if (!skipNotify) {
             this.notifySubscribers();
         }
@@ -216,6 +216,11 @@ export class ModuleManager {
 
     public getProfiles():string[]{
         return Object.keys(this.profiles);
+    }
+
+    public deactivateModule(moduleName:string){
+        this.activeModules.delete(moduleName);
+        this.notifySubscribers();
     }
 }
 
