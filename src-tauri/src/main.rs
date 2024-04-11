@@ -1,20 +1,115 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use mki;
 use rdev;
-use std::{
-    fs::{self, File},
-    io::Write,
-    path, string,
-};
+use std::{fs, io::{Seek, SeekFrom, Write}, path, string};
 use tauri::{
-    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem, SystemTrayMenuItemHandle,
+    CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+    SystemTrayMenuItemHandle,
 };
 
 mod fswatch;
 mod inputsim;
 mod keybinds;
+
+#[derive(Clone, serde::Serialize)]
+struct FSResult {
+    successful: bool,
+    path: String,
+    message: String,
+}
+
+#[tauri::command]
+fn read_file(path_str: String, use_relative_path: bool, module_name: String) -> FSResult {
+    let final_path_str: String;
+    if use_relative_path {
+        final_path_str = format!("../overfloat_modules/{}/{}", module_name, path_str);
+    } else {
+        final_path_str = path_str;
+    }
+
+    let path = std::path::Path::new(&final_path_str);
+    let message: String;
+    let successful: bool;
+
+    match fs::read_to_string(path) {
+        Ok(content) => {
+            successful = true;
+            message = content;
+        }
+        Err(error) => {
+            successful = false;
+            message = error.to_string();
+        }
+    }
+
+    return FSResult {
+        successful: successful,
+        path: final_path_str,
+        message: message,
+    };
+}
+
+#[tauri::command]
+fn write_file(
+    content: String,
+    path_str: String,
+    append_mode: bool,
+    use_relative_path: bool,
+    module_name: String,
+) -> FSResult {
+    let final_path_str: String;
+    if use_relative_path {
+        final_path_str = format!("../overfloat_modules/{}/{}", module_name, path_str);
+    } else {
+        final_path_str = path_str;
+    }
+
+    let path = std::path::Path::new(&final_path_str);
+
+    if let Some(parent) = path.parent() {
+        if let Err(error) = std::fs::create_dir_all(parent) {
+            return FSResult {
+                successful: false,
+                path: final_path_str,
+                message: error.to_string()
+            };
+        }
+    }
+
+    let message: String;
+    let successful: bool;
+
+    match fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(!append_mode)
+        .open(&final_path_str)
+    {
+        Ok(mut file) => {
+            let _ = file.seek(SeekFrom::End(0));
+            match file.write_all(content.as_bytes()) {
+            Ok(_) => {
+                message = String::new();
+                successful = true;
+            }
+            Err(error) => {
+                message = error.to_string();
+                successful = false;
+            }
+        }},
+        Err(error) => {
+            message = error.to_string();
+            successful = false;
+        }
+    };
+
+    return FSResult {
+        successful: successful,
+        path: final_path_str,
+        message: message,
+    };
+}
 
 #[tauri::command]
 fn get_module_names() -> Vec<string::String> {
@@ -37,17 +132,19 @@ fn get_module_names() -> Vec<string::String> {
 }
 
 #[tauri::command]
-fn hide_app(handle: tauri::AppHandle){
+fn hide_app(handle: tauri::AppHandle) {
     let tray_item_handle: SystemTrayMenuItemHandle = handle.tray_handle().get_item("Overfloat");
     let _ = tray_item_handle.set_title("Overfloat");
-    match handle.get_window("Overfloat"){
-        Some(window) => {let _ = window.hide();}
+    match handle.get_window("Overfloat") {
+        Some(window) => {
+            let _ = window.hide();
+        }
         None => {}
     }
 }
 
 #[tauri::command]
-fn quit_app(handle: tauri::AppHandle){
+fn quit_app(handle: tauri::AppHandle) {
     handle.exit(0);
 }
 
@@ -68,7 +165,7 @@ fn get_config() -> String {
 fn save_config(config_json: String) {
     if let Some(parent) = std::path::Path::new("../config/config.json").parent() {
         if let Err(err) = std::fs::create_dir_all(parent) {
-            panic!("Error while creating directories for config file: {}", err);
+            println!("Error while creating directories for config file: {}", err);
         }
     }
 
@@ -103,7 +200,7 @@ fn get_profiles() -> String {
 fn save_profiles(profiles_json: String) {
     if let Some(parent) = std::path::Path::new("../config/profiles.json").parent() {
         if let Err(err) = std::fs::create_dir_all(parent) {
-            panic!("Error while creating directories for profile file: {}", err);
+            println!("Error while creating directories for profile file: {}", err);
         }
     }
 
@@ -125,11 +222,27 @@ fn save_profiles(profiles_json: String) {
 async fn watch_path(handle: tauri::AppHandle, path: String, window_label: String, id: String) {
     println!("label: {:?}", window_label);
     println! {"id: {:?}", id};
-    tauri::async_runtime::spawn(async move {
+
+    let window_label_clone = window_label.clone();
+    let id_clone = id.clone();
+
+    
+    println!("Before removing");
+    fswatch::remove_watched_path(&window_label_clone, &id_clone);
+    println!("After removing");
+    
+
+    let process = tauri::async_runtime::spawn(async move {
         if let Err(e) = fswatch::async_watch(handle, path, window_label, id).await {
             println!("error: {:?}", e)
         }
     });
+
+    
+    println!("Before adding");
+    fswatch::add_watched_path(&window_label_clone, &id_clone, process);
+    println!("After adding");
+    
 }
 
 #[tauri::command]
@@ -253,6 +366,8 @@ fn main() {
             save_config,
             hide_app,
             quit_app,
+            read_file,
+            write_file
         ])
         .device_event_filter(tauri::DeviceEventFilter::Always)
         .run(tauri::generate_context!())

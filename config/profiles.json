@@ -1,166 +1,38 @@
 {
-	"TestProfile": [
+	"FSTester": [
 		{
-			"moduleName": "test_module",
+			"moduleName": "FS_Tester",
 			"mainWindow": {
-				"title": "test_module",
+				"title": "FS_Tester",
 				"isVisible": true,
-				"x": 111,
-				"y": 41,
-				"height": 300,
-				"width": 500,
-				"shortcuts": [
-					{
-						"id": "module/test_module/test",
-						"keybinds": [
-							"ShiftLeft+A",
-							"B"
-						]
-					},
-					{
-						"id": "module/test_module/test_input",
-						"keybinds": [
-							"ShiftLeft+B"
-						]
-					}
-				]
-			},
-			"subwindows": []
-		},
-		{
-			"moduleName": "central",
-			"mainWindow": {
-				"title": "central",
-				"isVisible": true,
-				"x": 110,
-				"y": 387,
+				"x": 0,
+				"y": 468,
 				"height": 300,
 				"width": 500,
 				"shortcuts": []
 			},
 			"subwindows": [
 				{
-					"title": "Counter A",
+					"title": "Read Tester",
 					"isVisible": true,
-					"x": 1211,
-					"y": 705,
+					"x": 500,
+					"y": 0,
 					"height": 300,
 					"width": 500,
-					"shortcuts": [
-						{
-							"id": "module/central/counter/0/count_up",
-							"keybinds": [
-								"A"
-							]
-						}
-					],
-					"params": {
-						"keybind": "A"
-					},
-					"componentName": "counter"
-				}
-			]
-		}
-	],
-	"XD": [
-		{
-			"moduleName": "test_module",
-			"mainWindow": {
-				"title": "test_module",
-				"isVisible": true,
-				"x": 111,
-				"y": 41,
-				"height": 300,
-				"width": 500,
-				"shortcuts": [
-					{
-						"id": "module/test_module/test",
-						"keybinds": [
-							"ShiftLeft+A",
-							"B"
-						]
-					},
-					{
-						"id": "module/test_module/test_input",
-						"keybinds": [
-							"ShiftLeft+B"
-						]
-					}
-				]
-			},
-			"subwindows": []
-		},
-		{
-			"moduleName": "central",
-			"mainWindow": {
-				"title": "central",
-				"isVisible": true,
-				"x": 110,
-				"y": 387,
-				"height": 300,
-				"width": 500,
-				"shortcuts": []
-			},
-			"subwindows": [
-				{
-					"title": "Counter A",
-					"isVisible": true,
-					"x": 1211,
-					"y": 705,
-					"height": 300,
-					"width": 500,
-					"shortcuts": [
-						{
-							"id": "module/central/counter/0/count_up",
-							"keybinds": [
-								"A"
-							]
-						}
-					],
-					"params": {
-						"keybind": "A"
-					},
-					"componentName": "counter"
+					"shortcuts": [],
+					"params": {},
+					"componentName": "ReadTester"
 				},
 				{
-					"title": "Counter S",
-					"isVisible": true,
-					"x": 860,
-					"y": 300,
-					"height": 300,
-					"width": 500,
-					"shortcuts": [
-						{
-							"id": "module/central/counter/1/count_up",
-							"keybinds": [
-								"S"
-							]
-						}
-					],
-					"params": {
-						"keybind": "S"
-					},
-					"componentName": "counter"
-				},
-				{
-					"title": "Counter F",
+					"title": "Write Tester",
 					"isVisible": true,
 					"x": 0,
 					"y": 0,
 					"height": 300,
 					"width": 500,
-					"shortcuts": [
-						{
-							"id": "module/central/counter/3/count_up",
-							"keybinds": [
-								"F"
-							]
-						}
-					],
-					"params": {
-						"keybind": "F"
-					},
-					"componentName": "counter"
+					"shortcuts": [],
+					"params": {},
+					"componentName": "WriteTester"
 				}
 			]
 		}

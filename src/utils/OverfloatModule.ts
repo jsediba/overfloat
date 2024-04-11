@@ -20,6 +20,7 @@ export type Window = {
     visible: boolean;
     createdPromise: Promise<void>;
     destroyedPromise: Promise<void>;
+    savedKeybinds: Map<string, string[]>;
     params?: NameValuePairs;
     componentName?: string;
 };
@@ -71,9 +72,10 @@ export class OverfloatModule {
         x: number = 0,
         y: number = 0,
         height: number = 300,
-        width: number = 500
+        width: number = 500,
+        savedShortcuts: SerializedShortcut[] = []
     ) {
-        this.moduleName = moduleName;
+        this.moduleName = moduleName
 
         const windowLabel: string = "module/" + this.moduleName;
         const windowUrl: string = _LOCAL_URL + this.moduleName;
@@ -104,12 +106,15 @@ export class OverfloatModule {
         webview.once("tauri://close-requested", () => this.closeModule());
         webview.once("tauri://destroyed", () => resolveDestroyed());
 
+        const savedKeybinds = this.setupSavedKeybinds(savedShortcuts);
+
         this.mainWindow = {
             webview: webview,
             visible: visible,
             shortcuts: new Map<string, Shortcut>(),
             createdPromise: createdPromise,
             destroyedPromise: destortedPromise,
+            savedKeybinds: savedKeybinds,
         };
 
         this.subscribers = new Set<Function>();
@@ -151,6 +156,7 @@ export class OverfloatModule {
         height: number = 300,
         width: number = 500,
         skipNotify: boolean = false,
+        savedKeybinds: Map<string, string[]> = new Map<string, string[]>()
     ): Promise<Window> {
 
 
@@ -208,6 +214,7 @@ export class OverfloatModule {
             destroyedPromise: destoryedPromise,
             params: params,
             componentName: componentName,
+            savedKeybinds: savedKeybinds,
         };
 
         this.subwindows.set(windowLabel, window);
@@ -309,6 +316,10 @@ export class OverfloatModule {
         return windowLabel == "module/" + this.moduleName;
     }
 
+    private getShortcutIdSuffix(id: string): string {
+        return id.replace(/.*\/([^/]*)/g, "$1");
+    }
+
     public addShortcut(
         windowLabel: string,
         id: string,
@@ -317,6 +328,23 @@ export class OverfloatModule {
         boundKeys: string[] = [],
         skipNotify: boolean = false
     ): Shortcut | undefined {
+
+        let window: Window | undefined;
+        if (this.isMainWindowLabel(windowLabel)) window = this.mainWindow;
+        else window = this.subwindows.get(windowLabel);
+
+        if (window == undefined) return;
+
+        console.log("Shortcut ID: " + id);
+        console.log("Shortcut ID suffix: " + this.getShortcutIdSuffix(id));
+        console.log(window.savedKeybinds);
+
+
+        const savedKeybinds: string[] | undefined = window.savedKeybinds.get(this.getShortcutIdSuffix(id));
+        if (savedKeybinds) boundKeys = savedKeybinds;
+
+        console.log("BoundKeys: " + boundKeys);
+
         const shortcut: Shortcut = new Shortcut(
             name,
             windowLabel,
@@ -476,6 +504,7 @@ export class OverfloatModule {
         };
     }
 
+    /*
     async setupShortcuts(
         window: Window,
         serializedShortcuts: SerializedShortcut[]
@@ -499,16 +528,23 @@ export class OverfloatModule {
             });
         });
     }
+    */
+
+    private setupSavedKeybinds(serializedShortcuts: SerializedShortcut[]): Map<string, string[]> {
+        const savedKeybinds = new Map<string, string[]>();
+        serializedShortcuts.forEach((serializedShortcut) => {
+            savedKeybinds.set(serializedShortcut.id, serializedShortcut.keybinds);
+        })
+
+        return savedKeybinds;
+    }
+
 
     public loadModule(serializedModule: SerializedModule): Promise<Window>[] {
-        this.setupShortcuts(
-            this.mainWindow,
-            serializedModule.mainWindow.shortcuts
-        );
-
         const promises: Promise<Window>[] = [];
 
         serializedModule.subwindows.forEach((serializedSubwindow) => {
+            const savedKeybinds = this.setupSavedKeybinds(serializedSubwindow.shortcuts);
             const window = this.openSubwindow(
                 serializedSubwindow.componentName
                     ? serializedSubwindow.componentName
@@ -519,14 +555,12 @@ export class OverfloatModule {
                 serializedSubwindow.x,
                 serializedSubwindow.y,
                 serializedSubwindow.height,
-                serializedSubwindow.width
+                serializedSubwindow.width,
+                false,
+                savedKeybinds
             );
 
             if (serializedSubwindow.isVisible) promises.push(window);
-
-            window.then((window) =>
-                this.setupShortcuts(window, serializedSubwindow.shortcuts)
-            );
         });
 
         return promises;

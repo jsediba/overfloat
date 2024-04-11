@@ -40,8 +40,17 @@ export class Shortcut {
         keybind: string
     ): string | undefined {
         if (position < 0 || position >= this.boundKeys.length) return undefined;
+
         const tmp: string = this.boundKeys[position];
-        this.boundKeys[position] = keybind;
+
+        if(this.boundKeys.includes(keybind)){
+            this.boundKeys.splice(position, 1);
+        } else {
+            this.boundKeys[position] = keybind;
+        }
+
+        console.log(this.boundKeys);
+
         return tmp;
     }
 
@@ -69,7 +78,12 @@ export class Shortcut {
         this.boundKeys = [];
     }
 
+    private getShortcutIdSuffix(id: string): string{
+        return id.replace(/.*\/([^/]*)/g, "$1");
+    }
+
+
     public serializeShortcut(): SerializedShortcut{
-        return {id: this.id, keybinds: this.boundKeys};
+        return {id: this.getShortcutIdSuffix(this.id), keybinds: this.boundKeys};
     }
 }

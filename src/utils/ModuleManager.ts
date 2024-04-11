@@ -1,5 +1,6 @@
 import { OverfloatModule, SerializedModule, Window } from "./OverfloatModule";
 import { invoke } from "@tauri-apps/api";
+import { SerializedShortcut } from "./Shortcut";
 
 export class ModuleManager {
     private static instance: ModuleManager;
@@ -13,14 +14,15 @@ export class ModuleManager {
 
     private constructor() {
         this.subscribers = new Set<Function>();
-        this.setupModules();
         this.initialLoad();
     }
 
     async initialLoad() {
+        await this.setupModules();
         await this.loadProfiles();
         await this.loadConfig();
         this.loadProfile(this.config["activeProfile"]);
+        this.notifySubscribers();
     }
 
     async loadConfig() {
@@ -29,6 +31,7 @@ export class ModuleManager {
             this.config = JSON.parse(configString);
         } catch {
             this.config = { activeProfile: "" };
+            this.saveConfig();
         }
     }
 
@@ -50,6 +53,7 @@ export class ModuleManager {
             this.profiles = JSON.parse(profilesString);
         } catch (_) {
             this.profiles = {};
+            this.saveProfiles();
         }
     }
 
@@ -69,16 +73,17 @@ export class ModuleManager {
             this.closeModule(moduleName, true);
         });
 
-        await Promise.all(promises).then(() => {});
+        await Promise.all(promises).then(() => { });
         if (!skipNotify) {
             this.notifySubscribers();
         }
     }
 
+
     async loadProfile(profileName: string) {
         if (!(profileName in this.profiles)) {
-            console.log("LOAD PROFILE DONE");
-            return};
+            return
+        };
 
         await this.closeAllModules();
 
@@ -87,6 +92,7 @@ export class ModuleManager {
         const promises: Promise<Window>[] = [];
 
         profile.forEach((serializedModule) => {
+            if(!this.allModules.includes(serializedModule.moduleName)) return;
             const module = this.startModule(
                 serializedModule.moduleName,
                 serializedModule.mainWindow.title,
@@ -95,13 +101,14 @@ export class ModuleManager {
                 serializedModule.mainWindow.y,
                 serializedModule.mainWindow.height,
                 serializedModule.mainWindow.width,
-                true
+                true,
+                serializedModule.mainWindow.shortcuts
             );
 
 
-            if(serializedModule.mainWindow.isVisible) {
-                const promise: Promise<Window> = new Promise<Window>(resolve => {resolve(module.getMainWindow())});
-                promises.push(promise); 
+            if (serializedModule.mainWindow.isVisible) {
+                const promise: Promise<Window> = new Promise<Window>(resolve => { resolve(module.getMainWindow()) });
+                promises.push(promise);
             }
             promises.push(...module.loadModule(serializedModule));
         });
@@ -110,7 +117,7 @@ export class ModuleManager {
         this.saveConfig();
 
         Promise.all(promises).then((windows: Window[]) => {
-            windows.forEach((window) => {window.webview.show(); window.visible = true});
+            windows.forEach((window) => { window.webview.show(); window.visible = true });
             this.activeModules.forEach((module) => module.notifySubscribers())
             this.notifySubscribers();
         });
@@ -140,8 +147,8 @@ export class ModuleManager {
 
     private async setupModules() {
         let module_names: string[] = await invoke("get_module_names");
+        this.activeModules = new Map<string, OverfloatModule>();
         this.allModules = module_names;
-        this.notifySubscribers();
     }
 
     public startModule(
@@ -152,11 +159,12 @@ export class ModuleManager {
         y: number = 0,
         height: number = 300,
         width: number = 500,
-        skipNotify: boolean = false
+        skipNotify: boolean = false,
+        savedShortcuts: SerializedShortcut[] = []
     ): OverfloatModule {
 
         const activeModule = this.activeModules.get(moduleName);
-        if(activeModule != undefined) return activeModule;
+        if (activeModule != undefined) return activeModule;
 
 
         const module = new OverfloatModule(
@@ -166,7 +174,8 @@ export class ModuleManager {
             x,
             y,
             height,
-            width
+            width,
+            savedShortcuts
         );
         this.activeModules.set(moduleName, module);
         if (!skipNotify) {
@@ -214,14 +223,43 @@ export class ModuleManager {
         this.saveProfiles();
     }
 
-    public getProfiles():string[]{
+    public async deleteProfile(profileName: string) {
+        console.log(profileName);
+        console.log(this.profiles);
+        if (!(profileName in this.profiles)) return;
+        delete this.profiles[profileName]
+        if (profileName == this.getActiveProfile()) {
+            this.setActiveProfile("");
+        }
+        await this.saveProfiles();
+        await this.saveConfig();
+        this.notifySubscribers();
+    }
+
+    public async addProfile(profileName: string){
+        if(profileName == "") return;
+        await this.saveProfile(profileName);
+        this.notifySubscribers();
+    }
+
+    public getProfiles(): string[] {
         return Object.keys(this.profiles);
     }
 
-    public deactivateModule(moduleName:string){
+    public getActiveProfile(): string {
+        return this.config["activeProfile"];
+    }
+
+    public setActiveProfile(profileName: string) {
+        this.config["activeProfile"] = profileName;
+    }
+
+    public deactivateModule(moduleName: string) {
         this.activeModules.delete(moduleName);
         this.notifySubscribers();
     }
+
+
 }
 
 type SerializedProfiles = {

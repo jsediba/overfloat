@@ -62,11 +62,11 @@ export class KeybindManager {
         if (shortcut == undefined) return;
 
         // Remove duplicates
-        defaultKeybinds = defaultKeybinds?.filter(
+        const boundKeys = shortcut.getBoundKeys().filter(
             (value, index, self) => self.indexOf(value) === index
         );
 
-        defaultKeybinds?.forEach((keybind) => {
+        boundKeys.forEach((keybind) => {
             if (!this.keybinds.has(keybind)) {
                 this.keybinds.set(keybind, new Set<Shortcut>());
             }
@@ -209,6 +209,8 @@ export class KeybindManager {
 
         if (shortcut == undefined) return;
 
+        const alreadyBound = keybind in shortcut.getBoundKeys();
+
         const removedKey: string | undefined = shortcut.changeKeybind(
             position,
             keybind
@@ -217,7 +219,15 @@ export class KeybindManager {
         if (removedKey == undefined) return;
 
         this.keybinds.get(removedKey)?.delete(shortcut);
-        this.keybinds.get(keybind)?.add(shortcut);
+
+        if (!alreadyBound) {
+
+            if (!this.keybinds.has(keybind))
+                this.keybinds.set(keybind, new Set<Shortcut>());
+
+
+            this.keybinds.get(keybind)?.add(shortcut);
+        }
 
         if (!skipNotify) {
             this.notifySubscribers();

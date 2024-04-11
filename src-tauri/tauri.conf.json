@@ -26,9 +26,6 @@
       "dialog": {
         "all": true
       },
-      "fs": {
-        "all": true
-      },
       "clipboard": {
         "all": true
       }

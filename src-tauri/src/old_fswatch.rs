@@ -4,11 +4,6 @@ use tauri::{self, Manager};
 use notify::{RecursiveMode, Watcher};
 use notify_debouncer_full::new_debouncer;
 
-use futures::{
-    channel::mpsc::{channel, Receiver},
-    SinkExt, StreamExt,
-};
-
 use lazy_static::lazy_static;
 use std::sync::Mutex;
 
@@ -31,13 +26,13 @@ impl WatchedPaths {
         }
     }
 
-    fn remove_watched_path(&mut self, window_label: &String, id: &String){
+    fn remove_watched_path(&mut self, window_label: &String, id: &String) {
         match self.watched_paths.get_mut(window_label) {
             Some(map) => match map.get(id) {
                 Some(process) => {
                     println!("Killing process for {}: {}", window_label, id);
                     println!("{:?}", process);
-                    process.abort();
+
                     map.remove(id);
                 }
                 None => {}
@@ -85,15 +80,37 @@ struct PayloadFileChange {
 }
 
 pub async fn async_watch(
-    handle: tauri::AppHandle,
+    _handle: tauri::AppHandle,
     path_str: String,
-    window_label: String,
-    id: String,
+    _window_label: String,
+    _id: String,
 ) -> notify::Result<()> {
-    let (mut watcher, mut rx) = create_async_watcher()?;
+    //let (mut watcher, mut rx) = create_async_watcher()?;
 
     let path = std::path::Path::new(&path_str);
 
+    // setup debouncer
+    let (tx, rx) = std::sync::mpsc::channel();
+
+    // no specific tickrate, max debounce time 2 seconds
+    let mut debouncer = new_debouncer(std::time::Duration::from_secs(1), None, tx)?;
+
+    debouncer
+        .watcher()
+        .watch(path, RecursiveMode::Recursive)
+        .unwrap();
+    debouncer.cache().add_root(path, RecursiveMode::Recursive);
+
+    // print all events and errors
+    for result in rx {
+        match result {
+            Ok(events) => events.iter().for_each(|event| println!("{event:?}")),
+            Err(errors) => errors.iter().for_each(|error| println!("{error:?}")),
+        }
+        println!();
+    }
+
+    /*
     watcher.watch(path, notify::RecursiveMode::Recursive)?;
 
     while let Some(res) = rx.next().await {
@@ -109,15 +126,15 @@ pub async fn async_watch(
                     },
                 );
             }
-            Err(e) => {
-                println!("{:?}", e)
-            }
+            Err(e) => {println!("{:?}", e)}
         }
     }
+    */
 
     Ok(())
 }
 
+/*
 fn create_async_watcher() -> notify::Result<(
     notify::RecommendedWatcher,
     Receiver<notify::Result<notify::Event>>,
@@ -134,7 +151,7 @@ fn create_async_watcher() -> notify::Result<(
         },
         notify::Config::default(),
     )?;
-    
 
     Ok((watcher, rx))
 }
+*/

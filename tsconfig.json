@@ -20,6 +20,6 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src", "src/.tsx", "overfloat_modules", "overfloat_modules/.tsx"],
+  "include": ["src", "src/.tsx", "overfloat_modules", "overfloat_modules/*.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

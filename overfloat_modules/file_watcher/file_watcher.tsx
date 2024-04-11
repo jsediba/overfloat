@@ -4,10 +4,12 @@ import { appWindow } from '@tauri-apps/api/window';
 import { open } from '@tauri-apps/api/dialog';
 import { invoke } from '@tauri-apps/api';
 import { listen } from '@tauri-apps/api/event';
+import { TitleBar } from '../../src/services/TitleBar';
+import { watchPath } from '../../src/services/api';
 
 const FileWatcher = () => {
     useEffect(() => {
-        appWindow.show() ;
+        appWindow.show();
         const unlisten = listen('overfloat://FileChange', (event) => handle_file_change(event));
 
         return () => {
@@ -22,29 +24,32 @@ const FileWatcher = () => {
         const selected_file = await open({
             directory: true,
             multiple: false,
-            title: "Select a file to monitor."
+            title: "Select a folder to monitor."
         })
-        if(selected_file == null || Array.isArray(selected_file)) return;
+        if (selected_file == null || Array.isArray(selected_file)) return;
         setPath(selected_file);
-        invoke('watch_file', {path: selected_file});
+        watchPath("test", selected_file, ()=>{});
     }
 
-    const handle_file_change = (event:any) => {
-        if(event.payload.path == pathRef.current){
-            setInfo("File changed at: " + new Date().toLocaleTimeString());
+    const handle_file_change = (event: any) => {
+        if (event.payload.path == pathRef.current) {
+            setInfo("Folder changed at: " + new Date().toLocaleTimeString());
         }
     }
 
     return (
-        <div className='container'>
-            <div className="row">
-                <div className="col">Watching file: {path}</div>
-            </div>
-            <div className="row">
-                <button onClick={set_file}>Select File</button>
-            </div>
-            <div className="row">
-                <div className="col">{info}</div>
+        <div>
+            <TitleBar />
+            <div className='container'>
+                <div className="row">
+                    <div className="col">Watching Folder: {path}</div>
+                </div>
+                <div className="row">
+                    <button onClick={set_file}>Select Folder</button>
+                </div>
+                <div className="row">
+                    <div className="col">{info}</div>
+                </div>
             </div>
         </div>
     )

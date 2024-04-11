@@ -10,13 +10,12 @@ const Counter = (): React.JSX.Element => {
         ShortcutManager.addShortcut(
             "count_up",
             "Increment Counter",
-            "Increments the counter",
+            "Increments the counter displayed in this subwindow.",
             handle_keypress,
             [keybind]
         );
 
         return () => {
-            ShortcutManager.removeShortcut("count_up");
         };
     }, []);
 
@@ -31,12 +30,12 @@ const Counter = (): React.JSX.Element => {
     return (
         <div>
             <TitleBar />
-            <div className="container">
+            <div className="container text-center">
                 <div className="row">
-                    <div className="col">Counting presses of [{keybind}]</div>
+                    <div className="col h2">Counting:</div>
                 </div>
                 <div className="row">
-                    <div className="col">{counter}</div>
+                    <div className="col h2">{counter}</div>
                 </div>
             </div>
         </div>

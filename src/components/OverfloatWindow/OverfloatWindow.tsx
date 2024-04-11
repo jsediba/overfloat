@@ -7,7 +7,7 @@ import { KeybindManager } from "../../utils/KeybindManager";
 import { KeybindEventHandler } from "../../utils/KeybindEventHandler";
 import "./css/OverfloatWindow.css";
 import { PhysicalSize, appWindow } from "@tauri-apps/api/window";
-import TitleBar from "./TitleBar";
+import OverfloatTitleBar from "./OverfloatTitleBar";
 import { createGlobalStyle } from "styled-components";
 import TrayModule from "../Tray/TrayModule";
 import ModuleSettings from "../Modules/ModuleSettings";
@@ -98,7 +98,7 @@ const OverfloatWindow: React.FC = () => {
     return (
         <div className="container-fluid p-0">
             <GlobalStyle />
-            <TitleBar />
+            <OverfloatTitleBar />
             <div className="row m-0">
                 <div className="tray col-auto p-0">
                     <button

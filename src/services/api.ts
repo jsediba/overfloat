@@ -197,9 +197,29 @@ export function watchPath(id: string, path: string, callback: () => void) {
 }
 
 export async function clipboardRead() {
-    return readText();
+    const content = await readText();
+    return content == null ? "" : content;
 }
 
 export async function clipboardWrite(text: string) {
     return writeText(text);
+}
+
+function getModuleName(): string {
+    const moduleName = appWindow.label.replace(/module\/([^/]*)(\/.*)?/g, "$1");
+    return moduleName;
+}
+
+export type FSResult = {
+    successful: boolean;
+    path: string;
+    message: string;
+}
+
+export async function write_file(content: string, path: string, useRelativePath: boolean, appendMode: boolean): Promise<FSResult> {
+    return await invoke<FSResult>("write_file", {content: content, pathStr: path, appendMode: appendMode, useRelativePath: useRelativePath, moduleName: getModuleName()});
+}
+
+export async function read_file(path: string, useRelativePath: boolean): Promise<FSResult>{
+    return await invoke<FSResult>("read_file", {pathStr: path, useRelativePath: useRelativePath, moduleName: getModuleName()});
 }

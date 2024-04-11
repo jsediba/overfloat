@@ -38,13 +38,16 @@ const ModuleSettings: React.FC = () => {
 
     return (
         <div className="container-fluid">
-            <h2>Module Settings</h2>
+            <h2>Profile Settings</h2>
             <ProfileSettings />
-            <h2>Active Modules</h2>
+            <hr />
+            <h2>Module Settings</h2>
+            <h3>Active Modules</h3>
             {Array.from(activeModules).map(([moduleName, module]) => (
                 <ActiveModuleDisplay key={moduleName} module={module} />
             ))}
-            <h2>Inactive Modules</h2>
+            <hr />
+            <h3>Inactive Modules</h3>
             {inactiveModules.map((moduleName) => (
                 <InactiveModuleDisplay
                     key={moduleName}

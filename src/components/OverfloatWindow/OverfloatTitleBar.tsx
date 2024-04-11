@@ -4,7 +4,7 @@ import { invoke } from "@tauri-apps/api";
 import { PhysicalSize, appWindow } from "@tauri-apps/api/window";
 
 
-const TitleBar: React.FC = () => {
+const OverfloatTitleBar: React.FC = () => {
 
     const [rolledUp, setRolledUp] = useState<boolean>(false);
 
@@ -61,4 +61,4 @@ const TitleBar: React.FC = () => {
     );
 };
 
-export default TitleBar;
+export default OverfloatTitleBar;

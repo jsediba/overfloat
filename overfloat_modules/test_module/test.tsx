@@ -33,11 +33,6 @@ const TestComponent = () => {
             ["ShiftLeft+B"]
         );
 
-        watchPath(
-            "Testing",
-            "C:\\Users\\Urcier\\linuxstuff\\bp\\test",
-            () => {}
-        );
     }, []);
 
     const testSimulation = () => {
