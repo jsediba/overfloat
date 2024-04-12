@@ -36,5 +36,71 @@
 				}
 			]
 		}
+	],
+	"FSWatchTester": [
+		{
+			"moduleName": "FS_Tester",
+			"mainWindow": {
+				"title": "FS_Tester",
+				"isVisible": false,
+				"x": 290,
+				"y": 431,
+				"height": 300,
+				"width": 500,
+				"shortcuts": []
+			},
+			"subwindows": [
+				{
+					"title": "Read Tester",
+					"isVisible": true,
+					"x": 500,
+					"y": 0,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [],
+					"params": {},
+					"componentName": "ReadTester"
+				},
+				{
+					"title": "Write Tester",
+					"isVisible": true,
+					"x": 0,
+					"y": 0,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [],
+					"params": {},
+					"componentName": "WriteTester"
+				}
+			]
+		},
+		{
+			"moduleName": "FSWatch_Tester",
+			"mainWindow": {
+				"title": "FSWatch_Tester",
+				"isVisible": true,
+				"x": 0,
+				"y": 300,
+				"height": 300,
+				"width": 500,
+				"shortcuts": []
+			},
+			"subwindows": []
+		}
+	],
+	"SimTester": [
+		{
+			"moduleName": "InputSim_Tester",
+			"mainWindow": {
+				"title": "InputSim_Tester",
+				"isVisible": true,
+				"x": 232,
+				"y": 49,
+				"height": 580,
+				"width": 878,
+				"shortcuts": []
+			},
+			"subwindows": []
+		}
 	]
 }

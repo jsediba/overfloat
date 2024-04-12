@@ -4,6 +4,7 @@ import { invoke } from "@tauri-apps/api";
 import { readText, writeText } from "@tauri-apps/api/clipboard";
 import { WindowEventType } from "../utils/WindowEventHandler";
 import { NameValuePairs } from "../utils/OverfloatModule";
+import { OverfloatEvent } from "../utils/WindowEventHandler";
 
 function mainWindow() {
     return WebviewWindow.getByLabel("Overfloat");
@@ -79,7 +80,6 @@ class _ShortcutManager {
     private listeners: Map<string, Promise<UnlistenFn>>;
 
     private constructor() {
-        console.log("Creating new ShortcutManager");
         this.listeners = new Map<string, Promise<UnlistenFn>>();
 
         once("Overfloat://Close", () => {
@@ -151,7 +151,9 @@ class _ShortcutManager {
     }
 
     public removeAllShortcuts() {
-        this.listeners.forEach((_, shortcut_id) => {
+        const listeners = new Map<string, Promise<UnlistenFn>>(this.listeners);
+
+        listeners.forEach((_, shortcut_id) => {
             this.removeShortcut(shortcut_id.substring(_SHORTCUT_PREFIX.length));
         });
     }
@@ -188,14 +190,6 @@ class _ShortcutManager {
 
 export const ShortcutManager = Object.freeze(_ShortcutManager.getInstance());
 
-export function watchPath(id: string, path: string, callback: () => void) {
-    invoke("watch_path", { path: path, windowLabel: appWindow.label, id: id });
-    listen("Overfloat://FSEvent/" + id, (event) => {
-        console.log(event);
-        callback();
-    });
-}
-
 export async function clipboardRead() {
     const content = await readText();
     return content == null ? "" : content;
@@ -210,16 +204,115 @@ function getModuleName(): string {
     return moduleName;
 }
 
+export async function writeFile(content: string, path: string, useRelativePath: boolean, appendMode: boolean): Promise<FSResult> {
+    return await invoke<FSResult>("write_file", { content: content, pathStr: path, appendMode: appendMode, useRelativePath: useRelativePath, moduleName: getModuleName() });
+}
+
+export async function readFile(path: string, useRelativePath: boolean): Promise<FSResult> {
+    return await invoke<FSResult>("read_file", { pathStr: path, useRelativePath: useRelativePath, moduleName: getModuleName() });
+}
+
 export type FSResult = {
     successful: boolean;
     path: string;
     message: string;
 }
 
-export async function write_file(content: string, path: string, useRelativePath: boolean, appendMode: boolean): Promise<FSResult> {
-    return await invoke<FSResult>("write_file", {content: content, pathStr: path, appendMode: appendMode, useRelativePath: useRelativePath, moduleName: getModuleName()});
+export enum FSEventKind {
+    Create,
+    Remove,
+    Modify,
+    Rename
 }
 
-export async function read_file(path: string, useRelativePath: boolean): Promise<FSResult>{
-    return await invoke<FSResult>("read_file", {pathStr: path, useRelativePath: useRelativePath, moduleName: getModuleName()});
+export type FSEvent = {
+    eventKind: FSEventKind,
+    isDir: boolean,
+    path: string,
+    pathOld: string,
 }
+
+type FSPayload = {
+    kind: number,
+    is_dir: boolean,
+    path: string,
+    path_old: string
+}
+
+function triggerFSEventCallback(payload: FSPayload, callback: (event: FSEvent) => void) {
+    console.log("Inside trigger API payload is: ", payload);
+    let eventKind: FSEventKind;
+    switch (payload.kind) {
+        case 0:
+            eventKind = FSEventKind.Create;
+            break;
+        case 1:
+            eventKind = FSEventKind.Remove;
+            break;
+        case 2:
+            eventKind = FSEventKind.Modify;
+            break;
+        case 3:
+            eventKind = FSEventKind.Rename;
+            break;
+        default:
+            return;
+    }
+    callback({ eventKind: eventKind, isDir: payload.is_dir, path: payload.path, pathOld: payload.path_old });
+}
+
+
+
+class _WatchManager {
+    private static instance: _WatchManager;
+    private listeners: Map<string, Promise<UnlistenFn>>;
+
+    private constructor() {
+        this.listeners = new Map<string, Promise<UnlistenFn>>();
+
+        once("Overfloat://Close", () => {
+            this.listeners.forEach((listener) => listener.then((f) => f()));
+            appWindow.close();
+        });
+    }
+
+    public static getInstance(): _WatchManager {
+        if (!_WatchManager.instance) {
+            _WatchManager.instance = new _WatchManager();
+        }
+
+        return _WatchManager.instance;
+    }
+
+    public watchPath(id: string, path: string, callback: (event: FSEvent) => void) {
+        const unlisten = this.listeners.get(id);
+        if (unlisten != undefined) {
+            this.stopWatching(id);
+        }
+
+        invoke("watch_path", { path: path, windowLabel: appWindow.label, id: id });
+        const listener = listen("Overfloat://FSEvent/" + id, (event: OverfloatEvent<FSPayload>) => {
+            triggerFSEventCallback(event.payload, callback);
+        });
+
+        this.listeners.set(id, listener);
+    }
+
+    public async stopWatching(id: string) {
+        const unlisten = this.listeners.get(id);
+        if (unlisten == undefined) return;
+        await invoke("stop_watching", { windowLabel: appWindow.label, id: id });
+        unlisten.then(f => f());
+        this.listeners.delete(id);
+    }
+
+    public stopAll() {
+        const listeners = new Map<string, Promise<UnlistenFn>>(this.listeners);
+
+        listeners.forEach((_, watcher_id) => {
+            this.stopWatching(watcher_id);
+        });
+    }
+}
+
+export const WatchManager = Object.freeze(_WatchManager.getInstance());

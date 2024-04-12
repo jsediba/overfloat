@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 use tauri::{self, Manager};
 
-use notify::{RecursiveMode, Watcher};
-use notify_debouncer_full::new_debouncer;
+use notify::{event::ModifyKind, event::RenameMode, EventKind, Watcher};
 
 use futures::{
     channel::mpsc::{channel, Receiver},
@@ -31,12 +30,10 @@ impl WatchedPaths {
         }
     }
 
-    fn remove_watched_path(&mut self, window_label: &String, id: &String){
+    fn remove_watched_path(&mut self, window_label: &String, id: &String) {
         match self.watched_paths.get_mut(window_label) {
             Some(map) => match map.get(id) {
                 Some(process) => {
-                    println!("Killing process for {}: {}", window_label, id);
-                    println!("{:?}", process);
                     process.abort();
                     map.remove(id);
                 }
@@ -56,9 +53,6 @@ impl WatchedPaths {
             .watched_paths
             .entry(window_label.to_owned())
             .or_insert(HashMap::new());
-
-        println!("Setting process for {}: {}", window_label, id);
-        println!("{:?}", process);
 
         window_processes.insert(id.to_owned(), process);
     }
@@ -80,8 +74,30 @@ pub fn add_watched_path(
 
 #[derive(Clone, serde::Serialize)]
 struct PayloadFileChange {
+    kind: u64,
+    is_dir: bool,
     path: String,
-    kind: String,
+    path_old: String,
+}
+
+fn emit_filechange(
+    handle: &tauri::AppHandle,
+    window_label: &String,
+    id: &String,
+    kind: u64,
+    path: &std::path::PathBuf,
+    path_old: &std::path::PathBuf,
+) {
+    let _ = handle.emit_to(
+        window_label.as_str(),
+        format!("Overfloat://FSEvent/{}", id).as_str(),
+        PayloadFileChange {
+            kind: kind,
+            is_dir: std::fs::metadata(path).unwrap().is_dir(),
+            path: path.as_path().to_string_lossy().to_string(),
+            path_old: path_old.as_path().to_string_lossy().to_string(),
+        },
+    );
 }
 
 pub async fn async_watch(
@@ -97,21 +113,30 @@ pub async fn async_watch(
     watcher.watch(path, notify::RecursiveMode::Recursive)?;
 
     while let Some(res) = rx.next().await {
-        println!("{:?}", res);
         match res {
             Ok(event) => {
-                let _ = handle.emit_to(
-                    window_label.as_str(),
-                    format!("Overfloat://FSEvent/{}", id).as_str(),
-                    PayloadFileChange {
-                        path: event.paths.first().unwrap().to_string_lossy().to_string(),
-                        kind: format!("{:?}", event.kind),
-                    },
-                );
+                match event.kind {
+                    EventKind::Create(_) => {
+                        let path = event.paths.get(0).unwrap();
+                        emit_filechange(&handle, &window_label, &id, 0, path, path);
+                    }
+                    EventKind::Remove(_) => {
+                        let path = event.paths.get(0).unwrap();
+                        emit_filechange(&handle, &window_label, &id, 1, path, path);
+                    }
+                    EventKind::Modify(ModifyKind::Data(_)) => {
+                        let path = event.paths.get(0).unwrap();
+                        emit_filechange(&handle, &window_label, &id, 2, path, path);
+                    }
+                    EventKind::Modify(ModifyKind::Name(RenameMode::Both)) => {
+                        let path_old = event.paths.get(0).unwrap();
+                        let path_new = event.paths.get(1).unwrap();
+                        emit_filechange(&handle, &window_label, &id, 3, path_new, path_old);
+                    }
+                    _ => {}
+                }
             }
-            Err(e) => {
-                println!("{:?}", e)
-            }
+            Err(_) => {}
         }
     }
 
@@ -124,8 +149,6 @@ fn create_async_watcher() -> notify::Result<(
 )> {
     let (mut tx, rx) = channel(1);
 
-    // Automatically select the best implementation for your platform.
-    // You can also access each implementation directly e.g. INotifyWatcher.
     let watcher = notify::RecommendedWatcher::new(
         move |res| {
             futures::executor::block_on(async {
@@ -134,7 +157,6 @@ fn create_async_watcher() -> notify::Result<(
         },
         notify::Config::default(),
     )?;
-    
 
     Ok((watcher, rx))
 }

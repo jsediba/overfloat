@@ -1,6 +1,6 @@
 import { invoke } from "@tauri-apps/api";
 
-type SimulationStep = {
+export type SimulationStep = {
     device_type: number;
     simulation_type: number;
     data_str: string;
@@ -24,9 +24,6 @@ function constructSimulationStep(
     };
 }
 
-export function simWait(time: number): SimulationStep {
-    return constructSimulationStep(0, 0, undefined, time);
-}
 
 export function simKeyDown(key: string): SimulationStep {
     return constructSimulationStep(1, 0, key);
@@ -40,13 +37,13 @@ export function simKeyPress(key: string): SimulationStep {
     return constructSimulationStep(1, 2, key);
 }
 
-enum MouseButton {
+export enum MouseButton {
     MouseLeft,
     MouseMiddle,
     MouseRight,
 }
 
-enum Direction {
+export enum Direction {
     Up,
     Down,
     Left,

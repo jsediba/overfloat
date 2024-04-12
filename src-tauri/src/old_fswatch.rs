@@ -32,7 +32,7 @@ impl WatchedPaths {
                 Some(process) => {
                     println!("Killing process for {}: {}", window_label, id);
                     println!("{:?}", process);
-
+                    tauri::async_runtime::
                     map.remove(id);
                 }
                 None => {}

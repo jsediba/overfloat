@@ -1,13 +1,7 @@
 import { listen } from "@tauri-apps/api/event";
 import { KeybindManager } from "./KeybindManager";
 import { WebviewWindow } from "@tauri-apps/api/window";
-
-export type OverfloatEvent<T> = {
-    event: string;
-    windowLabel: string;
-    payload: T;
-    id: number;
-};
+import { OverfloatEvent } from "./WindowEventHandler";
 
 export type AddShortcutEventPayload = {
     id: string;

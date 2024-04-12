@@ -2,7 +2,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use rdev;
-use std::{fs, io::{Seek, SeekFrom, Write}, path, string};
+use std::{
+    fs,
+    io::{Seek, SeekFrom, Write},
+    path, string,
+};
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
     SystemTrayMenuItemHandle,
@@ -72,7 +76,7 @@ fn write_file(
             return FSResult {
                 successful: false,
                 path: final_path_str,
-                message: error.to_string()
+                message: error.to_string(),
             };
         }
     }
@@ -89,15 +93,16 @@ fn write_file(
         Ok(mut file) => {
             let _ = file.seek(SeekFrom::End(0));
             match file.write_all(content.as_bytes()) {
-            Ok(_) => {
-                message = String::new();
-                successful = true;
+                Ok(_) => {
+                    message = String::new();
+                    successful = true;
+                }
+                Err(error) => {
+                    message = error.to_string();
+                    successful = false;
+                }
             }
-            Err(error) => {
-                message = error.to_string();
-                successful = false;
-            }
-        }},
+        }
         Err(error) => {
             message = error.to_string();
             successful = false;
@@ -220,29 +225,21 @@ fn save_profiles(profiles_json: String) {
 
 #[tauri::command]
 async fn watch_path(handle: tauri::AppHandle, path: String, window_label: String, id: String) {
-    println!("label: {:?}", window_label);
-    println! {"id: {:?}", id};
-
     let window_label_clone = window_label.clone();
     let id_clone = id.clone();
 
-    
-    println!("Before removing");
     fswatch::remove_watched_path(&window_label_clone, &id_clone);
-    println!("After removing");
-    
 
     let process = tauri::async_runtime::spawn(async move {
-        if let Err(e) = fswatch::async_watch(handle, path, window_label, id).await {
-            println!("error: {:?}", e)
-        }
+        if let Err(_) = fswatch::async_watch(handle, path, window_label, id).await {}
     });
 
-    
-    println!("Before adding");
     fswatch::add_watched_path(&window_label_clone, &id_clone, process);
-    println!("After adding");
-    
+}
+
+#[tauri::command]
+async fn stop_watching(window_label: String, id: String) {
+    fswatch::remove_watched_path(&window_label, &id)
 }
 
 #[tauri::command]
@@ -367,7 +364,8 @@ fn main() {
             hide_app,
             quit_app,
             read_file,
-            write_file
+            write_file,
+            stop_watching,
         ])
         .device_event_filter(tauri::DeviceEventFilter::Always)
         .run(tauri::generate_context!())

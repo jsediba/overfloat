@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FSResult, write_file } from "../../../src/services/api";
+import { FSResult, writeFile } from "../../../src/services/api";
 import { TitleBar } from "../../../src/services/TitleBar";
 
 const WriteTester: React.FC = () => {
@@ -15,15 +15,15 @@ const WriteTester: React.FC = () => {
             <TitleBar />
             <div className="container">
                 <div className="row m-2">
+                    <input type="text" className="col"
+                        onChange={(event) => setPath(event.target.value)}
+                        placeholder="Path" />
+                </div>
+                <div className="row m-2">
                     <textarea className="col"
                         onChange={(event) => setContent(event.target.value)}
                         placeholder="Content to be written into file"
                         cols={300} rows={1} />
-                </div>
-                <div className="row m-2">
-                    <input type="text" className="col"
-                        onChange={(event) => setPath(event.target.value)}
-                        placeholder="Path" />
                 </div>
                 <div className="row text-center m-2">
                     <div className="col">
@@ -37,7 +37,7 @@ const WriteTester: React.FC = () => {
                 </div>
                 <div className="row m-2">
                     <button className="btn btn-primary col"
-                        onClick={() => write_file(content, path, isRelative, appendMode).then((result) => setResult(result))}>
+                        onClick={() => writeFile(content, path, isRelative, appendMode).then((result) => setResult(result))}>
                         Write
                     </button>
                 </div>

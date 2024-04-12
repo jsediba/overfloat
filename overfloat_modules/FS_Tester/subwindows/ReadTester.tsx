@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FSResult, read_file } from "../../../src/services/api";
+import { FSResult, readFile } from "../../../src/services/api";
 import { TitleBar } from "../../../src/services/TitleBar";
 
 const ReadTester: React.FC = () => {
@@ -25,7 +25,7 @@ const ReadTester: React.FC = () => {
                 </div>
                 <div className="row m-2">
                     <button className="btn btn-primary col"
-                        onClick={() => read_file(path, isRelative).then((result) => setResult(result))}>
+                        onClick={() => readFile(path, isRelative).then((result) => setResult(result))}>
                         Read
                     </button>
                 </div>
