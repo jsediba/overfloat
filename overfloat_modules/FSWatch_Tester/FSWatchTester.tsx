@@ -33,8 +33,8 @@ const FSWatchTester = () => {
             <TitleBar />
             <div className='container'>
                 <div className="row">
-                    <div className={"col-10" + (path == "" ? " d-none" : "s")}>Watching Folder: {path}</div>
-                    <button className="btn btn-primary col-2"
+                    <div className="col-10">Watching Folder: {path}</div>
+                    <button className={"btn btn-primary col-2" + (path == "" ? " d-none" : "")}
                         onClick={() => { WatchManager.stopWatching("FSWatchTester"), setPath("") }}>
                         Stop
                     </button>
