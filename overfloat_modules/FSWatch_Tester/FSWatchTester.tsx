@@ -1,41 +1,53 @@
-import { useEffect } from 'react';
-import useState from 'react-usestateref';
-import { open } from '@tauri-apps/api/dialog';
-import { TitleBar } from '../../src/services/TitleBar';
-import { WatchManager, FSEvent } from '../../src/services/api';
-import EventDisplay from './components/EventDisplay';
+import { useEffect } from "react";
+import useState from "react-usestateref";
+import { open } from "@tauri-apps/api/dialog";
+import { ModuleWindow } from "../../src/Api/ModuleWindow";
+import { WatchManager, FSEvent, FSEventKind } from "../../src/Api/api";
+import EventDisplay from "./components/EventDisplay";
 
 const FSWatchTester = () => {
     useEffect(() => {
-        return () => { }
-    }, [])
+
+    }, []);
 
     const [path, setPath] = useState<string>("");
-    const [info, setInfo] = useState<FSEvent[]>([]);
+    const [info, setInfo] = useState<FSEvent[]>([
+
+    ]);
 
     const selectFolder = async () => {
         const selectedFolder = await open({
             directory: true,
             multiple: false,
-            title: "Select a folder to monitor."
-        })
+            title: "Select a folder to monitor.",
+        });
         if (selectedFolder == null || Array.isArray(selectedFolder)) return;
         setPath(selectedFolder);
-        WatchManager.watchPath("FSWatchTester", selectedFolder, handle_file_change);
-    }
+        WatchManager.watchPath(
+            "FSWatchTester",
+            selectedFolder,
+            handle_file_change
+        );
+    };
 
     const handle_file_change = (event: FSEvent) => {
         setInfo((prev: FSEvent[]) => [event, ...prev]);
-    }
+    };
 
     return (
-        <div style={{ overflow: "hidden" }}>
-            <TitleBar />
-            <div className='container'>
+        <ModuleWindow>
+            <div className="container">
                 <div className="row">
                     <div className="col-10">Watching Folder: {path}</div>
-                    <button className={"btn btn-primary col-2" + (path == "" ? " d-none" : "")}
-                        onClick={() => { WatchManager.stopWatching("FSWatchTester"), setPath("") }}>
+                    <button
+                        className={
+                            "btn btn-primary col-2" +
+                            (path == "" ? " d-none" : "")
+                        }
+                        onClick={() => {
+                            WatchManager.stopWatching("FSWatchTester"),
+                                setPath("");
+                        }}>
                         Stop
                     </button>
                 </div>
@@ -44,13 +56,13 @@ const FSWatchTester = () => {
                 </div>
             </div>
             <hr />
-            <div className="container" style={{ overflowY: "auto" }}></div>
-            {info.map((event, index) => (
-                <EventDisplay key={index} event={event} />
-            ))}
-        </div>
-    )
-
-}
+            <div className="container">
+                {info.map((event, index) => (
+                    <EventDisplay key={index} event={event} />
+                ))}
+            </div>
+        </ModuleWindow>
+    );
+};
 
 export default FSWatchTester;

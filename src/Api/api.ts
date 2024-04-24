@@ -147,7 +147,6 @@ class _ShortcutManager {
             console.log("Removing shortcut: " + shortcut_id);
             f();
         });
-
     }
 
     public removeAllShortcuts() {
@@ -204,42 +203,65 @@ function getModuleName(): string {
     return moduleName;
 }
 
-export async function writeFile(content: string, path: string, useRelativePath: boolean, appendMode: boolean): Promise<FSResult> {
-    return await invoke<FSResult>("write_file", { content: content, pathStr: path, appendMode: appendMode, useRelativePath: useRelativePath, moduleName: getModuleName() });
+export async function writeFile(
+    content: string,
+    path: string,
+    useRelativePath: boolean,
+    appendMode: boolean
+): Promise<FSResult> {
+    return await invoke<FSResult>("write_file", {
+        content: content,
+        pathStr: path,
+        appendMode: appendMode,
+        useRelativePath: useRelativePath,
+        moduleName: getModuleName(),
+    });
 }
 
-export async function readFile(path: string, useRelativePath: boolean): Promise<FSResult> {
-    return await invoke<FSResult>("read_file", { pathStr: path, useRelativePath: useRelativePath, moduleName: getModuleName() });
+export async function readFile(
+    path: string,
+    useRelativePath: boolean
+): Promise<FSResult> {
+    return await invoke<FSResult>("read_file", {
+        pathStr: path,
+        useRelativePath: useRelativePath,
+        moduleName: getModuleName(),
+    });
 }
 
 export type FSResult = {
     successful: boolean;
     path: string;
     message: string;
-}
+};
 
 export enum FSEventKind {
     Create,
     Remove,
     Modify,
-    Rename
+    Rename,
 }
 
 export type FSEvent = {
-    eventKind: FSEventKind,
-    isDir: boolean,
-    path: string,
-    pathOld: string,
-}
+    eventKind: FSEventKind;
+    isDir: boolean;
+    path: string;
+    pathOld: string;
+    timestamp: Date;
+};
 
 type FSPayload = {
-    kind: number,
-    is_dir: boolean,
-    path: string,
-    path_old: string
-}
+    kind: number;
+    is_dir: boolean;
+    path: string;
+    path_old: string;
+    timestamp: number;
+};
 
-function triggerFSEventCallback(payload: FSPayload, callback: (event: FSEvent) => void) {
+function triggerFSEventCallback(
+    payload: FSPayload,
+    callback: (event: FSEvent) => void
+) {
     console.log("Inside trigger API payload is: ", payload);
     let eventKind: FSEventKind;
     switch (payload.kind) {
@@ -258,10 +280,14 @@ function triggerFSEventCallback(payload: FSPayload, callback: (event: FSEvent) =
         default:
             return;
     }
-    callback({ eventKind: eventKind, isDir: payload.is_dir, path: payload.path, pathOld: payload.path_old });
+    callback({
+        eventKind: eventKind,
+        isDir: payload.is_dir,
+        path: payload.path,
+        pathOld: payload.path_old,
+        timestamp: new Date(payload.timestamp),
+    });
 }
-
-
 
 class _WatchManager {
     private static instance: _WatchManager;
@@ -284,16 +310,27 @@ class _WatchManager {
         return _WatchManager.instance;
     }
 
-    public watchPath(id: string, path: string, callback: (event: FSEvent) => void) {
+    public watchPath(
+        id: string,
+        path: string,
+        callback: (event: FSEvent) => void
+    ) {
         const unlisten = this.listeners.get(id);
         if (unlisten != undefined) {
             this.stopWatching(id);
         }
 
-        invoke("watch_path", { path: path, windowLabel: appWindow.label, id: id });
-        const listener = listen("Overfloat://FSEvent/" + id, (event: OverfloatEvent<FSPayload>) => {
-            triggerFSEventCallback(event.payload, callback);
+        invoke("watch_path", {
+            path: path,
+            windowLabel: appWindow.label,
+            id: id,
         });
+        const listener = listen(
+            "Overfloat://FSEvent/" + id,
+            (event: OverfloatEvent<FSPayload>) => {
+                triggerFSEventCallback(event.payload, callback);
+            }
+        );
 
         this.listeners.set(id, listener);
     }
@@ -302,7 +339,7 @@ class _WatchManager {
         const unlisten = this.listeners.get(id);
         if (unlisten == undefined) return;
         await invoke("stop_watching", { windowLabel: appWindow.label, id: id });
-        unlisten.then(f => f());
+        unlisten.then((f) => f());
         this.listeners.delete(id);
     }
 

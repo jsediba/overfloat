@@ -1,7 +1,7 @@
 import "react";
 import { useState, useEffect } from "react";
-import { ShortcutManager, getParameter } from "../../../src/services/api";
-import { TitleBar } from "../../../src/services/TitleBar";
+import { ShortcutManager, getParameter } from "../../../src/Api/api";
+import { ModuleWindow } from "../../../src/Api/ModuleWindow";
 
 const Counter = (): React.JSX.Element => {
     const keybind = getParameter("keybind");
@@ -15,8 +15,7 @@ const Counter = (): React.JSX.Element => {
             [keybind]
         );
 
-        return () => {
-        };
+        return () => {};
     }, []);
 
     const [counter, setCounter] = useState<number>(0);
@@ -28,8 +27,7 @@ const Counter = (): React.JSX.Element => {
     };
 
     return (
-        <div>
-            <TitleBar />
+        <ModuleWindow>
             <div className="container text-center">
                 <div className="row">
                     <div className="col h2">Counting:</div>
@@ -38,7 +36,7 @@ const Counter = (): React.JSX.Element => {
                     <div className="col h2">{counter}</div>
                 </div>
             </div>
-        </div>
+        </ModuleWindow>
     );
 };
 

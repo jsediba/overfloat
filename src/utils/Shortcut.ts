@@ -49,7 +49,6 @@ export class Shortcut {
             this.boundKeys[position] = keybind;
         }
 
-        console.log(this.boundKeys);
 
         return tmp;
     }

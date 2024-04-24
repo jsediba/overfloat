@@ -1,31 +1,29 @@
 import { useEffect } from "react";
-import { ShortcutManager, openSubwindow } from "../../src/services/api";
-import { TitleBar } from "../../src/services/TitleBar";
-
+import { ShortcutManager, openSubwindow } from "../../src/Api/api";
+import { ModuleWindow } from "../../src/Api/ModuleWindow";
 
 const Keybind_Tester = () => {
-
     useEffect(() => {
-
-        ShortcutManager.addShortcut("spawn_counter",
-            "Spawn Counter", "Spawns a new counter subwindow without a bound key.",
+        ShortcutManager.addShortcut(
+            "spawn_counter",
+            "Spawn Counter",
+            "Spawns a new counter subwindow without a bound key.",
             () => {
-                openSubwindow("counter", "Counter")
+                openSubwindow("counter", "Counter");
             },
-            ["Alt+X"]);
+            ["Alt+X"]
+        );
 
-        return () => { }
+        return () => {};
     }, []);
 
-
     const newWindow = (keybind: string) => {
-        openSubwindow('counter', `Counter ${keybind}`, { "keybind": keybind });
+        openSubwindow("counter", `Counter ${keybind}`, { keybind: keybind });
         console.log("opening new subwindow");
     };
 
     return (
-        <div>
-            <TitleBar />
+        <ModuleWindow>
             <div className="container text-center">
                 <div className="row">
                     <div className="col text-center h2">Keybind Tester</div>
@@ -47,10 +45,12 @@ const Keybind_Tester = () => {
                     </div>
                 </div>
                 <div className="row">
-                    <div className="col">Press Alt+X to open a new counter.</div>
+                    <div className="col">
+                        Press Alt+X to open a new counter.
+                    </div>
                 </div>
             </div>
-        </div>
+        </ModuleWindow>
     );
 };
 

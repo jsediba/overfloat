@@ -1,11 +1,9 @@
-import { TitleBar } from "../../src/services/TitleBar";
-import { openSubwindow } from "../../src/services/api";
+import { ModuleWindow } from "../../src/Api/ModuleWindow";
+import { openSubwindow } from "../../src/Api/api";
 
 const FSTester: React.FC = () => {
-
     return(
-        <div>
-            <TitleBar/>
+        <ModuleWindow>
             <div className="container text-center">
                 <div className="row">
                     <div className="col">
@@ -28,7 +26,7 @@ const FSTester: React.FC = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </ModuleWindow>
     )
 }
 

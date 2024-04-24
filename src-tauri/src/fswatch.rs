@@ -1,7 +1,10 @@
-use std::collections::HashMap;
+use std::{collections::HashMap, path::PathBuf};
 use tauri::{self, Manager};
 
-use notify::{event::ModifyKind, event::RenameMode, EventKind, Watcher};
+use notify::{
+    event::{ModifyKind, RemoveKind, RenameMode},
+    EventKind, Watcher,
+};
 
 use futures::{
     channel::mpsc::{channel, Receiver},
@@ -78,6 +81,7 @@ struct PayloadFileChange {
     is_dir: bool,
     path: String,
     path_old: String,
+    timestamp: u128,
 }
 
 fn emit_filechange(
@@ -85,6 +89,7 @@ fn emit_filechange(
     window_label: &String,
     id: &String,
     kind: u64,
+    is_dir: bool,
     path: &std::path::PathBuf,
     path_old: &std::path::PathBuf,
 ) {
@@ -93,11 +98,101 @@ fn emit_filechange(
         format!("Overfloat://FSEvent/{}", id).as_str(),
         PayloadFileChange {
             kind: kind,
-            is_dir: std::fs::metadata(path).unwrap().is_dir(),
+            is_dir: is_dir,
             path: path.as_path().to_string_lossy().to_string(),
             path_old: path_old.as_path().to_string_lossy().to_string(),
+            timestamp: std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_millis(),
         },
     );
+}
+
+#[allow(dead_code)]
+fn handle_fswatch_event_linux(
+    event: notify::Event,
+    handle: &tauri::AppHandle,
+    window_label: &String,
+    id: &String,
+) {
+
+    let path: &PathBuf = match event.paths.get(0) {
+        Some(value) => value,
+        None => return
+    };
+
+    let path_old: &PathBuf = match event.paths.get(1) {
+        Some(value) => value,
+        None => path
+    };
+
+    let is_dir: bool = match std::fs::metadata(path){
+        Ok(result) => result.is_dir(),
+        Err(_) => false, 
+    };
+
+    match event.kind {
+        EventKind::Create(_) => {
+            emit_filechange(&handle, &window_label, &id, 0, is_dir, path, path_old);
+        }
+        EventKind::Remove(RemoveKind::File) => {
+            emit_filechange(&handle, &window_label, &id, 1, false, path, path_old);
+        }
+        EventKind::Remove(RemoveKind::Folder) => {
+            emit_filechange(&handle, &window_label, &id, 1, true, path, path_old);
+        }
+        EventKind::Modify(ModifyKind::Data(_)) => {
+            emit_filechange(&handle, &window_label, &id, 2, is_dir, path, path_old);
+        }
+        EventKind::Modify(ModifyKind::Name(RenameMode::Both)) => {
+            emit_filechange(&handle, &window_label, &id, 3, is_dir, path, path_old);
+        }
+        _ => {}
+    }
+}
+
+lazy_static! {
+    static ref LAST_RENAME_FROM: Mutex<PathBuf> = Mutex::new(PathBuf::from("/")); // Initialize with default value
+}
+
+#[allow(dead_code)]
+fn handle_fswatch_event_windows(
+    event: notify::Event,
+    handle: &tauri::AppHandle,
+    window_label: &String,
+    id: &String,
+) {
+    let path: &PathBuf = match event.paths.get(0) {
+        Some(value) => value,
+        None => return
+    };
+
+    let is_dir: bool = match std::fs::metadata(path){
+        Ok(result) => result.is_dir(),
+        Err(_) => false, 
+    };
+
+    match event.kind {
+        EventKind::Create(_) => {
+            emit_filechange(&handle, &window_label, &id, 0, is_dir, path, path);
+        }
+        EventKind::Modify(ModifyKind::Name(RenameMode::From)) => {
+            let mut last_rename_from = LAST_RENAME_FROM.lock().unwrap();
+            *last_rename_from = path.to_path_buf(); 
+        }
+        EventKind::Modify(ModifyKind::Name(RenameMode::To)) => {
+            let last_rename_from = LAST_RENAME_FROM.lock().unwrap();
+            let path_old: &PathBuf = &(*last_rename_from);
+            emit_filechange(handle, window_label, id, 3, is_dir, path, path_old)
+        }
+
+
+        EventKind::Modify(ModifyKind::Any) => {
+            emit_filechange(&handle, &window_label, &id, 2, is_dir, path, path);
+        }
+        EventKind::Remove(RemoveKind::Any) => {
+            emit_filechange(&handle, &window_label, &id, 1, false, path, path);
+        }
+        _ => {}
+    }
 }
 
 pub async fn async_watch(
@@ -115,25 +210,13 @@ pub async fn async_watch(
     while let Some(res) = rx.next().await {
         match res {
             Ok(event) => {
-                match event.kind {
-                    EventKind::Create(_) => {
-                        let path = event.paths.get(0).unwrap();
-                        emit_filechange(&handle, &window_label, &id, 0, path, path);
-                    }
-                    EventKind::Remove(_) => {
-                        let path = event.paths.get(0).unwrap();
-                        emit_filechange(&handle, &window_label, &id, 1, path, path);
-                    }
-                    EventKind::Modify(ModifyKind::Data(_)) => {
-                        let path = event.paths.get(0).unwrap();
-                        emit_filechange(&handle, &window_label, &id, 2, path, path);
-                    }
-                    EventKind::Modify(ModifyKind::Name(RenameMode::Both)) => {
-                        let path_old = event.paths.get(0).unwrap();
-                        let path_new = event.paths.get(1).unwrap();
-                        emit_filechange(&handle, &window_label, &id, 3, path_new, path_old);
-                    }
-                    _ => {}
+                #[cfg(target_os = "linux")]
+                {
+                    handle_fswatch_event_linux(event, &handle, &window_label, &id)
+                }
+                #[cfg(target_os = "windows")]
+                {
+                    handle_fswatch_event_windows(event, &handle, &window_label, &id);
                 }
             }
             Err(_) => {}

@@ -44,6 +44,18 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ]
-    }
+    },
+    "windows": [
+      {
+        "title": "PoE_Trade",
+        "visible": true,
+        "label": "trade",
+        "url": "/module/PoE_Trade",
+        "decorations": false,
+        "resizable": true,
+        "transparent": true,
+        "alwaysOnTop": true
+      }
+    ]
   }
 }

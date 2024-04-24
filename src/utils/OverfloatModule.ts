@@ -335,15 +335,11 @@ export class OverfloatModule {
 
         if (window == undefined) return;
 
-        console.log("Shortcut ID: " + id);
-        console.log("Shortcut ID suffix: " + this.getShortcutIdSuffix(id));
-        console.log(window.savedKeybinds);
 
 
         const savedKeybinds: string[] | undefined = window.savedKeybinds.get(this.getShortcutIdSuffix(id));
         if (savedKeybinds) boundKeys = savedKeybinds;
 
-        console.log("BoundKeys: " + boundKeys);
 
         const shortcut: Shortcut = new Shortcut(
             name,

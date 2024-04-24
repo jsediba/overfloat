@@ -9,24 +9,25 @@ interface TrayModuleProps {
 
 const TrayModule: React.FC<TrayModuleProps> = (props: TrayModuleProps) => {
     const module = props["module"];
-    const containerName = module.getModuleName()+"-module-container";
+    const containerName = module.getModuleName() + "-module-container";
 
     const [, forceUpdate] = useState(false);
-    const [minHeight, setMinHeight] = useState<number>(0);
 
     useEffect(() => {
-        const moduleContainer = document.getElementById(containerName);
-        if(moduleContainer != null){
-            const height = Array.from(moduleContainer.children).reduce((height, child) => height + child.clientHeight, 0);
-            setMinHeight(height);
-        }
-        module.subscribe(() => forceUpdate(previousState => !previousState));
-    }, [])
+        const redrawComponent = () => {forceUpdate((previousState) => !previousState)};
+
+        module.subscribe(() => (redrawComponent));
+
+        return () => {
+            module.unsubscribe(redrawComponent);
+        };
+    }, []);
 
     return (
         <div
             id={containerName}
-            className="module-container" style={{minHeight: `${minHeight}px`}}>
+            className="module-container"
+            >
             <button
                 className={
                     module.getMainWindow().visible
@@ -42,7 +43,7 @@ const TrayModule: React.FC<TrayModuleProps> = (props: TrayModuleProps) => {
                     ? module.getModuleName()
                     : module.getModuleName().substring(0, 4) + "..."}
             </button>
-            <TraySubwindows module={module} />
+            <TraySubwindows module={module} containerId={containerName}/>
         </div>
     );
 };

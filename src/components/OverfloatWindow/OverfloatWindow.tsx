@@ -13,8 +13,7 @@ import TrayModule from "../Tray/TrayModule";
 import ModuleSettings from "../Modules/ModuleSettings";
 import ShortcutSettings from "../Shortcuts/ShortcutSettings";
 import { invoke } from "@tauri-apps/api";
-
-
+import { IconApps, IconKeyboard } from "@tabler/icons-react";
 
 enum Submenu {
     None,
@@ -38,8 +37,6 @@ const OverfloatWindow: React.FC = () => {
         Map<string, OverfloatModule>
     >(new Map<string, OverfloatModule>());
 
-
-
     useEffect(() => {
         const updateModules = () => {
             setActiveModules(
@@ -48,7 +45,6 @@ const OverfloatWindow: React.FC = () => {
                 )
             );
         };
-
 
         appWindow.once("tauri://close-requested", () => invoke("quit_app"));
 
@@ -99,46 +95,50 @@ const OverfloatWindow: React.FC = () => {
         <div className="container-fluid p-0">
             <GlobalStyle />
             <OverfloatTitleBar />
-            <div className="row m-0">
-                <div className="tray col-auto p-0">
-                    <button
+            <div className="content">
+                <div className="row m-0">
+                    <div className="tray col-auto p-0">
+                        <button
+                            className={
+                                shownSubmenu == Submenu.Modules
+                                    ? "tray-button tray-button-active"
+                                    : "tray-button tray-button-inactive"
+                            }
+                            onClick={() => toggleSubmenu(Submenu.Modules)}>
+                            <IconApps color="white" size={48}/>
+                        </button>
+                        <button
+                            className={
+                                shownSubmenu == Submenu.Shortcuts
+                                    ? "tray-button tray-button-active"
+                                    : "tray-button tray-button-inactive"
+                            }
+                            onClick={() => toggleSubmenu(Submenu.Shortcuts)}>
+                            <IconKeyboard color="white" size={48}/>
+                        </button>
+                        <div className="separator" />
+                        {Array.from(activeModules).map(
+                            ([moduleName, module]) => (
+                                <TrayModule key={moduleName} module={module} />
+                            )
+                        )}
+                    </div>
+                    <div
                         className={
                             shownSubmenu == Submenu.Modules
-                                ? "tray-button tray-button-active"
-                                : "tray-button tray-button-inactive"
-                        }
-                        onClick={() => toggleSubmenu(Submenu.Modules)}>
-                        <img className="tray-button-icon" src="/modules.svg" />
-                    </button>
-                    <button
+                                ? "detail col bg-secondary"
+                                : "d-none"
+                        }>
+                        <ModuleSettings />
+                    </div>
+                    <div
                         className={
                             shownSubmenu == Submenu.Shortcuts
-                                ? "tray-button tray-button-active"
-                                : "tray-button tray-button-inactive"
-                        }
-                        onClick={() => toggleSubmenu(Submenu.Shortcuts)}>
-                        <img className="tray-button-icon" src="/keyboard.svg" />
-                    </button>
-                    <div className="separator" />
-                    {Array.from(activeModules).map(([moduleName, module]) => (
-                        <TrayModule key={moduleName} module={module} />
-                    ))}
-                </div>
-                <div
-                    className={
-                        shownSubmenu == Submenu.Modules
-                            ? "detail col bg-secondary"
-                            : "d-none"
-                    }>
-                    <ModuleSettings />
-                </div>
-                <div
-                    className={
-                        shownSubmenu == Submenu.Shortcuts
-                            ? "detail col bg-secondary"
-                            : "d-none"
-                    }>
-                    <ShortcutSettings activeModules={activeModules} />
+                                ? "detail col bg-secondary"
+                                : "d-none"
+                        }>
+                        <ShortcutSettings activeModules={activeModules} />
+                    </div>
                 </div>
             </div>
         </div>

@@ -184,5 +184,20 @@
 			},
 			"subwindows": []
 		}
+	],
+	"PoE Trade": [
+		{
+			"moduleName": "PoE_Trade",
+			"mainWindow": {
+				"title": "PoE_Trade",
+				"isVisible": true,
+				"x": 337,
+				"y": 241,
+				"height": 300,
+				"width": 500,
+				"shortcuts": []
+			},
+			"subwindows": []
+		}
 	]
 }

@@ -224,8 +224,6 @@ export class ModuleManager {
     }
 
     public async deleteProfile(profileName: string) {
-        console.log(profileName);
-        console.log(this.profiles);
         if (!(profileName in this.profiles)) return;
         delete this.profiles[profileName]
         if (profileName == this.getActiveProfile()) {

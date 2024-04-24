@@ -1,7 +1,8 @@
 import { useState } from "react";
-import "./css/TitleBar.css";
+import "../../api/TitleBar.css";
 import { invoke } from "@tauri-apps/api";
 import { PhysicalSize, appWindow } from "@tauri-apps/api/window";
+import { IconCornerDownLeft, IconCornerUpRight, IconMinus } from "@tabler/icons-react";
 
 
 const OverfloatTitleBar: React.FC = () => {
@@ -29,33 +30,21 @@ const OverfloatTitleBar: React.FC = () => {
                     rollUp();
                 }}
                 className={rolledUp ? "d-none" : "titlebar-button m-0"}>
-                <img
-                    className="button-icon"
-                    src="/window_roll_up.svg"
-                    alt="Roll Up"
-                />
+                <IconCornerDownLeft size={12}/>
             </button>
             <button
                 onClick={() => {
                     rollDown();
                 }}
                 className={rolledUp ? "titlebar-button m-0" : "d-none"}>
-                <img
-                    className="button-icon"
-                    src="/window_roll_down.svg"
-                    alt="Roll Down"
-                />
+                <IconCornerUpRight size={12}/>
             </button>
             <button
                 onClick={() => {
                     invoke("hide_app");
                 }}
                 className="titlebar-button m-0">
-                <img
-                    className="button-icon"
-                    src="/window_minimize.svg"
-                    alt="Minimize"
-                />
+                <IconMinus size={12}/>
             </button>
         </div>
     );
