@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../../api/TitleBar.css";
+import "../../Api/TitleBar.css";
 import { invoke } from "@tauri-apps/api";
 import { PhysicalSize, appWindow } from "@tauri-apps/api/window";
 import { IconCornerDownLeft, IconCornerUpRight, IconMinus } from "@tabler/icons-react";

@@ -68,6 +68,9 @@
 .detail {
     overflow-x: hidden;
     overflow-y: auto;
+    background-color: rgb(225, 225, 225);
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .detail::-webkit-scrollbar {

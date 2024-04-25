@@ -4,6 +4,7 @@ import ProfileSettings from "./ProfileSettings";
 import { OverfloatModule } from "../../utils/OverfloatModule";
 import ActiveModuleDisplay from "./ActiveModuleDisplay";
 import InactiveModuleDisplay from "./InactiveModuleDisplay";
+import ToggleElementDisplayButton from "./ToggleElementDisplayButton";
 
 const ModuleSettings: React.FC = () => {
     const [activeModules, setActiveModules] = useState<
@@ -38,22 +39,37 @@ const ModuleSettings: React.FC = () => {
 
     return (
         <div className="container-fluid">
-            <h2>Profile Settings</h2>
-            <ProfileSettings />
+            <div className="contrainer">
+                <div className="row">
+                    <div className="col-11">
+                        <h2 className="h2 fw-bold fst-italic">
+                            Profile Settings
+                        </h2>
+                    </div>
+                    <div className="col-1">
+                        <ToggleElementDisplayButton id={"profileContainer"}/>
+                    </div>
+                </div>
+                <div className="container" id="profileContainer">
+                    <ProfileSettings />
+                </div>
+            </div>
             <hr />
-            <h2>Module Settings</h2>
-            <h3>Active Modules</h3>
-            {Array.from(activeModules).map(([moduleName, module]) => (
-                <ActiveModuleDisplay key={moduleName} module={module} />
-            ))}
-            <hr />
-            <h3>Inactive Modules</h3>
-            {inactiveModules.map((moduleName) => (
-                <InactiveModuleDisplay
-                    key={moduleName}
-                    moduleName={moduleName}
-                />
-            ))}
+            <div className="container">
+                <h2 className="h2 fw-bold fst-italic">Module Settings</h2>
+                <h3 className="h3 fw-bold">Active Modules</h3>
+                {Array.from(activeModules).map(([moduleName, module]) => (
+                    <ActiveModuleDisplay key={moduleName} module={module} />
+                ))}
+                <hr />
+                <h3 className="h3 fw-bold">Inactive Modules</h3>
+                {inactiveModules.map((moduleName) => (
+                    <InactiveModuleDisplay
+                        key={moduleName}
+                        moduleName={moduleName}
+                    />
+                ))}
+            </div>
         </div>
     );
 };

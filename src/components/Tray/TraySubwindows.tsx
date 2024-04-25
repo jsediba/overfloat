@@ -4,7 +4,7 @@ import { OverfloatModule } from "../../utils/OverfloatModule";
 import { Window } from "../../utils/OverfloatModule";
 import "./css/TraySubwindows.css";
 import TraySubwindow from "./TraySubwindow";
-import { IconCaretDown, IconCaretUp } from "@tabler/icons-react";
+import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
 interface TraySubwindowsProps {
     module: OverfloatModule;
@@ -78,7 +78,7 @@ const TraySubwindows: React.FC<TraySubwindowsProps> = (
                     onClick={() => {
                         setSubwindowsVisible(true);
                     }}>
-                    <IconCaretDown color="white" size={20} />
+                    <IconCaretDownFilled color="white" size={20} />
                 </button>
                 <div className={subwindowsVisible ? "" : "d-none"}>
                     {Array.from(subwindows).map(([windowLabel, window]) => (
@@ -97,7 +97,7 @@ const TraySubwindows: React.FC<TraySubwindowsProps> = (
                             : "d-none"
                     }
                     onClick={() => setSubwindowsVisible(false)}>
-                    <IconCaretUp color="white" size={20} />
+                    <IconCaretUpFilled color="white" size={20} />
                 </button>
             </div>
         );

@@ -126,7 +126,7 @@ const OverfloatWindow: React.FC = () => {
                     <div
                         className={
                             shownSubmenu == Submenu.Modules
-                                ? "detail col bg-secondary"
+                                ? "detail col"
                                 : "d-none"
                         }>
                         <ModuleSettings />
@@ -134,7 +134,7 @@ const OverfloatWindow: React.FC = () => {
                     <div
                         className={
                             shownSubmenu == Submenu.Shortcuts
-                                ? "detail col bg-secondary"
+                                ? "detail col"
                                 : "d-none"
                         }>
                         <ShortcutSettings activeModules={activeModules} />
