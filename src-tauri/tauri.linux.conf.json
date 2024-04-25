@@ -1,0 +1,15 @@
+{
+  "tauri": {
+    "windows": [
+      {
+        "title": "Overfloat",
+        "visible": false,
+        "label": "Overfloat",
+        "url": "/overfloat",
+        "decorations": false,
+        "resizable": true,
+        "alwaysOnTop": true
+      }
+    ]
+  }
+}

@@ -1,0 +1,10 @@
+body{
+    background-color: rgba(0,0,0,0);
+}
+
+.module-content {
+    width: 100vw;
+    height: calc(100vh - 30px);
+    margin-top: 30px;
+    padding: 6px;
+}

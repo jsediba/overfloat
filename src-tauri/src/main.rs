@@ -2,15 +2,119 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use rdev;
-use mki;
-use std::{fs, path, string};
+use std::{
+    fs,
+    io::{Seek, SeekFrom, Write},
+    path, string,
+};
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
+    SystemTrayMenuItemHandle,
 };
 
 mod fswatch;
 mod inputsim;
 mod keybinds;
+
+#[derive(Clone, serde::Serialize)]
+struct FSResult {
+    successful: bool,
+    path: String,
+    message: String,
+}
+
+#[tauri::command]
+fn read_file(path_str: String, use_relative_path: bool, module_name: String) -> FSResult {
+    let final_path_str: String;
+    if use_relative_path {
+        final_path_str = format!("../overfloat_modules/{}/{}", module_name, path_str);
+    } else {
+        final_path_str = path_str;
+    }
+
+    let path = std::path::Path::new(&final_path_str);
+    let message: String;
+    let successful: bool;
+
+    match fs::read_to_string(path) {
+        Ok(content) => {
+            successful = true;
+            message = content;
+        }
+        Err(error) => {
+            successful = false;
+            message = error.to_string();
+        }
+    }
+
+    return FSResult {
+        successful: successful,
+        path: final_path_str,
+        message: message,
+    };
+}
+
+#[tauri::command]
+fn write_file(
+    content: String,
+    path_str: String,
+    append_mode: bool,
+    use_relative_path: bool,
+    module_name: String,
+) -> FSResult {
+    let final_path_str: String;
+    if use_relative_path {
+        final_path_str = format!("../overfloat_modules/{}/{}", module_name, path_str);
+    } else {
+        final_path_str = path_str;
+    }
+
+    let path = std::path::Path::new(&final_path_str);
+
+    if let Some(parent) = path.parent() {
+        if let Err(error) = std::fs::create_dir_all(parent) {
+            return FSResult {
+                successful: false,
+                path: final_path_str,
+                message: error.to_string(),
+            };
+        }
+    }
+
+    let message: String;
+    let successful: bool;
+
+    match fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(!append_mode)
+        .open(&final_path_str)
+    {
+        Ok(mut file) => {
+            let _ = file.seek(SeekFrom::End(0));
+            match file.write_all(content.as_bytes()) {
+                Ok(_) => {
+                    message = String::new();
+                    successful = true;
+                }
+                Err(error) => {
+                    message = error.to_string();
+                    successful = false;
+                }
+            }
+        }
+        Err(error) => {
+            message = error.to_string();
+            successful = false;
+        }
+    };
+
+    return FSResult {
+        successful: successful,
+        path: final_path_str,
+        message: message,
+    };
+}
 
 #[tauri::command]
 fn get_module_names() -> Vec<string::String> {
@@ -33,12 +137,109 @@ fn get_module_names() -> Vec<string::String> {
 }
 
 #[tauri::command]
-async fn watch_path(handle: tauri::AppHandle, path: String, window_label: String, id: String) {
-    tauri::async_runtime::spawn(async move {
-        if let Err(e) = fswatch::async_watch(handle, path, window_label, id).await {
-            println!("error: {:?}", e)
+fn hide_app(handle: tauri::AppHandle) {
+    let tray_item_handle: SystemTrayMenuItemHandle = handle.tray_handle().get_item("Overfloat");
+    let _ = tray_item_handle.set_title("Overfloat");
+    match handle.get_window("Overfloat") {
+        Some(window) => {
+            let _ = window.hide();
         }
+        None => {}
+    }
+}
+
+#[tauri::command]
+fn quit_app(handle: tauri::AppHandle) {
+    handle.exit(0);
+}
+
+#[tauri::command]
+fn get_config() -> String {
+    let path = std::path::Path::new("../config/config.json");
+
+    match fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(error) => {
+            println!("Couldn't read config file: {}", error);
+            String::new()
+        }
+    }
+}
+
+#[tauri::command]
+fn save_config(config_json: String) {
+    if let Some(parent) = std::path::Path::new("../config/config.json").parent() {
+        if let Err(err) = std::fs::create_dir_all(parent) {
+            println!("Error while creating directories for config file: {}", err);
+        }
+    }
+
+    match fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open("../config/config.json")
+    {
+        Ok(mut file) => match file.write_all(config_json.as_bytes()) {
+            Ok(_) => {}
+            Err(error) => println!("Error while writing into a config file: {}", error),
+        },
+        Err(error) => println!("Error while opening a config file{}", error),
+    };
+}
+
+#[tauri::command]
+fn get_profiles() -> String {
+    let path = std::path::Path::new("../config/profiles.json");
+
+    match fs::read_to_string(path) {
+        Ok(content) => content,
+        Err(error) => {
+            println!("Couldn't read profile file: {}", error);
+            String::new()
+        }
+    }
+}
+
+#[tauri::command]
+fn save_profiles(profiles_json: String) {
+    if let Some(parent) = std::path::Path::new("../config/profiles.json").parent() {
+        if let Err(err) = std::fs::create_dir_all(parent) {
+            println!("Error while creating directories for profile file: {}", err);
+        }
+    }
+
+    match fs::OpenOptions::new()
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open("../config/profiles.json")
+    {
+        Ok(mut file) => match file.write_all(profiles_json.as_bytes()) {
+            Ok(_) => {}
+            Err(error) => println!("Error while writing into a profile file: {}", error),
+        },
+        Err(error) => println!("Error while opening a profile file{}", error),
+    };
+}
+
+#[tauri::command]
+async fn watch_path(handle: tauri::AppHandle, path: String, window_label: String, id: String) {
+    let window_label_clone = window_label.clone();
+    let id_clone = id.clone();
+
+    fswatch::remove_watched_path(&window_label_clone, &id_clone);
+
+    let process = tauri::async_runtime::spawn(async move {
+        if let Err(_) = fswatch::async_watch(handle, path, window_label, id).await {}
     });
+
+    fswatch::add_watched_path(&window_label_clone, &id_clone, process);
+}
+
+#[tauri::command]
+async fn stop_watching(window_label: String, id: String) {
+    fswatch::remove_watched_path(&window_label, &id)
 }
 
 #[tauri::command]
@@ -99,13 +300,11 @@ fn main() {
         tray_menu.as_ref().add_item(m);
     }
     */
-    let module_manager = CustomMenuItem::new("ModuleManager".to_string(), "✔ Module Manager");
-    let keybind_manager = CustomMenuItem::new("KeybindManager".to_string(), "✔ Keybind Manager");
+    let module_manager = CustomMenuItem::new("Overfloat".to_string(), "✔ Overfloat");
 
     let quit = CustomMenuItem::new("Quit".to_string(), "Quit");
     let tray_menu = SystemTrayMenu::new()
         .add_item(module_manager)
-        .add_item(keybind_manager)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
@@ -123,13 +322,14 @@ fn main() {
             */
             //fn callback(event: rdev::Event) {
 
-            
-            let callback = move |event: rdev::Event| {
-                match event.event_type {
-                    rdev::EventType::KeyPress(_) => keyboard_state.handle_key_press_event(handle.clone(), event),
-                    rdev::EventType::KeyRelease(_) => keyboard_state.handle_key_press_event(handle.clone(), event),
-                    _ => {}
+            let callback = move |event: rdev::Event| match event.event_type {
+                rdev::EventType::KeyPress(_) => {
+                    keyboard_state.handle_key_press_event(handle.clone(), event)
                 }
+                rdev::EventType::KeyRelease(_) => {
+                    keyboard_state.handle_key_press_event(handle.clone(), event)
+                }
+                _ => {}
             };
 
             tauri::async_runtime::spawn(async move {
@@ -137,7 +337,6 @@ fn main() {
                     println!("Error: {:?}", error)
                 }
             });
-            
 
             Ok(())
         })
@@ -145,20 +344,11 @@ fn main() {
         .on_system_tray_event(|app, event| match event {
             SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
                 "Quit" => {
-                    std::process::exit(0);
+                    app.exit(0);
                 }
-                "ModuleManager" => tray_toggle_window(
-                    app.clone(),
-                    "overfloat_modules",
-                    "ModuleManager",
-                    "Module Manager",
-                ),
-                "KeybindManager" => tray_toggle_window(
-                    app.clone(),
-                    "overfloat_keybinds",
-                    "KeybindManager",
-                    "Keybind Manager",
-                ),
+                "Overfloat" => {
+                    tray_toggle_window(app.clone(), "Overfloat", "Overfloat", "Overfloat")
+                }
                 _ => {}
             },
             _ => {}
@@ -166,7 +356,16 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             get_module_names,
             watch_path,
-            input_simulation
+            input_simulation,
+            get_profiles,
+            save_profiles,
+            get_config,
+            save_config,
+            hide_app,
+            quit_app,
+            read_file,
+            write_file,
+            stop_watching,
         ])
         .device_event_filter(tauri::DeviceEventFilter::Always)
         .run(tauri::generate_context!())

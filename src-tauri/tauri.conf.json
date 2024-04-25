@@ -26,27 +26,10 @@
       "dialog": {
         "all": true
       },
-      "fs": {
-        "all": true
-      },
       "clipboard": {
         "all": true
       }
     },
-    "windows": [
-      {
-        "title": "Overfloat Modules",
-        "visible": true,
-        "label": "overfloat_modules",
-        "url": "/overfloat_modules"
-      },
-      {
-        "title": "Overfloat Keybinds",
-        "visible": true,
-        "label": "overfloat_keybinds",
-        "url": "/overfloat_keybinds"
-      }
-    ],
     "security": {
       "csp": null
     },
@@ -61,6 +44,18 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ]
-    }
+    },
+    "windows": [
+      {
+        "title": "PoE_Trade",
+        "visible": true,
+        "label": "trade",
+        "url": "/module/PoE_Trade",
+        "decorations": false,
+        "resizable": true,
+        "transparent": true,
+        "alwaysOnTop": true
+      }
+    ]
   }
 }

@@ -1,5 +1,4 @@
 use rdev;
-use std::time::Duration;
 use std::{thread, time};
 
 fn string_to_key(key: &str) -> Result<rdev::Key, &str> {
@@ -125,7 +124,6 @@ pub struct SimulationStep {
 pub fn simulate_inputs(inputs: Vec<SimulationStep>) {
     for step in inputs {
         match step.device_type{
-            0=>thread::sleep(Duration::from_millis(step.data_num1 as u64)),
             1=>{
                 match step.simulation_type{
                     0..=2 => keyboard_key(step.simulation_type, step.data_str),

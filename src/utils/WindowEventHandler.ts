@@ -71,7 +71,7 @@ export class WindowEventHandler {
         event: OverfloatEvent<MainWindowEventPayload>
     ) {
         const module = this.moduleManager
-            .getModules()
+            .getActiveModules()
             .get(this.getModuleName(event.windowLabel));
         switch (event.payload.eventType) {
             case WindowEventType.Show:
@@ -81,15 +81,14 @@ export class WindowEventHandler {
                 module?.hideMainWindow();
                 break;
             case WindowEventType.Close:
-                module?.closeMainWindow();
-                WebviewWindow.getByLabel(event.windowLabel)?.emit("Overfloat://Close");
+                this.moduleManager.closeModule(this.getModuleName(event.windowLabel));
                 break;
         }
     }
 
     private subwindowOpen(event: OverfloatEvent<SubwindowOpenEventPayload>) {
         const module = this.moduleManager
-            .getModules()
+            .getActiveModules()
             .get(this.getModuleName(event.windowLabel));
         module?.openSubwindow(
             event.payload.componentName,
@@ -102,7 +101,7 @@ export class WindowEventHandler {
         event: OverfloatEvent<SubwindowModificationEventPayload>
     ) {
         const module = this.moduleManager
-            .getModules()
+            .getActiveModules()
             .get(this.getModuleName(event.windowLabel));
 
         switch (event.payload.eventType) {

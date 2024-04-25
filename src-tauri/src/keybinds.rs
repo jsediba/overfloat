@@ -141,7 +141,6 @@ impl KeyboardState {
     }
 
     pub fn handle_key_press_event(&mut self, handle: tauri::AppHandle, event: rdev::Event) {
-        println!("{:?}", event.name);
         match event.event_type {
             rdev::EventType::KeyPress(key) => self.keydown(handle, key),
             rdev::EventType::KeyRelease(key) => self.keyup(handle, key),
@@ -174,7 +173,7 @@ impl KeyboardState {
 
                 result_string = format!("{}{}", result_string, key_to_string(key));
                 handle.emit_to(
-                    "overfloat_keybinds",
+                    "Overfloat",
                     "Overfloat://GlobalKeypress",
                     PayloadKeypress { key: result_string },
                 ).unwrap();
