@@ -1,7 +1,15 @@
-import { useEffect, useState } from "react";
+/*****************************************************************************
+ * @FilePath    : src/components/Tray/TrayModule.tsx                         *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
+import { useEffect } from "react";
+import useStateRef from "react-usestateref";
 import { OverfloatModule } from "../../utils/OverfloatModule";
 import "./css/TrayModule.css";
 import TraySubwindows from "./TraySubwindows";
+import TrayWindowIcon from "./TrayWindowIcon";
 
 interface TrayModuleProps {
     module: OverfloatModule;
@@ -11,17 +19,19 @@ const TrayModule: React.FC<TrayModuleProps> = (props: TrayModuleProps) => {
     const module = props["module"];
     const containerName = module.getModuleName() + "-module-container";
 
-    const [, forceUpdate] = useState(false);
+    const [_, setVisible, refVisible] = useStateRef<boolean>(module.getMainWindow().visible);
 
     useEffect(() => {
-        const redrawComponent = () => {forceUpdate((previousState) => !previousState)};
-
-        module.subscribe(() => (redrawComponent));
+        module.subscribe(() => setVisible(module.getMainWindow().visible));
 
         return () => {
-            module.unsubscribe(redrawComponent);
+            module.unsubscribe(() => setVisible(module.getMainWindow().visible));
         };
     }, []);
+
+    const getModuleIconPath = () => {
+        return "../../overfloat_modules/" + module.getModuleName() + "/icon.png";
+    }
 
     return (
         <div
@@ -30,18 +40,16 @@ const TrayModule: React.FC<TrayModuleProps> = (props: TrayModuleProps) => {
             >
             <button
                 className={
-                    module.getMainWindow().visible
-                        ? "module-button module-button-active"
-                        : "module-button module-button-inactive"
+                    refVisible.current
+                        ? "module-button module-button-active text-truncate"
+                        : "module-button module-button-inactive text-truncate"
                 }
                 title={module.getModuleName()}
                 onClick={() => {
-                    if (module.getMainWindow().visible) module.hideMainWindow();
+                    if (refVisible.current) module.hideMainWindow();
                     else module.showMainWindow();
                 }}>
-                {module.getModuleName().length <= 7
-                    ? module.getModuleName()
-                    : module.getModuleName().substring(0, 4) + "..."}
+                <TrayWindowIcon webview={module.getMainWindow().webview} imgPath={getModuleIconPath()} />
             </button>
             <TraySubwindows module={module} containerId={containerName}/>
         </div>

@@ -1,6 +1,11 @@
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/FS_Tester/subwindows/ReadTester.tsx      *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { useState } from "react";
-import { FSResult, readFile } from "../../../src/Api/api";
-import { ModuleWindow } from "../../../src/Api/ModuleWindow";
+import { ModuleWindow, FSResult, readFile } from "@OverfloatAPI";
 
 const ReadTester: React.FC = () => {
     const [result, setResult] = useState<FSResult | undefined>();

@@ -1,5 +1,11 @@
+/*****************************************************************************
+ * @FilePath    : src/Api/TitleBar.tsx                                       *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { appWindow } from "@tauri-apps/api/window";
-import "./TitleBar.css";
+import "./css/TitleBar.css";
 import { useEffect, useState } from "react";
 import { IconMinus, IconX } from "@tabler/icons-react";
 import {
@@ -7,11 +13,15 @@ import {
     closeSubwindow,
     hideMainWindow,
     hideSubwindow,
-} from "./api";
+} from "./WindowOperations";
 
+/**
+ * React component for the title bar of the window.
+ */
 export const TitleBar: React.FC = () => {
     const [windowTitle, setWindowTitle] = useState<string>("");
 
+    // Check if the window is a subwindow
     const isSubwindow = (): boolean => {
         const submodule = appWindow.label.replace(
             /module\/([^/]*)\/?(.*)?/g,
@@ -22,6 +32,7 @@ export const TitleBar: React.FC = () => {
 
     const subwindow: boolean = isSubwindow();
 
+    // Close the window
     const closeWindow = () => {
         if (subwindow) {
             closeSubwindow();
@@ -30,6 +41,7 @@ export const TitleBar: React.FC = () => {
         }
     };
 
+    // Minimize the window
     const minimizeWindow = () => {
         if (subwindow) {
             hideSubwindow();
@@ -46,14 +58,17 @@ export const TitleBar: React.FC = () => {
         <div
             data-tauri-drag-region={true}
             className="titlebar container-fluid mb-2 px-0">
-            <div data-tauri-drag-region={true} className="titlebar-title">
+            {/* Title of the window */}
+            <div data-tauri-drag-region={true} className="titlebar-title" title={appWindow.label}>
                 {windowTitle}
             </div>
+            {/* Minimize Button */}
             <button
                 onClick={() => minimizeWindow()}
                 className="titlebar-button">
                 <IconMinus size={12}/>
             </button>
+            {/* Close Button */}
             <button onClick={() => closeWindow()} className="titlebar-button">
                 <IconX size={12} />
             </button>

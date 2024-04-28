@@ -1,0 +1,8 @@
+html, body {
+    background-color: rgba(0,0,0,0) !important;
+}
+
+.module-content {
+    width: 100vw;
+    padding: 6px;
+}

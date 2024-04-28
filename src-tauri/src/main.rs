@@ -1,3 +1,9 @@
+/*****************************************************************************
+ * @FilePath              : src-tauri/src/main.rs                            *
+ * @Author                : Jakub Šediba <xsedib00@vutbr.cz>                 *
+ * @Year                  : 2024                                             *
+ ****************************************************************************/
+
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
@@ -16,6 +22,7 @@ mod fswatch;
 mod inputsim;
 mod keybinds;
 
+// Struct for returning results from file system operations
 #[derive(Clone, serde::Serialize)]
 struct FSResult {
     successful: bool,
@@ -23,8 +30,16 @@ struct FSResult {
     message: String,
 }
 
+/**
+ * @brief Reads a file from the file system
+ * @param path_str: Path to the file
+ * @param use_relative_path: If true, the path is relative to the module directory
+ * @param module_name: Name of the module
+ * @return FSResult: Struct containing the result of the operation
+ */
 #[tauri::command]
 fn read_file(path_str: String, use_relative_path: bool, module_name: String) -> FSResult {
+    // Construct the path string based on the parameters
     let final_path_str: String;
     if use_relative_path {
         final_path_str = format!("../overfloat_modules/{}/{}", module_name, path_str);
@@ -32,10 +47,14 @@ fn read_file(path_str: String, use_relative_path: bool, module_name: String) -> 
         final_path_str = path_str;
     }
 
+    // Create a path object
     let path = std::path::Path::new(&final_path_str);
+
+    // Prepare the result variables
     let message: String;
     let successful: bool;
 
+    // Try to read the file and handle the result
     match fs::read_to_string(path) {
         Ok(content) => {
             successful = true;
@@ -47,6 +66,7 @@ fn read_file(path_str: String, use_relative_path: bool, module_name: String) -> 
         }
     }
 
+    // Return the result
     return FSResult {
         successful: successful,
         path: final_path_str,
@@ -54,6 +74,15 @@ fn read_file(path_str: String, use_relative_path: bool, module_name: String) -> 
     };
 }
 
+/**
+ * @brief Writes a file to the file system
+ * @param content: Content to write
+ * @param path_str: Path to the file
+ * @param append_mode: If true, the content is appended to the file without truncating it
+ * @param use_relative_path: If true, the path is relative to the module directory
+ * @param module_name: Name of the module
+ * @return FSResult: Struct containing the result of the operation
+ */
 #[tauri::command]
 fn write_file(
     content: String,
@@ -62,6 +91,7 @@ fn write_file(
     use_relative_path: bool,
     module_name: String,
 ) -> FSResult {
+    // Construct the path string based on the parameters
     let final_path_str: String;
     if use_relative_path {
         final_path_str = format!("../overfloat_modules/{}/{}", module_name, path_str);
@@ -69,10 +99,13 @@ fn write_file(
         final_path_str = path_str;
     }
 
+    // Create a path object
     let path = std::path::Path::new(&final_path_str);
 
+    // Create parent directories if they don't exist
     if let Some(parent) = path.parent() {
         if let Err(error) = std::fs::create_dir_all(parent) {
+            // Return an error if the directories couldn't be created
             return FSResult {
                 successful: false,
                 path: final_path_str,
@@ -81,9 +114,11 @@ fn write_file(
         }
     }
 
+    // Prepare the result variables
     let message: String;
     let successful: bool;
 
+    // Try to write the file and handle the result
     match fs::OpenOptions::new()
         .write(true)
         .create(true)
@@ -91,7 +126,10 @@ fn write_file(
         .open(&final_path_str)
     {
         Ok(mut file) => {
+            // Move the cursor to the end of the file
             let _ = file.seek(SeekFrom::End(0));
+
+            // Write the content to the file and handle the result
             match file.write_all(content.as_bytes()) {
                 Ok(_) => {
                     message = String::new();
@@ -109,6 +147,7 @@ fn write_file(
         }
     };
 
+    // Return the result
     return FSResult {
         successful: successful,
         path: final_path_str,
@@ -116,10 +155,25 @@ fn write_file(
     };
 }
 
+/**
+ * @brief Gets the names of all modules in the overfloat_modules directory
+ * @return Vec<string::String>: Vector of module names
+ */
 #[tauri::command]
 fn get_module_names() -> Vec<string::String> {
+    // Create a vector for storing the module names
     let mut modules = Vec::new();
-    for entry in fs::read_dir("../overfloat_modules").unwrap() {
+
+    // Read the content of the overfloat_modules directory
+    let dir_content = match fs::read_dir("../overfloat_modules") {
+        Ok(content) => content,
+        Err(err) => {
+            println!("Error while creating directories for config file: {}", err);
+            return modules},
+    };
+
+    // Iterate over the content and add the names of directories to the vector
+    for entry in dir_content {
         let entry = entry.unwrap();
         let path = entry.path();
         if path.is_dir() {
@@ -133,13 +187,21 @@ fn get_module_names() -> Vec<string::String> {
         }
     }
 
+    // Return the vector of module names
     modules
 }
 
+/**
+ * @brief Toggles the visibility of the Overfloat window
+ * @param handle: Tauri application handle
+ */
 #[tauri::command]
 fn hide_app(handle: tauri::AppHandle) {
+    // Get the handle of the Overfloat tray item and remove the "✔" from the title
     let tray_item_handle: SystemTrayMenuItemHandle = handle.tray_handle().get_item("Overfloat");
     let _ = tray_item_handle.set_title("Overfloat");
+
+    // Hide the Overfloat window
     match handle.get_window("Overfloat") {
         Some(window) => {
             let _ = window.hide();
@@ -148,24 +210,37 @@ fn hide_app(handle: tauri::AppHandle) {
     }
 }
 
+/**
+ * @brief Quits the application
+ */
 #[tauri::command]
 fn quit_app(handle: tauri::AppHandle) {
     handle.exit(0);
 }
 
+/**
+ * @brief Gets the content of the config file
+ * @return String: Content of the config file
+ */
 #[tauri::command]
 fn get_config() -> String {
+    // Create a path object
     let path = std::path::Path::new("../config/config.json");
 
+    // Try to read the file and handle the result
     match fs::read_to_string(path) {
         Ok(content) => content,
-        Err(error) => {
-            println!("Couldn't read config file: {}", error);
-            String::new()
-        }
+        Err(err) => {
+            println!("Error while reading the config file: {}", err);
+            String::new()},
     }
 }
 
+/**
+ * @brief Saves the content to the config file
+ * @param config_json: Content to save
+ * @return String: Content of the config file
+ */
 #[tauri::command]
 fn save_config(config_json: String) {
     if let Some(parent) = std::path::Path::new("../config/config.json").parent() {
@@ -188,10 +263,16 @@ fn save_config(config_json: String) {
     };
 }
 
+/**
+ * @brief Gets the content of the profiles file
+ * @return String: Content of the profiles file
+ */
 #[tauri::command]
 fn get_profiles() -> String {
+    // Create a path object
     let path = std::path::Path::new("../config/profiles.json");
 
+    // Try to read the file and handle the result
     match fs::read_to_string(path) {
         Ok(content) => content,
         Err(error) => {
@@ -201,14 +282,21 @@ fn get_profiles() -> String {
     }
 }
 
+/**
+ * @brief Saves the content to the profiles file
+ * @param profiles_json: Content to save
+ */
 #[tauri::command]
 fn save_profiles(profiles_json: String) {
+    // Create parent directories if they don't exist
     if let Some(parent) = std::path::Path::new("../config/profiles.json").parent() {
         if let Err(err) = std::fs::create_dir_all(parent) {
             println!("Error while creating directories for profile file: {}", err);
+            return;
         }
     }
 
+    // Try to write the content to the file and handle the result
     match fs::OpenOptions::new()
         .write(true)
         .create(true)
@@ -223,39 +311,69 @@ fn save_profiles(profiles_json: String) {
     };
 }
 
+/**
+ * @brief Watches a path for changes
+ * @param handle: Tauri application handle
+ * @param path: Path to watch
+ * @param window_label: Label of the window to be notified
+ * @param id: ID of the watched path
+ */
 #[tauri::command]
 async fn watch_path(handle: tauri::AppHandle, path: String, window_label: String, id: String) {
+    // Clone the parameters to be used for tracking the watched path
     let window_label_clone = window_label.clone();
     let id_clone = id.clone();
 
+    // Remove the watched path if it already exists
     fswatch::remove_watched_path(&window_label_clone, &id_clone);
 
-    let process = tauri::async_runtime::spawn(async move {
+    // Spawn a new async task for watching the path
+    let task = tauri::async_runtime::spawn(async move {
         if let Err(_) = fswatch::async_watch(handle, path, window_label, id).await {}
     });
 
-    fswatch::add_watched_path(&window_label_clone, &id_clone, process);
+    // Add the watched path to the list of watched paths
+    fswatch::add_watched_path(&window_label_clone, &id_clone, task);
 }
 
+/**
+ * @brief Stops watching a path
+ * @param window_label: Label of the window that was being notified
+ * @param id: ID of the watched path
+ */
 #[tauri::command]
 async fn stop_watching(window_label: String, id: String) {
     fswatch::remove_watched_path(&window_label, &id)
 }
 
+/**
+ * @brief Simulates input events
+ * @param simulation_steps: Vector of simulation steps
+ */
 #[tauri::command]
 fn input_simulation(simulation_steps: Vec<inputsim::SimulationStep>) {
     inputsim::simulate_inputs(simulation_steps);
 }
 
+/**
+ * @brief Toggles the visibility of a window and updates the tray item title
+ * @param handle: Tauri application handle
+ * @param window_label: Label of the window to toggle
+ * @param tray_item_id: ID of the tray item to update
+ * @param tray_item_title: Title of the tray item to update
+ */
 fn tray_toggle_window(
     handle: tauri::AppHandle,
     window_label: &str,
     tray_item_id: &str,
     tray_item_title: &str,
 ) {
+    // Get the window by label
     match handle.get_window(window_label) {
+        // Check if the window is visible
         Some(window) => match window.is_visible() {
             Ok(visible) => {
+                // Toggle the visibility of the window and update the tray item title
                 if visible {
                     match window.hide() {
                         Ok(_) => {
@@ -287,41 +405,22 @@ fn tray_toggle_window(
 }
 
 fn main() {
-    /*
-    let quit = CustomMenuItem::new("quit".to_string(), "Quit");
-    let central = CustomMenuItem::new("central".to_string(), "Central");
-    */
-    let _module_names: Vec<string::String> = get_module_names();
-
-    /*
-    let tray_menu = SystemTrayMenu::new(); // insert the menu items here
-    for module in get_module_names(){
-        let m = CustomMenuItem::new(module.clone(), module.clone());
-        tray_menu.as_ref().add_item(m);
-    }
-    */
-    let module_manager = CustomMenuItem::new("Overfloat".to_string(), "✔ Overfloat");
-
+    // Create the tray menu
+    let overfloat = CustomMenuItem::new("Overfloat".to_string(), "✔ Overfloat");
     let quit = CustomMenuItem::new("Quit".to_string(), "Quit");
     let tray_menu = SystemTrayMenu::new()
-        .add_item(module_manager)
+        .add_item(overfloat)
         .add_native_item(SystemTrayMenuItem::Separator)
         .add_item(quit);
 
+    // Create a keyboard state object
     let mut keyboard_state = keybinds::KeyboardState::new();
 
+    // Run the Tauri application
     tauri::Builder::default()
         .setup(|app| {
+            // Setup callback for keyboard events
             let handle = app.handle();
-
-            //Keybind event firing
-            /*
-            mki::bind_any_key(mki::Action::handle_kb(move |key| {
-                println!("MKI Keypress: {:?}", key);
-            }));
-            */
-            //fn callback(event: rdev::Event) {
-
             let callback = move |event: rdev::Event| match event.event_type {
                 rdev::EventType::KeyPress(_) => {
                     keyboard_state.handle_key_press_event(handle.clone(), event)
@@ -332,6 +431,7 @@ fn main() {
                 _ => {}
             };
 
+            // Spawn a new async task for listening to rdev keyboard events
             tauri::async_runtime::spawn(async move {
                 if let Err(error) = rdev::listen(callback) {
                     println!("Error: {:?}", error)
@@ -342,6 +442,7 @@ fn main() {
         })
         .system_tray(SystemTray::new().with_menu(tray_menu))
         .on_system_tray_event(|app, event| match event {
+            // Handle system tray events
             SystemTrayEvent::MenuItemClick { id, .. } => match id.as_str() {
                 "Quit" => {
                     app.exit(0);

@@ -1,7 +1,12 @@
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/Keybind_Tester/subwindows/counter.tsx    *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import "react";
 import { useState, useEffect } from "react";
-import { ShortcutManager, getParameter } from "../../../src/Api/api";
-import { ModuleWindow } from "../../../src/Api/ModuleWindow";
+import { ModuleWindow, ShortcutManager, getParameter } from "@OverfloatAPI";
 
 const Counter = (): React.JSX.Element => {
     const keybind = getParameter("keybind");
@@ -12,7 +17,7 @@ const Counter = (): React.JSX.Element => {
             "Increment Counter",
             "Increments the counter displayed in this subwindow.",
             handle_keypress,
-            [keybind]
+            keybind? [keybind] : []
         );
 
         return () => {};

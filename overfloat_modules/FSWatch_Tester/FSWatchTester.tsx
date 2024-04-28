@@ -1,8 +1,13 @@
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/FSWatch_Tester/FSWatchTester.tsx         *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { useEffect } from "react";
 import useState from "react-usestateref";
 import { open } from "@tauri-apps/api/dialog";
-import { ModuleWindow } from "../../src/Api/ModuleWindow";
-import { WatchManager, FSEvent, FSEventKind } from "../../src/Api/api";
+import { ModuleWindow, WatchManager, FSEvent } from "@OverfloatAPI";
 import EventDisplay from "./components/EventDisplay";
 
 const FSWatchTester = () => {

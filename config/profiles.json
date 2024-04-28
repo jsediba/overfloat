@@ -42,7 +42,8 @@
 			"moduleName": "FS_Tester",
 			"mainWindow": {
 				"title": "FS_Tester",
-				"isVisible": false,
+				"isVisible": true,
+				"isTransparent": false,
 				"x": 290,
 				"y": 431,
 				"height": 300,
@@ -51,19 +52,9 @@
 			},
 			"subwindows": [
 				{
-					"title": "Read Tester",
-					"isVisible": false,
-					"x": 500,
-					"y": 0,
-					"height": 300,
-					"width": 500,
-					"shortcuts": [],
-					"params": {},
-					"componentName": "ReadTester"
-				},
-				{
 					"title": "Write Tester",
 					"isVisible": false,
+					"isTransparent": false,
 					"x": 0,
 					"y": 0,
 					"height": 300,
@@ -71,6 +62,18 @@
 					"shortcuts": [],
 					"params": {},
 					"componentName": "WriteTester"
+				},
+				{
+					"title": "Read Tester",
+					"isVisible": true,
+					"isTransparent": true,
+					"x": 947,
+					"y": 517,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [],
+					"params": {},
+					"componentName": "ReadTester"
 				}
 			]
 		},
@@ -79,6 +82,7 @@
 			"mainWindow": {
 				"title": "FSWatch_Tester",
 				"isVisible": false,
+				"isTransparent": false,
 				"x": 0,
 				"y": 300,
 				"height": 300,
@@ -88,79 +92,36 @@
 			"subwindows": []
 		}
 	],
-	"KeybindTester": [
+	"asdf": [
 		{
 			"moduleName": "Keybind_Tester",
 			"mainWindow": {
 				"title": "Keybind_Tester",
 				"isVisible": true,
-				"x": 0,
-				"y": 0,
+				"x": 187,
+				"y": 180,
 				"height": 300,
 				"width": 500,
 				"shortcuts": [
 					{
 						"id": "spawn_counter",
-						"keybinds": [
-							"Alt+X",
-							"ShiftLeft+B"
-						]
+						"keybinds": []
 					}
 				]
 			},
 			"subwindows": [
 				{
-					"title": "Counter A",
-					"isVisible": true,
-					"x": 0,
-					"y": 300,
-					"height": 300,
-					"width": 500,
-					"shortcuts": [
-						{
-							"id": "count_up",
-							"keybinds": [
-								"X"
-							]
-						}
-					],
-					"params": {
-						"keybind": "A"
-					},
-					"componentName": "counter"
-				},
-				{
-					"title": "Counter B",
-					"isVisible": true,
-					"x": 500,
-					"y": 0,
-					"height": 300,
-					"width": 500,
-					"shortcuts": [
-						{
-							"id": "count_up",
-							"keybinds": [
-								"B"
-							]
-						}
-					],
-					"params": {
-						"keybind": "B"
-					},
-					"componentName": "counter"
-				},
-				{
 					"title": "Counter",
-					"isVisible": false,
-					"x": 500,
-					"y": 300,
+					"isVisible": true,
+					"x": 143,
+					"y": 447,
 					"height": 300,
 					"width": 500,
 					"shortcuts": [
 						{
 							"id": "count_up",
 							"keybinds": [
-								""
+								"A"
 							]
 						}
 					],
@@ -168,21 +129,6 @@
 					"componentName": "counter"
 				}
 			]
-		}
-	],
-	"asdf": [
-		{
-			"moduleName": "InputSim_Tester",
-			"mainWindow": {
-				"title": "InputSim_Tester",
-				"isVisible": true,
-				"x": 42,
-				"y": 18,
-				"height": 580,
-				"width": 878,
-				"shortcuts": []
-			},
-			"subwindows": []
 		}
 	],
 	"PoE Trade": [
@@ -198,6 +144,46 @@
 				"shortcuts": []
 			},
 			"subwindows": []
+		}
+	],
+	"KeybindTester": [
+		{
+			"moduleName": "Keybind_Tester",
+			"mainWindow": {
+				"title": "Keybind_Tester",
+				"isVisible": true,
+				"x": 187,
+				"y": 180,
+				"height": 300,
+				"width": 500,
+				"shortcuts": [
+					{
+						"id": "spawn_counter",
+						"keybinds": []
+					}
+				]
+			},
+			"subwindows": [
+				{
+					"title": "Counter",
+					"isVisible": true,
+					"x": 143,
+					"y": 447,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [
+						{
+							"id": "count_up",
+							"keybinds": [
+								"X",
+								"A"
+							]
+						}
+					],
+					"params": {},
+					"componentName": "counter"
+				}
+			]
 		}
 	]
 }

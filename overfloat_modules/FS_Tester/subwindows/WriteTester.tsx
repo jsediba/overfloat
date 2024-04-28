@@ -1,6 +1,11 @@
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/FS_Tester/subwindows/WriteTester.tsx     *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { useState } from "react";
-import { FSResult, writeFile } from "../../../src/Api/api";
-import { ModuleWindow } from "../../../src/Api/ModuleWindow";
+import { ModuleWindow, FSResult, writeFile } from "@OverfloatAPI";
 
 const WriteTester: React.FC = () => {
     const [result, setResult] = useState<FSResult | undefined>();
@@ -8,6 +13,7 @@ const WriteTester: React.FC = () => {
     const [path, setPath] = useState<string>("");
     const [isRelative, setIsRelative] = useState<boolean>(false);
     const [appendMode, setAppendMode] = useState<boolean>(false);
+
 
     return (
         <ModuleWindow>

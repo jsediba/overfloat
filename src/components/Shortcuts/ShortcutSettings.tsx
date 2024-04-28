@@ -1,38 +1,31 @@
-import { useEffect } from "react";
+/*****************************************************************************
+ * @FilePath    : src/components/Shortcuts/ShortcutSettings.tsx              *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { OverfloatModule } from "../../utils/OverfloatModule";
-import WindowShorctus from "./WindowShortcuts";
+import ModuleShortcutsDisplay from "./ModuleShortcutsDisplay";
 
 type ShortcutSettingsProps = {
     activeModules: Map<string, OverfloatModule>;
 };
 
+/**
+ * React component for the Shortcut Settings submenu.
+ */
 const ShortcutSettings: React.FC<ShortcutSettingsProps> = (
     props: ShortcutSettingsProps
 ) => {
     const activeModules = props["activeModules"];
 
-    useEffect(() => {}, []);
-
     return (
         <div className="container-fluid">
-            <h2>Shortcut Settings</h2>
+            <h2 className="h2 fw-bold fst-italic">Shortcut Settings</h2>
             <hr />
+            {/* Display the shortcuts for each active module */}
             {Array.from(activeModules).map(([moduleName, module]) => (
-                <div className="container" key={moduleName}>
-                    <h3>{moduleName}</h3>
-                    <WindowShorctus
-                        moduleName={moduleName}
-                        window={module.getMainWindow()}
-                    />
-                    {Array.from(module.getSubwindows()).map(([id, window]) => (
-                        <div key={id}>
-                            <WindowShorctus
-                                moduleName={moduleName}
-                                window={window}
-                            />
-                        </div>
-                    ))}
-                </div>
+                <ModuleShortcutsDisplay key={moduleName} module={module} />
             ))}
         </div>
     );

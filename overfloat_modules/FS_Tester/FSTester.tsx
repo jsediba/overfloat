@@ -1,6 +1,11 @@
-import { ModuleWindow } from "../../src/Api/ModuleWindow";
-import { openSubwindow } from "../../src/Api/api";
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/FS_Tester/FSTester.tsx                   *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
 
+
+import { ModuleWindow, openSubwindow } from "@OverfloatAPI";
 const FSTester: React.FC = () => {
     return(
         <ModuleWindow>
@@ -19,7 +24,9 @@ const FSTester: React.FC = () => {
                         <button className="btn btn-primary"
                         onClick={()=>openSubwindow(
                             "ReadTester",
-                            "Read Tester"
+                            "Read Tester",
+                            {},
+                            {transparent: true}
                         )}>
                             Open Read Tester
                         </button>

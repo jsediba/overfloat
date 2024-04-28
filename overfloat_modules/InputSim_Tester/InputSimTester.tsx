@@ -1,7 +1,13 @@
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/InputSim_Tester/InputSimTester.tsx       *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { useState } from "react";
-import { ModuleWindow } from "../../src/Api/ModuleWindow";
 
 import {
+    ModuleWindow,
     Direction,
     MouseButton,
     SimulationStep,
@@ -14,7 +20,7 @@ import {
     simMouseScroll,
     simMouseMove,
     inputSimulation,
-} from "../../src/Api/InputSimulation";
+} from "@OverfloatAPI";
 
 const InputSimTester: React.FC = () => {
     const [simStr, setSimStr] = useState<string[]>([]);

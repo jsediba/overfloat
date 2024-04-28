@@ -18,7 +18,12 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* Paths */
+    "paths": {
+      "@OverfloatAPI": ["./src/Api/OverfloatAPI.ts"],
+    }
   },
   "include": ["src", "src/.tsx", "overfloat_modules", "overfloat_modules/*.tsx"],
   "references": [{ "path": "./tsconfig.node.json" }]

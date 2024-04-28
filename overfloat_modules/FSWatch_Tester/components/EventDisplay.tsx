@@ -1,5 +1,11 @@
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/FSWatch_Tester/components/EventDisplay.tsx*
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { IconFilePencil, IconFilePlus, IconFileSymlink, IconFileX, IconFolderCog, IconFolderPlus, IconFolderSymlink, IconFolderX } from "@tabler/icons-react";
-import { FSEvent, FSEventKind } from "../../../src/Api/api";
+import { FSEvent, FSEventKind } from "@OverfloatAPI";
 
 type EventDisplayProps = {
     event: FSEvent;

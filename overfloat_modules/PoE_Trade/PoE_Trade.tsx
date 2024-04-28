@@ -1,5 +1,11 @@
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/PoE_Trade/PoE_Trade.tsx                  *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { IconMinimize } from "@tabler/icons-react";
-import { ModuleWindow } from "../../src/Api/ModuleWindow";
+import { ModuleWindow } from "../../src/Api/OverfloatAPI";
 import TradeDisplay from "./components/TradeDisplay";
 
 const PoETrade: React.FC = () => {

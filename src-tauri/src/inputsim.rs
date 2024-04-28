@@ -1,15 +1,25 @@
+/*****************************************************************************
+ * @FilePath              : src-tauri/src/inputsim.rs                        *
+ * @Author                : Jakub Šediba <xsedib00@vutbr.cz>                 *
+ * @Year                  : 2024                                             *
+ ****************************************************************************/
+
 use rdev;
 use std::{thread, time};
-
+/**
+ * @brief Function to convert string to rdev::Key
+ * @param key - string to convert
+ * @return rdev::Key
+ */
 fn string_to_key(key: &str) -> Result<rdev::Key, &str> {
     match key {
         "Alt" => Ok(rdev::Key::Alt),
         "AltGr" => Ok(rdev::Key::AltGr),
         "Backspace" => Ok(rdev::Key::Backspace),
         "CapsLock" => Ok(rdev::Key::CapsLock),
-        "ControlLeft" => Ok(rdev::Key::ControlLeft),
-        "ControlRight" => Ok(rdev::Key::ControlRight),
-        "Delete" => Ok(rdev::Key::Delete),
+        "LCtrl" => Ok(rdev::Key::ControlLeft),
+        "RCtrl" => Ok(rdev::Key::ControlRight),
+        "Del" => Ok(rdev::Key::Delete),
         "DownArrow" => Ok(rdev::Key::DownArrow),
         "End" => Ok(rdev::Key::End),
         "Escape" => Ok(rdev::Key::Escape),
@@ -27,14 +37,14 @@ fn string_to_key(key: &str) -> Result<rdev::Key, &str> {
         "F9" => Ok(rdev::Key::F9),
         "Home" => Ok(rdev::Key::Home),
         "LeftArrow" => Ok(rdev::Key::LeftArrow),
-        "MetaLeft" => Ok(rdev::Key::MetaLeft),
-        "MetaRight" => Ok(rdev::Key::MetaRight),
-        "PageDown" => Ok(rdev::Key::PageDown),
-        "PageUp" => Ok(rdev::Key::PageUp),
+        "LMeta" => Ok(rdev::Key::MetaLeft),
+        "RMeta" => Ok(rdev::Key::MetaRight),
+        "PgDown" => Ok(rdev::Key::PageDown),
+        "PgUp" => Ok(rdev::Key::PageUp),
         "Return" => Ok(rdev::Key::Return),
         "RightArrow" => Ok(rdev::Key::RightArrow),
-        "ShiftLeft" => Ok(rdev::Key::ShiftLeft),
-        "ShiftRight" => Ok(rdev::Key::ShiftRight),
+        "LShft" => Ok(rdev::Key::ShiftLeft),
+        "RShft" => Ok(rdev::Key::ShiftRight),
         "Space" => Ok(rdev::Key::Space),
         "Tab" => Ok(rdev::Key::Tab),
         "UpArrow" => Ok(rdev::Key::UpArrow),
@@ -42,19 +52,19 @@ fn string_to_key(key: &str) -> Result<rdev::Key, &str> {
         "ScrollLock" => Ok(rdev::Key::ScrollLock),
         "Pause" => Ok(rdev::Key::Pause),
         "NumLock" => Ok(rdev::Key::NumLock),
-        "BackQuote" => Ok(rdev::Key::BackQuote),
-        "Num1" => Ok(rdev::Key::Num1),
-        "Num2" => Ok(rdev::Key::Num2),
-        "Num3" => Ok(rdev::Key::Num3),
-        "Num4" => Ok(rdev::Key::Num4),
-        "Num5" => Ok(rdev::Key::Num5),
-        "Num6" => Ok(rdev::Key::Num6),
-        "Num7" => Ok(rdev::Key::Num7),
-        "Num8" => Ok(rdev::Key::Num8),
-        "Num9" => Ok(rdev::Key::Num9),
-        "Num0" => Ok(rdev::Key::Num0),
-        "Minus" => Ok(rdev::Key::Minus),
-        "Equal" => Ok(rdev::Key::Equal),
+        "`" => Ok(rdev::Key::BackQuote),
+        "1" => Ok(rdev::Key::Num1),
+        "2" => Ok(rdev::Key::Num2),
+        "3" => Ok(rdev::Key::Num3),
+        "4" => Ok(rdev::Key::Num4),
+        "5" => Ok(rdev::Key::Num5),
+        "6" => Ok(rdev::Key::Num6),
+        "7" => Ok(rdev::Key::Num7),
+        "8" => Ok(rdev::Key::Num8),
+        "9" => Ok(rdev::Key::Num9),
+        "0" => Ok(rdev::Key::Num0),
+        "-" => Ok(rdev::Key::Minus),
+        "=" => Ok(rdev::Key::Equal),
         "Q" => Ok(rdev::Key::KeyQ),
         "W" => Ok(rdev::Key::KeyW),
         "E" => Ok(rdev::Key::KeyE),
@@ -65,8 +75,8 @@ fn string_to_key(key: &str) -> Result<rdev::Key, &str> {
         "I" => Ok(rdev::Key::KeyI),
         "O" => Ok(rdev::Key::KeyO),
         "P" => Ok(rdev::Key::KeyP),
-        "LeftBracket" => Ok(rdev::Key::LeftBracket),
-        "RightBracket" => Ok(rdev::Key::RightBracket),
+        "(" => Ok(rdev::Key::LeftBracket),
+        ")" => Ok(rdev::Key::RightBracket),
         "A" => Ok(rdev::Key::KeyA),
         "S" => Ok(rdev::Key::KeyS),
         "D" => Ok(rdev::Key::KeyD),
@@ -76,10 +86,9 @@ fn string_to_key(key: &str) -> Result<rdev::Key, &str> {
         "J" => Ok(rdev::Key::KeyJ),
         "K" => Ok(rdev::Key::KeyK),
         "L" => Ok(rdev::Key::KeyL),
-        "SemiColon" => Ok(rdev::Key::SemiColon),
-        "Quote" => Ok(rdev::Key::Quote),
-        "BackSlash" => Ok(rdev::Key::BackSlash),
-        "IntlBackslash" => Ok(rdev::Key::IntlBackslash),
+        ";" => Ok(rdev::Key::SemiColon),
+        "\"" => Ok(rdev::Key::Quote),
+        "\\" => Ok(rdev::Key::BackSlash),
         "Z" => Ok(rdev::Key::KeyZ),
         "X" => Ok(rdev::Key::KeyX),
         "C" => Ok(rdev::Key::KeyC),
@@ -87,9 +96,9 @@ fn string_to_key(key: &str) -> Result<rdev::Key, &str> {
         "B" => Ok(rdev::Key::KeyB),
         "N" => Ok(rdev::Key::KeyN),
         "M" => Ok(rdev::Key::KeyM),
-        "Comma" => Ok(rdev::Key::Comma),
-        "Dot" => Ok(rdev::Key::Dot),
-        "Slash" => Ok(rdev::Key::Slash),
+        "," => Ok(rdev::Key::Comma),
+        "." => Ok(rdev::Key::Dot),
+        "/" => Ok(rdev::Key::Slash),
         "Insert" => Ok(rdev::Key::Insert),
         "KpReturn" => Ok(rdev::Key::KpReturn),
         "KpMinus" => Ok(rdev::Key::KpMinus),
@@ -112,6 +121,7 @@ fn string_to_key(key: &str) -> Result<rdev::Key, &str> {
     }
 }
 
+// Struct for simulation step
 #[derive(Debug, serde::Deserialize)]
 pub struct SimulationStep {
     device_type: i64,
@@ -121,62 +131,84 @@ pub struct SimulationStep {
     data_num2: f64,
 }
 
+/**
+ * @brief Function to simulate inputs
+ * @param inputs - vector of SimulationSteps
+ */
 pub fn simulate_inputs(inputs: Vec<SimulationStep>) {
+    // Iterate over all steps
     for step in inputs {
-        match step.device_type{
-            1=>{
-                match step.simulation_type{
-                    0..=2 => keyboard_key(step.simulation_type, step.data_str),
-                    3 =>  keyboard_text(step.data_str),
-                    _ => {}
-                }
-            }
-            2=>{
-                match step.simulation_type{
-                    0 => mouse_move(step.data_num1, step.data_num2),
-                    1..=2 => mouse_button(step.simulation_type, step.data_num1 as i64),
-                    3 => mouse_scroll(step.data_num1 as i64, step.data_num2 as i64),
-                    _ => {}
-                }
-            }
+        match step.device_type {
+            // Keyboard
+            1 => match step.simulation_type {
+                0..=2 => keyboard_key(step.simulation_type, step.data_str),
+                _ => {}
+            },
+            // Mouse
+            2 => match step.simulation_type {
+                0 => mouse_move(step.data_num1, step.data_num2),
+                1..=2 => mouse_button(step.simulation_type, step.data_num1 as i64),
+                3 => mouse_scroll(step.data_num1 as i64, step.data_num2 as i64),
+                _ => {}
+            },
             _ => {}
         }
     }
 }
 
+/**
+ * @brief Function to simulate keyboard key
+ * @param simulation_type - type of simulation
+ * @param key_string - key to simulate
+ */
 fn keyboard_key(simulation_type: i64, key_string: String) {
-    let key: rdev::Key = match string_to_key(key_string.as_str()){
-        Ok(key)=> key,
-        Err(_) => return
+    // Convert string representation of the key to rdev::Key
+    let key: rdev::Key = match string_to_key(key_string.as_str()) {
+        Ok(key) => key,
+        Err(_) => return,
     };
 
     match simulation_type {
+        // KeyDown
         0 => send_event(&rdev::EventType::KeyPress(key)),
+        // KeyUp
         1 => send_event(&rdev::EventType::KeyRelease(key)),
+        // KeyPress
         2 => {
             send_event(&rdev::EventType::KeyPress(key));
             send_event(&rdev::EventType::KeyRelease(key));
-        },
+        }
         _ => return,
     }
 }
 
-fn keyboard_text(text: String){
-    println!("Simulate text: {}", text);
-}
-
+/**
+ * @brief Function to send a simulation event to the system
+ * @param event_type - type of event
+ */
 fn send_event(event_type: &rdev::EventType) {
+    // Delay between events
     let delay = time::Duration::from_millis(1);
+
+    // Send event
     match rdev::simulate(event_type) {
         Ok(()) => (),
         Err(_) => {
             println!("Failed to send event: {:?}", event_type);
         }
     }
+
+    // Sleep for delay for the system to process the event
     thread::sleep(delay);
 }
 
+/**
+ * @brief Function to simulate mouse button
+ * @param simulation_type - type of simulation
+ * @param button - button to simulate
+ */
 fn mouse_button(simulation_type: i64, button: i64) {
+    // Convert mouse button code to rdev::Button
     let mouse_button: rdev::Button = match button {
         0 => rdev::Button::Left,
         1 => rdev::Button::Middle,
@@ -185,8 +217,11 @@ fn mouse_button(simulation_type: i64, button: i64) {
     };
 
     match simulation_type {
+        // ButtonDown
         0 => send_event(&rdev::EventType::ButtonPress(mouse_button)),
+        // ButtonUp
         1 => send_event(&rdev::EventType::ButtonRelease(mouse_button)),
+        // ButtonClick
         2 => {
             send_event(&rdev::EventType::ButtonPress(mouse_button));
             send_event(&rdev::EventType::ButtonRelease(mouse_button));
@@ -195,15 +230,24 @@ fn mouse_button(simulation_type: i64, button: i64) {
     }
 }
 
+/**
+ * @brief Function to simulate mouse scroll
+ * @param delta_x - delta x
+ * @param delta_y - delta y
+ * @return
+ */
 fn mouse_scroll(delta_x: i64, delta_y: i64) {
-    println!("Mouse Move: {}, {}", delta_x, delta_y);
-
     send_event(&rdev::EventType::Wheel {
         delta_x: delta_x,
         delta_y: delta_y,
     });
 }
 
+/**
+ * @brief Function to simulate mouse move
+ * @param x - x coordinate
+ * @param y - y coordinate
+ */
 fn mouse_move(x: f64, y: f64) {
     send_event(&rdev::EventType::MouseMove { x: x, y: y });
 }

@@ -1,6 +1,12 @@
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/Clipboard_Tester/ClipboardTester.tsx     *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { useState } from "react";
-import { ModuleWindow } from "../../src/Api/ModuleWindow";
-import { clipboardRead, clipboardWrite } from "../../src/Api/api";
+import { clipboardRead, clipboardWrite, ModuleWindow } from "@OverfloatAPI";
+
 
 const ClipboardTester: React.FC = () => {
     const [targetContent, setTargetContent] = useState<string>("");

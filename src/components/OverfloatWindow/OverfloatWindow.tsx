@@ -1,3 +1,9 @@
+/*****************************************************************************
+ * @FilePath    : src/components/OverfloatWindow/OverfloatWindow.tsx         *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { useState, useEffect } from "react";
 import useStateRef from "react-usestateref";
 import { OverfloatModule } from "../../utils/OverfloatModule";
@@ -15,12 +21,14 @@ import ShortcutSettings from "../Shortcuts/ShortcutSettings";
 import { invoke } from "@tauri-apps/api";
 import { IconApps, IconKeyboard } from "@tabler/icons-react";
 
+// Enum for the displayed submenu modes
 enum Submenu {
     None,
     Modules,
     Shortcuts,
 }
 
+// Global style, to prevent white blinks when resizing, disable text selection and hide scrollbar
 const GlobalStyle = createGlobalStyle`body{background-color: rgb(75,75,75);
     user-select: none;
    -moz-user-select: none;
@@ -32,12 +40,16 @@ const GlobalStyle = createGlobalStyle`body{background-color: rgb(75,75,75);
     background-color: transparent;
 }`;
 
+/**
+ * React component for the main Overfloat window.
+ */
 const OverfloatWindow: React.FC = () => {
     const [activeModules, setActiveModules] = useState<
         Map<string, OverfloatModule>
     >(new Map<string, OverfloatModule>());
 
     useEffect(() => {
+        // Function to update the active modules
         const updateModules = () => {
             setActiveModules(
                 new Map<string, OverfloatModule>(
@@ -46,8 +58,10 @@ const OverfloatWindow: React.FC = () => {
             );
         };
 
+        // Close the app when this window is closed
         appWindow.once("tauri://close-requested", () => invoke("quit_app"));
 
+        // Setup the window
         const setupWindow = async () => {
             await appWindow.setSize(new PhysicalSize(60, 600));
             await appWindow.setMinSize(new PhysicalSize(60, 600));
@@ -55,14 +69,17 @@ const OverfloatWindow: React.FC = () => {
             appWindow.show();
         };
 
+        // Subscribe to the module manager and keybind manager notifications
         WindowEventHandler.getInstance();
         ModuleManager.getInstance().subscribe(updateModules);
         KeybindEventHandler.getInstance();
         KeybindManager.getInstance().subscribe(updateModules);
 
+        // Initialize the modules and setup the window
         updateModules();
-
         setupWindow();
+
+        // Unsubscribe from the module manager and keybind manager notifications on unmount
         return () => {
             ModuleManager.getInstance().unsubscribe(updateModules);
             KeybindManager.getInstance().unsubscribe(updateModules);
@@ -70,17 +87,22 @@ const OverfloatWindow: React.FC = () => {
         };
     }, []);
 
+    // State for the shown submenu
     const [shownSubmenu, setShownSubmenu, refShownSubmenu] =
         useStateRef<Submenu>(Submenu.None);
 
+    // Function to toggle the submenu
     const toggleSubmenu = async (submenu: Submenu) => {
         const shownSubmenu = refShownSubmenu.current;
 
+        // Increase the size of the window when the submenu is shown and wasn't shown before
         if (shownSubmenu == Submenu.None) {
             await appWindow.setSize(new PhysicalSize(1000, 600));
             await appWindow.setMinSize(new PhysicalSize(1000, 600));
             await appWindow.setMaxSize(new PhysicalSize(1000, 600));
             setShownSubmenu(submenu);
+        
+        // Only show the taskbar when the already shwon submenu is clicked
         } else if (shownSubmenu == submenu) {
             setShownSubmenu(Submenu.None);
             await appWindow.setSize(new PhysicalSize(60, 600));
@@ -93,11 +115,15 @@ const OverfloatWindow: React.FC = () => {
 
     return (
         <div className="container-fluid p-0">
+            {/* Global style to prevent white blinks when resizing, disable text selection and hide scrollbar */}
             <GlobalStyle />
+            {/* Title bar of the window */}
             <OverfloatTitleBar />
             <div className="content">
                 <div className="row m-0">
+                    {/* Tray  */}
                     <div className="tray col-auto p-0">
+                        {/* Buttons for toggling the submenus */}
                         <button
                             className={
                                 shownSubmenu == Submenu.Modules
@@ -117,12 +143,15 @@ const OverfloatWindow: React.FC = () => {
                             <IconKeyboard color="white" size={48}/>
                         </button>
                         <div className="separator" />
+                        
+                        {/* Tray displays of active modules */}
                         {Array.from(activeModules).map(
                             ([moduleName, module]) => (
                                 <TrayModule key={moduleName} module={module} />
                             )
                         )}
                     </div>
+                    {/* Module and Profile settings submenu */}
                     <div
                         className={
                             shownSubmenu == Submenu.Modules
@@ -131,6 +160,8 @@ const OverfloatWindow: React.FC = () => {
                         }>
                         <ModuleSettings />
                     </div>
+
+                    {/* Shortcut settings submenu */}
                     <div
                         className={
                             shownSubmenu == Submenu.Shortcuts

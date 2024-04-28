@@ -1,9 +1,19 @@
+/*****************************************************************************
+ * @FilePath    : src/components/Modules/InactiveModuleDisplay.tsx           *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
+import { IconPlayerPlayFilled } from "@tabler/icons-react";
 import { ModuleManager } from "../../utils/ModuleManager";
 
 type InactiveModuleDisplayProps = {
     moduleName: string;
 }
 
+/**
+ * React component for the display of an inactive module.
+ */
 const InactiveModuleDisplay: React.FC<InactiveModuleDisplayProps> = (props: InactiveModuleDisplayProps) => {
     const moduleName = props["moduleName"];
     
@@ -13,8 +23,10 @@ const InactiveModuleDisplay: React.FC<InactiveModuleDisplayProps> = (props: Inac
                 {moduleName}
             </div>
             <div className="col-2">
-                <button className="btn btn-primary" onClick={()=>(ModuleManager.getInstance().startModule(moduleName))}>
-                    Start
+                {/* Start module button */}
+                <button className="windowControlButton" onClick={()=>(ModuleManager.getInstance().startModule(moduleName))}
+                title="Start Module">
+                    <IconPlayerPlayFilled />
                 </button>
             </div>
         </div>

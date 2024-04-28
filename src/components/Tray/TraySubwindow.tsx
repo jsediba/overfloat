@@ -1,6 +1,13 @@
+/*****************************************************************************
+ * @FilePath    : src/components/Tray/TraySubwindow.tsx                      *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { useEffect, useState } from "react";
 import { OverfloatModule, Window } from "../../utils/OverfloatModule";
 import "./css/TraySubwindow.css"
+import TrayWindowIcon from "./TrayWindowIcon";
 
 type TraySubwindowProps = {
     module: OverfloatModule;
@@ -21,22 +28,25 @@ const TraySubwindow: React.FC<TraySubwindowProps> = (
         window.webview.title().then(title => setTitle(title))
     }, []);
 
+    const getComponentIconPath = () => {
+        return "../../overfloat_modules/" + module.getModuleName() + "/icons/" + window.componentName + ".png";
+    };
+
     return (
-        <button
-                className={
-                    window.visible
-                        ? "subwindow-button subwindow-button-active"
-                        : "subwindow-button subwindow-button-inactive"
+        <button className={
+                window.visible
+                    ? "subwindow-button subwindow-button-active text-truncate px-1"
+                    : "subwindow-button subwindow-button-inactive text-truncate px-1"
                 }
                 title={title}
                 onClick={() => {
                     if (window.visible) module.hideSubwindow(windowLabel);
                     else module.showSubwindow(windowLabel);
                 }}>
-                {title.length <= 7
-                    ? title
-                    : title.substring(0, 4) + "..."}
-            </button>
+                
+                <TrayWindowIcon webview={window.webview} imgPath={getComponentIconPath()} />
+        
+        </button>
     )
 };
 

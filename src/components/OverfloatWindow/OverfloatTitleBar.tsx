@@ -1,14 +1,24 @@
+/*****************************************************************************
+ * @FilePath    : src/components/OverfloatWindow/OverfloatTitleBar.tsx       *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { useState } from "react";
-import "../../Api/TitleBar.css";
+import "../../Api/css/TitleBar.css";
 import { invoke } from "@tauri-apps/api";
 import { PhysicalSize, appWindow } from "@tauri-apps/api/window";
 import { IconCornerDownLeft, IconCornerUpRight, IconMinus } from "@tabler/icons-react";
 
-
+/**
+ * React component for the title bar of the overfloat window.
+ */
 const OverfloatTitleBar: React.FC = () => {
 
+    // State for the rolled up state of the window
     const [rolledUp, setRolledUp] = useState<boolean>(false);
 
+    // Roll up the window, only showing the title bar
     const rollUp = async () => {
         await appWindow.setSize(new PhysicalSize(innerWidth, 20))
         await appWindow.setMinSize(new PhysicalSize(innerWidth, 20))
@@ -16,6 +26,7 @@ const OverfloatTitleBar: React.FC = () => {
         setRolledUp(true);
     };
 
+    // Roll down the window, showing the full window
     const rollDown = async () => {
         await appWindow.setSize(new PhysicalSize(innerWidth, 600))
         await appWindow.setMinSize(new PhysicalSize(innerWidth, 600))
@@ -25,6 +36,7 @@ const OverfloatTitleBar: React.FC = () => {
 
     return (
         <div data-tauri-drag-region={true} className="titlebar p-0 m-0">
+            {/* Roll Up Button */}
             <button
                 onClick={() => {
                     rollUp();
@@ -32,6 +44,7 @@ const OverfloatTitleBar: React.FC = () => {
                 className={rolledUp ? "d-none" : "titlebar-button m-0"}>
                 <IconCornerDownLeft size={12}/>
             </button>
+            {/* Roll Down Button */}
             <button
                 onClick={() => {
                     rollDown();
@@ -39,6 +52,7 @@ const OverfloatTitleBar: React.FC = () => {
                 className={rolledUp ? "titlebar-button m-0" : "d-none"}>
                 <IconCornerUpRight size={12}/>
             </button>
+            {/* Minimize Button */}
             <button
                 onClick={() => {
                     invoke("hide_app");

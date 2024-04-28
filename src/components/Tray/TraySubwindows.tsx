@@ -26,7 +26,6 @@ const TraySubwindows: React.FC<TraySubwindowsProps> = (
 
     const updateMinHeight = () => {
         const moduleContainer = document.getElementById(containerId);
-        console.log("Container is:", moduleContainer);
         if (moduleContainer != null) {
             const height = Array.from(moduleContainer.children).reduce(
                 (height, child) => height + child.clientHeight,

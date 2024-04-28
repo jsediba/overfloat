@@ -1,6 +1,11 @@
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/Keybind_Tester/KeybindTester.tsx         *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { useEffect } from "react";
-import { ShortcutManager, openSubwindow } from "../../src/Api/api";
-import { ModuleWindow } from "../../src/Api/ModuleWindow";
+import { ModuleWindow, ShortcutManager, openSubwindow } from "@OverfloatAPI";
 
 const Keybind_Tester = () => {
     useEffect(() => {
