@@ -160,7 +160,7 @@ export function simMouseScroll(direction: Direction): SimulationStep {
  * @returns SimulationStep object representing the MouseMove event
  */
 export function simMouseMove(x: number, y: number): SimulationStep {
-    return constructSimulationStep(2,0, undefined, x, y);
+    return constructSimulationStep(2,4, undefined, x, y);
 }
 
 /**

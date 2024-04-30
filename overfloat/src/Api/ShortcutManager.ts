@@ -117,51 +117,6 @@ class _ShortcutManager {
             this.removeShortcut(shortcut_id.substring(_SHORTCUT_PREFIX.length));
         });
     }
-
-    /**
-     * @brief Add a keybind to a shortcut
-     * @param shortcut_id ID of the shortcut
-     * @param keybind Keybind to be added
-     */
-    public addKeybind(shortcut_id: string, keybind: string) {
-        const id: string = _SHORTCUT_PREFIX + shortcut_id;
-        mainWindow()?.emit("Overfloat://AddKeybind", {
-            shortcut_id: id,
-            keybind: keybind,
-        });
-    }
-
-    /**
-     * @brief Change the keybind of a shortcut
-     * @param shortcut_id ID of the shortcut
-     * @param oldKeybind Old keybind to be changed
-     * @param newKeybind New keybind
-     */
-    public changeKeybind(
-        shortcut_id: string,
-        oldKeybind: string,
-        newKeybind: string
-    ) {
-        const id: string = _SHORTCUT_PREFIX + shortcut_id;
-        mainWindow()?.emit("Overfloat://ChangeKeybind", {
-            shortcut_id: id,
-            oldKeybind: oldKeybind,
-            newKeybind: newKeybind,
-        });
-    }
-
-    /**
-     * @brief Remove a keybind from a shortcut
-     * @param shortcut_id ID of the shortcut
-     * @param keybind Keybind to be removed
-     */
-    public removeKeybind(shortcut_id: string, keybind: string) {
-        const id: string = _SHORTCUT_PREFIX + shortcut_id;
-        mainWindow()?.emit("Overfloat://RemoveKeybind", {
-            shortcut_id: id,
-            keybind: keybind,
-        });
-    }
 }
 
 // Export the singleton instance of the ShortcutManager

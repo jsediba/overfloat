@@ -43,9 +43,11 @@ export function closeMainWindow() {
     });
 }
 
+export type { NameValuePairs, WindowSettings };
+
 /**
  * @brief Function for opening a subwindow
- * @param componentName Name of the component to be opened (the file name of the component in ./subwindows without the extension) 
+ * @param subwindowName Name of the subwindow to be opened (the file name of the subwindow in ./subwindows without the extension)
  * @param title Title to be displayed in the subwindow
  * @param parameters Name-value pairs to be passed to the subwindow in the URL
  * @param windowSettings Settings object for the subwindow, it includes the following optional fields:
@@ -57,27 +59,16 @@ export function closeMainWindow() {
  * @param windowSettings.width Width of the subwindow
  */
 export function openSubwindow(
-    componentName: string,
+    subwindowName: string,
     title?: string,
     parameters?: NameValuePairs,
     windowSettings?: WindowSettings
 ) {
     mainWindow()?.emit("Overfloat://SubwindowOpen", {
-        componentName: componentName,
+        subwindowName: subwindowName,
         title: title,
         params: parameters,
         windowSettings: windowSettings,
-    });
-}
-
-/**
- * @brief Function for showing a subwindow
- * @param label Label of the subwindow to be shown, default is the calling subwindow
- */
-export function showSubwindow(label: string = appWindow.label) {
-    mainWindow()?.emit("Overfloat://SubwindowModification", {
-        eventType: WindowEventType.Show,
-        label: label,
     });
 }
 
@@ -86,16 +77,55 @@ export function showSubwindow(label: string = appWindow.label) {
  * @param name Name of the parameter
  * @returns Value of the parameter or undefined if the parameter is not present
  */
-export function getParameter(name: string): string|undefined {
+export function getParameter(name: string): string | undefined {
     const value = new URLSearchParams(window.location.search).get(name);
     return value == null ? undefined : value;
 }
 
 /**
+ * @brief Extracts the module name from the window label
+ * @param windowLabel Window label
+ * @returns Name of the module the window belongs to
+ */
+function getModuleName(windowLabel: string): string {
+    const moduleName = windowLabel.replace(/module\/([^/]*)(\/.*)?/g, "$1");
+    return moduleName;
+}
+
+/**
+ * @brief Checks if the current window and the requested window are in the same module
+ * @param label Window label of the requested window
+ * @returns True if the windows are in the same module, false otherwise
+ */
+function moduleMatch(label: string) {
+    const currentModule = getModuleName(appWindow.label);
+    const requestedModule = getModuleName(label);
+
+    return currentModule == requestedModule;
+}
+
+/**
+ * @brief Function for showing a subwindow
+ * @param label Label of the subwindow to be shown, default is the calling subwindow
+ * @note Only subwindows from the same module can be shown this way
+ */
+export function showSubwindow(label: string = appWindow.label) {
+    if (!moduleMatch(label)) return;
+
+    mainWindow()?.emit("Overfloat://SubwindowModification", {
+        eventType: WindowEventType.Show,
+        label: label,
+    });
+}
+
+/**
  * @brief Function for hiding(minimizing) a subwindow
  * @param label Label of the subwindow to be hidden, default is the calling subwindow
+ * @note Only subwindows from the same module can be hidden this way
  */
 export function hideSubwindow(label: string = appWindow.label) {
+    if (!moduleMatch(label)) return;
+
     mainWindow()?.emit("Overfloat://SubwindowModification", {
         eventType: WindowEventType.Hide,
         label: label,
@@ -106,10 +136,45 @@ export function hideSubwindow(label: string = appWindow.label) {
 /**
  * @brief Function for closing a subwindow
  * @param label Label of the subwindow to be closed, default is the calling subwindow
+ * @note Only subwindows from the same module can be closed this way
  */
 export function closeSubwindow(label: string = appWindow.label) {
+    if (!moduleMatch(label)) return;
+
     mainWindow()?.emit("Overfloat://SubwindowModification", {
         eventType: WindowEventType.Close,
         label: label,
     });
+}
+
+/**
+ * @brief Function for checking whether the window is a subwindow
+ * @returns true if the window is a subwindow, false otherwise
+ */
+function isSubwindow() {
+    const submodule = appWindow.label.replace(/module\/([^/]*)\/?(.*)?/g, "$2");
+    return submodule.length != 0;
+}
+
+/**
+ * @brief Function for hiding(minimalizing) the current window
+ */
+export function hideWindow() {
+    if (isSubwindow()) {
+        hideSubwindow();
+    } else {
+        hideMainWindow();
+    }
+}
+
+/**
+ * @brief Function for closing the current window
+ * @note If the window is a main window, the whole module will be closed
+ */
+export function closeWindow() {
+    if (isSubwindow()) {
+        closeSubwindow();
+    } else {
+        closeMainWindow();
+    }
 }

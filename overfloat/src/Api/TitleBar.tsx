@@ -9,10 +9,8 @@ import "./css/TitleBar.css";
 import { useEffect, useState } from "react";
 import { IconMinus, IconX } from "@tabler/icons-react";
 import {
-    closeMainWindow,
-    closeSubwindow,
-    hideMainWindow,
-    hideSubwindow,
+    closeWindow,
+    hideWindow,
 } from "./WindowOperations";
 
 /**
@@ -20,35 +18,6 @@ import {
  */
 export const TitleBar: React.FC = () => {
     const [windowTitle, setWindowTitle] = useState<string>("");
-
-    // Check if the window is a subwindow
-    const isSubwindow = (): boolean => {
-        const submodule = appWindow.label.replace(
-            /module\/([^/]*)\/?(.*)?/g,
-            "$2"
-        );
-        return submodule.length != 0;
-    };
-
-    const subwindow: boolean = isSubwindow();
-
-    // Close the window
-    const closeWindow = () => {
-        if (subwindow) {
-            closeSubwindow();
-        } else {
-            closeMainWindow();
-        }
-    };
-
-    // Minimize the window
-    const minimizeWindow = () => {
-        if (subwindow) {
-            hideSubwindow();
-        } else {
-            hideMainWindow();
-        }
-    };
 
     useEffect(() => {
         appWindow.title().then((title) => setWindowTitle(title));
@@ -64,7 +33,7 @@ export const TitleBar: React.FC = () => {
             </div>
             {/* Minimize Button */}
             <button
-                onClick={() => minimizeWindow()}
+                onClick={() => hideWindow()}
                 className="titlebar-button">
                 <IconMinus size={12}/>
             </button>

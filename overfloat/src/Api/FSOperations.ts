@@ -35,7 +35,7 @@ export enum FSEventKind {
  * @param eventKind Type of the event
  * @param isDir True if the event is related to a directory
  * @param path Path where the event occurred
- * @param pathOld Old path in case of a rename event
+ * @param pathOld Old path in case of a rename event, same as path otherwise
  * @param timestamp Timestamp of the event
  */
 export type FSEvent = {
@@ -70,7 +70,11 @@ function getModuleName(): string {
  * @param path Path to the file
  * @param useRelativePath If true, the path is relative to the module's directory, otherwise it is absolute
  * @param appendMode If true, the content is appended to the file, otherwise the file content is overwritten
- * @returns Result of the write operation, .message contains an error message on failure
+ * @returns Result of the write operation
+ * @note The result of the write operation contains the following fields:
+ * .successful contains success flag of the operation,
+ * .path contains the path to the modified file,
+ * .message contains an error message on failure.
  */
 export async function writeFile(
     content: string,
@@ -91,7 +95,11 @@ export async function writeFile(
  * @brief Read text from a file
  * @param path Path to the file
  * @param useRelativePath If true, the path is relative to the module's directory, otherwise it is absolute
- * @returns Result of the read operation, .message contains the content of the file on success or an error message on failure
+ * @returns Result of the read operation
+ * @note The result of the read operation contains the following fields:
+ * .successful contains success flag of the operation,
+ * .path contains the path to the file,
+ * .message contains the content of the file on success or an error message on failure.
  */
 export async function readFile(
     path: string,

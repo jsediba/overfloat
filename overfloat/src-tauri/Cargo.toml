@@ -1,7 +1,7 @@
 [package]
 name = "overfloat"
 version = "0.0.1"
-description = "A Tauri App"
+description = "An Overalay system for Windows and Linux(X11)"
 authors = ["Jakub Šediba"]
 edition = "2021"
 

@@ -146,9 +146,9 @@ pub fn simulate_inputs(inputs: Vec<SimulationStep>) {
             },
             // Mouse
             2 => match step.simulation_type {
-                0 => mouse_move(step.data_num1, step.data_num2),
-                1..=2 => mouse_button(step.simulation_type, step.data_num1 as i64),
+                0..=2 => mouse_button(step.simulation_type, step.data_num1 as i64),
                 3 => mouse_scroll(step.data_num1 as i64, step.data_num2 as i64),
+                4 => mouse_move(step.data_num1, step.data_num2),
                 _ => {}
             },
             _ => {}

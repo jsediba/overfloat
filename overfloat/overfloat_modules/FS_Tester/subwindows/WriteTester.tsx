@@ -66,7 +66,7 @@ const WriteTester: React.FC = () => {
                                 path,
                                 isRelative,
                                 appendMode
-                            ).then((result) => setResult(result))
+                            ).then((result: FSResult) => setResult(result))
                         }>
                         Write
                     </button>

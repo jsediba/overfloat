@@ -38,7 +38,7 @@ export type WindowSettings = {
 };
 
 export type SubwindowOpenEventPayload = {
-    componentName: string;
+    subwindowName: string;
     title?: string;
     params?: NameValuePairs;
     windowSettings?: WindowSettings;
@@ -135,7 +135,7 @@ export class WindowEventHandler {
                 : event.payload.windowSettings;
 
         module?.openSubwindow(
-            event.payload.componentName,
+            event.payload.subwindowName,
             event.payload.title,
             event.payload.params,
             windowSettings.visible,

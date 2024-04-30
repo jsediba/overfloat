@@ -31,7 +31,7 @@ export type Window = {
     destroyedPromise: Promise<void>;
     savedKeybinds: Map<string, string[]>;
     params?: NameValuePairs;
-    componentName?: string;
+    subwindowName?: string;
 };
 
 // Types for serialized window and module
@@ -45,7 +45,7 @@ type SerializedWindow = {
     width: number;
     shortcuts: SerializedShortcut[];
     params?: NameValuePairs;
-    componentName?: string;
+    subwindowName?: string;
 };
 
 export type SerializedModule = {
@@ -56,7 +56,7 @@ export type SerializedModule = {
 
 /**
  * @brief Class representing a module with main window and subwindows
- * Includes subscribing for react components to listen for changes
+ * Includes subscribing for react subwindows to listen for changes
  */
 export class OverfloatModule {
     private moduleName: string;
@@ -192,9 +192,9 @@ export class OverfloatModule {
 
     /**
      * @brief Opens a subwindow for the module
-     * @param componentName Name of the component to be opened
+     * @param subwindowName Name of the subwindow to be opened
      * @param title Title of the subwindow
-     * @param params Name-value pairs to be passed to the component
+     * @param params Name-value pairs to be passed to the subwindow
      * @param visible Visibility of the subwindow
      * @param x X position of the subwindow
      * @param y Y position of the subwindow
@@ -205,7 +205,7 @@ export class OverfloatModule {
      * @returns The opened subwindow
      */
     public async openSubwindow(
-        componentName: string,
+        subwindowName: string,
         title?: string,
         params: NameValuePairs = {},
         visible: boolean = true,
@@ -217,8 +217,8 @@ export class OverfloatModule {
         skipNotify: boolean = false,
         savedKeybinds: Map<string, string[]> = new Map<string, string[]>()
     ): Promise<Window> {
-        // Get the next id for the subwindow of this component
-        let id: number | undefined = this.subwindowsIds.get(componentName);
+        // Get the next id for the subwindow of this subwindow
+        let id: number | undefined = this.subwindowsIds.get(subwindowName);
         if (id == undefined) id = 0;
         else id = id + 1;
 
@@ -230,9 +230,9 @@ export class OverfloatModule {
         }
 
         const windowUrl =
-            _LOCAL_URL + this.moduleName + "/" + componentName + paramsString;
+            _LOCAL_URL + this.moduleName + "/" + subwindowName + paramsString;
         const windowLabel =
-            "module/" + this.moduleName + "/" + componentName + "/" + id;
+            "module/" + this.moduleName + "/" + subwindowName + "/" + id;
 
         // Create the subwindow
         const webview = new WebviewWindow(windowLabel, {
@@ -277,13 +277,13 @@ export class OverfloatModule {
             createdPromise: createdPromise,
             destroyedPromise: destoryedPromise,
             params: params,
-            componentName: componentName,
+            subwindowName: subwindowName,
             savedKeybinds: savedKeybinds,
         };
 
         // Save the subwindow
         this.subwindows.set(windowLabel, window);
-        this.subwindowsIds.set(componentName, id);
+        this.subwindowsIds.set(subwindowName, id);
 
         await createdPromise.then();
         if (!skipNotify) this.notifySubscribers();
@@ -666,7 +666,7 @@ export class OverfloatModule {
             width: size.width,
             shortcuts: shortcuts,
             params: window.params,
-            componentName: window.componentName,
+            subwindowName: window.subwindowName,
         };
     }
 
@@ -725,8 +725,8 @@ export class OverfloatModule {
         const promises: Promise<Window>[] = [];
 
         serializedModule.subwindows.forEach((serializedSubwindow) => {
-            // Skip subwindows without a component name
-            if (serializedSubwindow.componentName == undefined) return;
+            // Skip subwindows without a subwindow name
+            if (serializedSubwindow.subwindowName == undefined) return;
 
             // Setup saved keybinds for the subwindow
             const savedKeybinds = this.setupSavedKeybinds(
@@ -735,8 +735,8 @@ export class OverfloatModule {
 
             // Open the subwindow
             const window = this.openSubwindow(
-                serializedSubwindow.componentName
-                    ? serializedSubwindow.componentName
+                serializedSubwindow.subwindowName
+                    ? serializedSubwindow.subwindowName
                     : "",
                 serializedSubwindow.title,
                 serializedSubwindow.params,
