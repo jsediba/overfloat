@@ -11,7 +11,6 @@ use rdev;
 use std::{
     fs,
     io::{Seek, SeekFrom, Write},
-    path, string,
 };
 use tauri::{
     CustomMenuItem, Manager, SystemTray, SystemTrayEvent, SystemTrayMenu, SystemTrayMenuItem,
@@ -33,7 +32,7 @@ struct FSResult {
 /**
  * @brief Reads a file from the file system
  * @param path_str: Path to the file
- * @param use_relative_path: If true, the path is relative to the module directory
+ * @param use_relative_path: If true, the path is relative to instalation_directory/overfloat_modules/module_name/ 
  * @param module_name: Name of the module
  * @return FSResult: Struct containing the result of the operation
  */
@@ -41,8 +40,9 @@ struct FSResult {
 fn read_file(path_str: String, use_relative_path: bool, module_name: String) -> FSResult {
     // Construct the path string based on the parameters
     let final_path_str: String;
+
     if use_relative_path {
-        final_path_str = format!("../overfloat_modules/{}/{}", module_name, path_str);
+        final_path_str = format!("{}/overfloat_modules/{}/{}", get_install_dir(), module_name, path_str);
     } else {
         final_path_str = path_str;
     }
@@ -79,7 +79,7 @@ fn read_file(path_str: String, use_relative_path: bool, module_name: String) -> 
  * @param content: Content to write
  * @param path_str: Path to the file
  * @param append_mode: If true, the content is appended to the file without truncating it
- * @param use_relative_path: If true, the path is relative to the module directory
+ * @param use_relative_path: If true, the path is relative to instalation_directory/overfloat_modules/module_name/ 
  * @param module_name: Name of the module
  * @return FSResult: Struct containing the result of the operation
  */
@@ -94,13 +94,14 @@ fn write_file(
     // Construct the path string based on the parameters
     let final_path_str: String;
     if use_relative_path {
-        final_path_str = format!("../overfloat_modules/{}/{}", module_name, path_str);
+        final_path_str = format!("{}/overfloat_modules/{}/{}", get_install_dir(), module_name, path_str);
     } else {
         final_path_str = path_str;
     }
 
     // Create a path object
     let path = std::path::Path::new(&final_path_str);
+
 
     // Create parent directories if they don't exist
     if let Some(parent) = path.parent() {
@@ -156,42 +157,6 @@ fn write_file(
 }
 
 /**
- * @brief Gets the names of all modules in the overfloat_modules directory
- * @return Vec<string::String>: Vector of module names
- */
-#[tauri::command]
-fn get_module_names() -> Vec<string::String> {
-    // Create a vector for storing the module names
-    let mut modules = Vec::new();
-
-    // Read the content of the overfloat_modules directory
-    let dir_content = match fs::read_dir("../overfloat_modules") {
-        Ok(content) => content,
-        Err(err) => {
-            println!("Error while creating directories for config file: {}", err);
-            return modules},
-    };
-
-    // Iterate over the content and add the names of directories to the vector
-    for entry in dir_content {
-        let entry = entry.unwrap();
-        let path = entry.path();
-        if path.is_dir() {
-            let p: path::PathBuf = path
-                .iter()
-                .skip_while(|s| *s != "overfloat_modules")
-                .skip(1)
-                .collect();
-
-            modules.push(p.into_os_string().into_string().unwrap());
-        }
-    }
-
-    // Return the vector of module names
-    modules
-}
-
-/**
  * @brief Toggles the visibility of the Overfloat window
  * @param handle: Tauri application handle
  */
@@ -224,8 +189,21 @@ fn quit_app(handle: tauri::AppHandle) {
  */
 #[tauri::command]
 fn get_config() -> String {
+    
+    let path_string: String;
+    let mode = std::env::var("TAURI_MODE").unwrap_or_else(|_| "unknown".to_string());
+    
+    // Use the config file from the development directory if the application is running in development mode
+    if mode == "development"{
+        path_string = format!("../config/config.json");
+    } 
+    // Use the config file from the installation directory otherwise
+    else {
+        path_string = format!("{}/config/config.json", get_install_dir());
+    }
+    
     // Create a path object
-    let path = std::path::Path::new("../config/config.json");
+    let path = std::path::Path::new(&path_string);
 
     // Try to read the file and handle the result
     match fs::read_to_string(path) {
@@ -243,17 +221,32 @@ fn get_config() -> String {
  */
 #[tauri::command]
 fn save_config(config_json: String) {
-    if let Some(parent) = std::path::Path::new("../config/config.json").parent() {
+
+    let path_string: String;
+    let mode = std::env::var("TAURI_MODE").unwrap_or_else(|_| "unknown".to_string());
+    
+    // Use the config file from the development directory if the application is running in development mode
+    if mode == "development"{
+        path_string = format!("../config/config.json");
+    } 
+    // Use the config file from the installation directory otherwise
+    else {
+        path_string = format!("{}/config/config.json", get_install_dir());
+    }
+
+    // Create parent directories if they don't exist
+    if let Some(parent) = std::path::Path::new(&path_string).parent() {
         if let Err(err) = std::fs::create_dir_all(parent) {
             println!("Error while creating directories for config file: {}", err);
         }
     }
 
+    // Try to write the content to the config file and handle the result
     match fs::OpenOptions::new()
         .write(true)
         .create(true)
         .truncate(true)
-        .open("../config/config.json")
+        .open(&path_string)
     {
         Ok(mut file) => match file.write_all(config_json.as_bytes()) {
             Ok(_) => {}
@@ -269,8 +262,21 @@ fn save_config(config_json: String) {
  */
 #[tauri::command]
 fn get_profiles() -> String {
+    
+    let path_string: String;
+    let mode = std::env::var("TAURI_MODE").unwrap_or_else(|_| "unknown".to_string());
+
+    // Use the profiles file from the development directory if the application is running in development mode
+    if mode == "development"{
+        path_string = format!("../config/profiles.json");
+    } 
+    // Use the profiles file from the installation directory otherwise
+    else {
+        path_string = format!("{}/config/profiles.json", get_install_dir());
+    }
+    
     // Create a path object
-    let path = std::path::Path::new("../config/profiles.json");
+    let path = std::path::Path::new(&path_string);
 
     // Try to read the file and handle the result
     match fs::read_to_string(path) {
@@ -288,8 +294,22 @@ fn get_profiles() -> String {
  */
 #[tauri::command]
 fn save_profiles(profiles_json: String) {
+
+    let path_string: String;
+    let mode = std::env::var("TAURI_MODE").unwrap_or_else(|_| "unknown".to_string());
+    
+    // Use the profiles file from the development directory if the application is running in development mode
+    if mode == "development"{
+        path_string = format!("../config/profiles.json");
+    } 
+    // Use the profiles file from the installation directory otherwise
+    else {
+        path_string = format!("{}/config/profiles.json", get_install_dir());
+    }
+    
+
     // Create parent directories if they don't exist
-    if let Some(parent) = std::path::Path::new("../config/profiles.json").parent() {
+    if let Some(parent) = std::path::Path::new(&path_string).parent() {
         if let Err(err) = std::fs::create_dir_all(parent) {
             println!("Error while creating directories for profile file: {}", err);
             return;
@@ -301,7 +321,7 @@ fn save_profiles(profiles_json: String) {
         .write(true)
         .create(true)
         .truncate(true)
-        .open("../config/profiles.json")
+        .open(&path_string)
     {
         Ok(mut file) => match file.write_all(profiles_json.as_bytes()) {
             Ok(_) => {}
@@ -404,6 +424,17 @@ fn tray_toggle_window(
     }
 }
 
+/**
+ * @brief Get the directory of the installed application
+ * @return String: Path to the installed directory in as String
+ */
+fn get_install_dir() -> String{
+    let current_exe:std::path::PathBuf = std::env::current_exe().unwrap();
+    let current_dir:&std::path::Path = current_exe.parent().unwrap();
+    let current_dir_str: String = current_dir.to_str().unwrap().to_string();
+    current_dir_str
+}
+
 fn main() {
     // Create the tray menu
     let overfloat = CustomMenuItem::new("Overfloat".to_string(), "✔ Overfloat");
@@ -455,7 +486,6 @@ fn main() {
             _ => {}
         })
         .invoke_handler(tauri::generate_handler![
-            get_module_names,
             watch_path,
             input_simulation,
             get_profiles,

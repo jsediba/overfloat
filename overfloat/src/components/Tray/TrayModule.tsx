@@ -30,7 +30,7 @@ const TrayModule: React.FC<TrayModuleProps> = (props: TrayModuleProps) => {
     }, []);
 
     const getModuleIconPath = () => {
-        return "../../overfloat_modules/" + module.getModuleName() + "/icon.png";
+        return "../overfloat_modules/" + module.getModuleName() + "/icons/icon.png";
     }
 
     return (

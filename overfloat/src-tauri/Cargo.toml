@@ -2,7 +2,7 @@
 name = "overfloat"
 version = "0.0.1"
 description = "An Overalay system for Windows and Linux(X11)"
-authors = ["Jakub Šediba"]
+authors = ["Jakub Šediba <xsedib00@stud.fit.vutbr.cz>"]
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -11,7 +11,7 @@ edition = "2021"
 tauri-build = { version = "1.5", features = [] }
 
 [dependencies]
-tauri = { version = "1.5", features = [ "clipboard-all", "dialog-all", "system-tray", "shell-open", "window-all"] }
+tauri = { version = "1.5", features = [ "protocol-asset", "path-all", "clipboard-all", "dialog-all", "system-tray", "shell-open", "window-all"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 rdev = "0.5.3"

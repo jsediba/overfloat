@@ -6,18 +6,20 @@
 
 import "react";
 import { useState, useEffect } from "react";
-import { ModuleWindow, ShortcutManager, getParameter } from "@OverfloatAPI";
+import { ModuleWindow, ShortcutManager, getParameter, Key } from "@OverfloatAPI";
 
 const Counter = (): React.JSX.Element => {
     const keybind = getParameter("keybind");
 
     useEffect(() => {
+        const key = keybind as Key;
+
         ShortcutManager.addShortcut(
             "count_up",
             "Increment Counter",
             "Increments the counter displayed in this subwindow.",
             handle_keypress,
-            keybind? [keybind] : []
+            key? [{key: key}] : []
         );
 
         return () => {};

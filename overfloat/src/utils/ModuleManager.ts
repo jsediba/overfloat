@@ -7,6 +7,7 @@
 import { OverfloatModule, SerializedModule, Window } from "./OverfloatModule";
 import { invoke } from "@tauri-apps/api";
 import { SerializedShortcut } from "./Shortcut";
+import { MODULE_NAMES } from "../App";
 
 // Types for different serialized data
 type SerializedProfiles = {
@@ -40,7 +41,7 @@ export class ModuleManager {
      * @brief Load all modules, profiles and config from the backend
      */
     async initialLoad() {
-        await this.setupModules();
+        this.setupModules();
         await this.loadProfiles();
         await this.loadConfig();
         this.loadProfile(this.config["activeProfile"]);
@@ -224,8 +225,8 @@ export class ModuleManager {
     /**
      * @brief Setup all modules from the backend
      */
-    private async setupModules() {
-        let module_names: string[] = await invoke("get_module_names");
+    private setupModules() {
+        let module_names: string[] = [...MODULE_NAMES];
         this.activeModules = new Map<string, OverfloatModule>();
         this.allModules = module_names;
     }

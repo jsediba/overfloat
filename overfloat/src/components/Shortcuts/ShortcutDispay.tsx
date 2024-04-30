@@ -99,6 +99,7 @@ const ShortcutDisplay: React.FC<ShortcutDisplayProps> = (
     // Handler for opening the new keybind modal
     const handleShowModal = async () => {
         setNewKeybind("");
+        setErrorMessage("No key combination selected!");
 
         // Temporarily stop propagation of KeyPress events to modules
         await KeybindEventHandler.getInstance().stopListening();
@@ -120,7 +121,6 @@ const ShortcutDisplay: React.FC<ShortcutDisplayProps> = (
 
         // Stop listening for KeyPress events
         await unlisten?.then((f) => f());
-        setNewKeybind("");
         setModalVisible(false);
     };
 

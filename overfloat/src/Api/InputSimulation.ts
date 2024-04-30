@@ -5,6 +5,7 @@
  ****************************************************************************/
 
 import { invoke } from "@tauri-apps/api";
+import { Key, ModifierKey } from "./ShortcutManager";
 
 // Type for a single simulation step
 export type SimulationStep = {
@@ -34,44 +35,44 @@ function constructSimulationStep(
 
 /**
  * @brief Function for simulating a KeyDown event
- * @param key String representation of the key
+ * @param key Key to be pushed down
  * @returns SimulationStep object representing the KeyDown event
  */
-export function simKeyDown(key: string): SimulationStep {
+export function simKeyDown(key: Key|ModifierKey): SimulationStep {
     return constructSimulationStep(1, 0, key);
 }
 
 /**
  * @brief Function for simulating a KeyUp event
- * @param key String representation of the key
+ * @param key Key to be released
  * @returns SimulationStep object representing the KeyUp event
  */
-export function simKeyUp(key: string): SimulationStep {
+export function simKeyUp(key: Key|ModifierKey): SimulationStep {
     return constructSimulationStep(1, 1, key);
 }
 
 /**
  * @brief Function for simulating a KeyPress event
- * @param key String representation of the key
+ * @param key Key to be pressed
  * @returns SimulationStep object representing the KeyPress event
  */
-export function simKeyPress(key: string): SimulationStep {
+export function simKeyPress(key: Key|ModifierKey): SimulationStep {
     return constructSimulationStep(1, 2, key);
 }
 
 // Enum for different mouse buttons
 export enum MouseButton {
-    MouseLeft,
-    MouseMiddle,
-    MouseRight,
+    MouseLeft = "MouseLeft",
+    MouseMiddle = "MouseMiddle",
+    MouseRight = "MouseRight",
 }
 
 // Enum for different scroll directions
 export enum Direction {
-    Up,
-    Down,
-    Left,
-    Right,
+    Up = "Up",
+    Down = "Down",
+    Left = "Left",
+    Right = "Right",
 }
 
 /**

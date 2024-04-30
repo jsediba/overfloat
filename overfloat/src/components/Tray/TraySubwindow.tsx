@@ -29,7 +29,7 @@ const TraySubwindow: React.FC<TraySubwindowProps> = (
     }, []);
 
     const getComponentIconPath = () => {
-        return "../../overfloat_modules/" + module.getModuleName() + "/icons/" + window.componentName + ".png";
+        return "../overfloat_modules/" + module.getModuleName() + "/icons/" + window.subwindowName + ".png";
     };
 
     return (

@@ -18,6 +18,11 @@ const routes = Object.keys(ROUTES).map((route) => {
   return { path, Element: ROUTES[route].default} 
 })
 
+// Export module names so that the app can access them.
+export const MODULE_NAMES = Object.keys(ROUTES).map((route) => {
+  return route.replace(/..\/overfloat_modules\/([^/]*)\/.*.tsx/g, '$1');
+});
+
 // Create routes for subwindows of all modules based on the file structure
 const subroutes = Object.keys(SUB_ROUTES).map((route) => {
     const path = route.replace(/..\/overfloat_modules\/([^/]*)\/subwindows\/([^/]*).tsx/g, '/module/$1/$2');

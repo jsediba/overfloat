@@ -5,7 +5,7 @@
  ****************************************************************************/
 
 import { useEffect } from "react";
-import { ModuleWindow, ShortcutManager, openSubwindow } from "@OverfloatAPI";
+import { ModuleWindow, ShortcutManager, openSubwindow, Key, ModifierKey } from "@OverfloatAPI";
 
 const Keybind_Tester = () => {
     useEffect(() => {
@@ -16,7 +16,7 @@ const Keybind_Tester = () => {
             () => {
                 openSubwindow("counter", "Counter");
             },
-            ["Alt+X"]
+            [{ key: Key.X, modifiers: [ModifierKey.Alt]}]
         );
 
         return () => {};
@@ -35,23 +35,18 @@ const Keybind_Tester = () => {
                 </div>
                 <div className="row">
                     <div className="col">
-                        <button onClick={() => newWindow("A")}>[A]</button>
+                        <button className="btn btn-primary" onClick={() => newWindow("A")}>[A]</button>
                     </div>
                     <div className="col">
-                        <button onClick={() => newWindow("B")}>[B]</button>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col">
-                        <button onClick={() => newWindow("C")}>[C]</button>
-                    </div>
-                    <div className="col">
-                        <button onClick={() => newWindow("D")}>[D]</button>
+                        <button className="btn btn-primary" onClick={() => newWindow("B")}>[B]</button>
                     </div>
                 </div>
-                <div className="row">
+                <div className="row mt-1">
                     <div className="col">
-                        Press Alt+X to open a new counter.
+                        <button className="btn btn-primary" onClick={() => newWindow("C")}>[C]</button>
+                    </div>
+                    <div className="col">
+                        <button className="btn btn-primary" onClick={() => newWindow("D")}>[D]</button>
                     </div>
                 </div>
             </div>

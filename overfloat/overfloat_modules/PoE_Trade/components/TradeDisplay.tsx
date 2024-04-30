@@ -1,3 +1,9 @@
+/*****************************************************************************
+ * @FilePath    : overfloat_modules/PoE_Trade/components/TradeDisplay.tsx    *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import {
     IconArrowsExchange,
     IconCircleX,

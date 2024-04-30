@@ -15,15 +15,19 @@ A modular overlay system for Windows and Linux (X11) built using Tauri and React
 -   [Creating Windows](#creating-windows)
 -   [License](#license)
 
+## Disclaimer
+
+To capture all global keypresses this application needs to be ran with administrator privileges on Windows.
+
 ## Installation
 
-You can install the app with pre-bundled testing modules using the installers provided in the `installers` directory.
+Installers can be downloaded from the `installers` directory. Afterwards they only need to be installed and can be run.
 
-For the module development version, download the `overfloat` directory. Afterwards, run `yarn` to download the necessary node modules and you can start working on your modules. To run the application, use `yarn tauri dev`. To create an installer, use `yarn tauri build`. Only the installer for the used platform will be generated. Cross-platform compiling is currently unsupported.
+For the module development version, download the `overfloat` directory. Afterwards, run `yarn` to download the necessary node modules and you can start working on your modules. To run the application, use `yarn tauri:dev`. The installer for the currently used platform can be generated using `yarn tauri:build`, cross-platform compilation is not supported. 
 
 ## Usage
 
-Using the application with pre-installed modules is as simple as downloading the installer, installing the application, and then running it.
+If you only want to use the pre installed modules, download the installer and install the app.
 
 For module development, download the development version as described in [Installation](#installation). Modules are developed by creating a new folder in the `overfloat_modules` directory. These modules have to follow a specific [structure](#module-structure).
 
@@ -33,19 +37,19 @@ Modules are represented by directories inside the `overfloat_modules` directory.
 These modules must contain a main window and can contain any number of subwindows. The directory should be structured as follows:
 
 -   `module_name/`
-        -   `MainWindowFile.tsx`
-        -   `subwindows/`
-            -   `Subwindow1.tsx`
-            -   `Subwindow2.tsx`
-            -   ...
-        -   `icons/`
-            -   `icon.png`
-            -   `Subwindow1.png`
-            -   `Subwindow2.png`
-            -   ...
-        -   ...
+	-   `MainWindowFile.tsx`
+	-   `subwindows/`
+		-   `Subwindow1.tsx`
+		-   `Subwindow2.tsx`
+		-   ...
+	-   `icons/`
+		-   `icon.png`
+		-   `Subwindow1.png`
+		-   `Subwindow2.png`
+		-   ...
+	-   ...
 
-The window .tsx files have to include and default export React functional components representing the content of the window.
+The window .tsx files have to include and default export React functional components representing the content of the window. The names of these files can only contain alphanumerical characters, `-` and `_`.
 
 The file names inside the `subwindow` directory represent the names of the subwindows used when working with the API. In the provided example, there would be two subwindows, one named `Subwindow1` and the other named `Subwindow2`.
 
@@ -160,7 +164,7 @@ The File-System API exposes the following enums, types and functions for file-sy
 		- Modify - Event signalling file/folder content modification.
 		- Rename - Event signalling file/folder name change.
 
-- <a name="fseventkind"></a>`FSEvent`
+- <a name="fsevent"></a>`FSEvent`
 	- Type holding the information about a file-system event.
 	- Fields:
 		- eventKind: [FSEventKind](#fseventkind) - Type of the event.
@@ -213,7 +217,127 @@ Alongside these functions, the File-System API exposes an instance of a WatchMan
 
 ### Shortcut API
 
-The Shortcut API exposes an instance of a ShortcutManager. This provides methods to access the shortcut functionality. ShortcutManager exposes the following methods:
+The shortcut API exposes following enums and types related to keys and key combinations:
+
+- <a name="modifierkey"></a>`ModifierKey`
+	- Enum for modifier keys.
+	- Values:
+		- LeftMeta
+		- RightMeta
+		- LeftControl
+		- RightControl
+		- Alt
+		- AltGr
+		- LeftShift
+		- RightShift
+
+- <a name="key"></a>`Key`
+	- Enum for non-modifier keys.
+	- Values:
+		- BackQuote
+		- Num1
+		- Num2
+		- Num3
+		- Num4
+		- Num5
+		- Num6
+		- Num7
+		- Num8
+		- Num9
+		- Num0
+		- Minus
+		- Equal
+		- F1
+		- F2
+		- F3
+		- F4
+		- F5
+		- F6
+		- F7
+		- F8
+		- F9
+		- F10
+		- F11
+		- F12
+		- Q
+		- W
+		- E
+		- R
+		- T
+		- Y
+		- U
+		- I
+		- O
+		- P
+		- A
+		- S
+		- D
+		- F
+		- G
+		- H
+		- J
+		- K
+		- L
+		- Z
+		- X
+		- C
+		- V
+		- B
+		- N
+		- M
+		- KeyPadReturn
+		- KeyPadMinus,
+		- KeyPadPlus
+		- KeyPadMultiply
+		- KeyPadDivide
+		- KeyPadDelete
+		- KeyPad0
+		- KeyPad1
+		- KeyPad2
+		- KeyPad3
+		- KeyPad4
+		- KeyPad5
+		- KeyPad6
+		- KeyPad7
+		- KeyPad8
+		- KeyPad9
+		- UpArrow
+		- DownArrow
+		- LeftArrow
+		- RightArrow
+		- Insert
+		- Home
+		- Delete
+		- End
+		- PageUp
+		- PageDown
+		- Escape
+		- Enter
+		- Space
+		- Tab
+		- PrintScreen
+		- Pause
+		- Function
+		- ScrollLock
+		- NumLock
+		- CapsLock
+		- Backspace
+		- LeftBracket
+		- RightBracket
+		- Semicolon
+		- Quote
+		- Backslash
+		- Comma
+		- Period
+		- Slash
+
+- <a name="keycombination"></a>`KeyCombination`
+	- Type representing key combinations
+	- Fields:
+		- key: [Key](#key) - The key that activates the key combination.
+		- [optional] modifiers: [ModifierKey](#modifierkey)[] - Array of modifiers that need to be pressed for the key combination to activate.
+
+Alongside these enums and types, the Shortcut API also exposes an instance of a ShortcutManager. This provides methods to access the shortcut functionality. ShortcutManager exposes the following methods:
 
 - `addShortcut(id, name, description, callback, defaultKeybinds): boolean`
 	- Adds a new shortcut for this window.
@@ -222,7 +346,7 @@ The Shortcut API exposes an instance of a ShortcutManager. This provides methods
 		- name: string - Name of the shortcut
 		- description: string - Description of the shortcut.
 		- callback: () => void - Callback that will be triggered when a key combination bound to this shortcut is pressed.
-		- [optional] defaultKeybinds: string[] - An array of key combinations to be bound to this shortcut. Refer to [Key Combination Strings](#key-combination-strings) for the required format.
+		- [optional] defaultKeybinds: [KeyCombination](#keycombination)[] - An array of key combinations to be initially bound to this shortcut.
 	- Returns:
 		- True if the shortcut was successfully added. False otherwise.
 
@@ -238,14 +362,14 @@ The Shortcut API exposes an instance of a ShortcutManager. This provides methods
 
 The Input Simulation API exposes the following enums, types and functions for file-system operations:
 
-- `MouseButton`
+- <a name="mousebutton"></a>`MouseButton`
 	- Enum for the supported mouse buttons.
 	- Values:
 		- MouseLeft - Left Mouse Button
 		- MouseMiddle - Middle Mouse Button
 		- MouseRight - Right Mouse Button
 
-- `Direction`
+- <a name="direction"></a>`Direction`
 	- Enum for mouse scroll directions.
 	- Values:
 		- Up
@@ -253,7 +377,7 @@ The Input Simulation API exposes the following enums, types and functions for fi
 		- Left
 		- Right
 
-- `SimulationStep`
+- <a name="simulationstep"></a>`SimulationStep`
 	- Type used to internally represent simulation steps in a format suitable for the backend. Values of this type are returned from the functions of this API and it is not recommended to construct them manually.
 	- Fields:
 		- device_type: number - The type of device to be simulated. 1 for the keyboard, 2 for the mouse.
@@ -265,21 +389,21 @@ The Input Simulation API exposes the following enums, types and functions for fi
 - `simKeyDown(key)`
 	- Creates a simulation step for pushing the selected key down.
 	- Parameters:
-		- key: string - Key to be pushed down. Refer to [Key Strings](#key-strings) for the required format.
+		- key: [Key](#key)|[ModifierKey](#modifierkey) - Key to be pushed down. 
 	- Returns:
 		- The [SimulationStep](#simulationstep) representing the created simulation step.
 
 - `simKeyUp(key)`
 	- Creates a simulation step for releasing the selected key.
 	- Parameters:
-		- key: string - Key to be released. Refer to [Key Strings](#key-strings) for the required format.
+		- key: [Key](#key)|[ModifierKey](#modifierkey) - Key to be released.
 	- Returns:
 		- The [SimulationStep](#simulationstep) representing the created simulation step.
 
 - `simKeyPress(key)`
 	- Creates a simulation step for a quick press of the selected key.
 	- Parameters:
-		- key: string - Key to be pressed. Refer to [Key Strings](#key-strings) for the required format.
+		- key: [Key](#key)|[ModifierKey](#modifierkey) - Key to be pressed.
 	- Returns:
 		- The [SimulationStep](#simulationstep) representing the created simulation step.
 
@@ -322,148 +446,10 @@ The Input Simulation API exposes the following enums, types and functions for fi
 - `inputSimulation(steps)`
 	- Executes a sequence of simulation steps in order. The sequence should be constructed using the provided functions with the `sim` prefix.
 	- Parameters:
-		- steps: [SimulationStep](#simulation-step)[] - An array of the simulation steps to be executed.
+		- steps: [SimulationStep](#simulationstep)[] - An array of the simulation steps to be executed.
 	- Examples:
 		- `inputSimulation([simKeyDown("LShift"), simKeyPress("A"), simKeyUp("LShift)]);`
 		- `inputSimulation([simMouseMove(37, 42), simMouseDown(MouseButton.MouseLeft), simMouseMove(342, 537), simMouseUp(MouseButton.MouseLeft)]);`
-## Key Strings
-
-When using the [Input Simulation API](#input-simulation-api), the key strings need to follow a specific format. This is the list of all of the supported key strings:
-
-### Modifier Keys
-
--   `"LMeta"`
--   `"RMeta"`
--   `"LCtrl"`
--   `"RCtrl"`
--   `"Alt"`
--   `"AltGr"`
--   `"LShft"`
--   `"RShft"`
-
-### Num Row
-
--   `"`"`
--   `"1"`
--   `"2"`
--   `"3"`
--   `"4"`
--   `"5"`
--   `"6"`
--   `"7"`
--   `"8"`
--   `"9"`
--   `"0"`
--   `"-"`
--   `"="`
-
-### F Row
-
--   `"F1"`
--   `"F2"`
--   `"F3"`
--   `"F4"`
--   `"F5"`
--   `"F6"`
--   `"F7"`
--   `"F8"`
--   `"F9"`
--   `"F10"`
--   `"F11"`
--   `"F12"`
-
-### Alpha Keys
-
--   `"Q"`
--   `"W"`
--   `"E"`
--   `"R"`
--   `"T"`
--   `"Y"`
--   `"U"`
--   `"I"`
--   `"O"`
--   `"P"`
--   `"A"`
--   `"S"`
--   `"D"`
--   `"F"`
--   `"G"`
--   `"H"`
--   `"J"`
--   `"K"`
--   `"L"`
--   `"Z"`
--   `"X"`
--   `"C"`
--   `"V"`
--   `"B"`
--   `"N"`
--   `"M"`
-
-### Numpad Keys
-
--   `"KpReturn"`
--   `"KpMinus"`
--   `"KpPlus"`
--   `"KpMultiply"`
--   `"KpDivide"`
--   `"Kp0"`
--   `"Kp1"`
--   `"Kp2"`
--   `"Kp3"`
--   `"Kp4"`
--   `"Kp5"`
--   `"Kp6"`
--   `"Kp7"`
--   `"Kp8"`
--   `"Kp9"`
--   `"KpDelete"`
-
-### Arrow Keys
-
--   `"UpArrow"`
--   `"DownArrow"`
--   `"LeftArrow"`
--   `"RightArrow"`
-
-### Other Keys
-
--   `"Insert"`
--   `"Home"`
--   `"Del"`
--   `"End"`
--   `"PgUp"`
--   `"PgDown"`
--   `"Escape"`
--   `"Return"`
--   `"Space"`
--   `"Tab"`
--   `"PrintScreen"`
--   `"ScrollLock"`
--   `"NumLock"`
--   `"Pause"`
--   `"Function"`
--   `"Backspace"`
--   `"CapsLock"`
--   `"("`
--   `")"`
--   `";"`
--   `"\""`
--   `"\\"`
--   `","`
--   `"."`
--   `"/"`
-
-## Key Combination Strings
-
-When creating a new shortcut using the [Shorcut API](#shortcut-api), the default key combinations to be bound to the shortcut need to follow a specific format. The key combination can contain any combination of [Modifier Keys](#modifier-keys) and has to end with one key that is not a [Modifier Key](#modifier-keys). The key combination string is constructed by connecting the key strings with the `+` symbol. The modifiers in the string need to be in the same order as they are listed in the [Modifier Keys](#modifier-keys) section.
-
-Examples:
-
--   `"Pause"`
--   `"LCtrl+A"`
--   `"LMeta+RMeta+LCtrl+RCtrl+Alt+AltGr+LShft+RShft+Return"`
 
 ## Creating Windows
 

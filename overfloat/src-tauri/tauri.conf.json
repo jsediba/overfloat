@@ -15,6 +15,13 @@
       "iconAsTemplate": true
     },
     "allowlist": {
+      "protocol":{
+        "asset": true,
+        "assetScope": ["**"]
+      },
+      "path":{
+        "all": true
+      },
       "window": {
         "all": true,
         "startDragging": true
@@ -36,7 +43,10 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "com.overfloat.dev",
+      "resources": [
+        "../overfloat_modules/*/icons/*"
+      ],
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",

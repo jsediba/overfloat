@@ -14,8 +14,6 @@ import { SerializedShortcut, Shortcut } from "./Shortcut";
 import { KeybindManager } from "./KeybindManager";
 import { ModuleManager } from "./ModuleManager";
 
-const _LOCAL_URL = "http://localhost:1420/module/";
-
 // Interface for key-value pairs
 export interface NameValuePairs {
     [key: string]: string | number;
@@ -104,7 +102,7 @@ export class OverfloatModule {
         this.moduleName = moduleName;
 
         const windowLabel: string = "module/" + this.moduleName;
-        const windowUrl: string = _LOCAL_URL + this.moduleName;
+        const windowUrl: string = "module/" + this.moduleName;
 
         // Create main window
         const webview = new WebviewWindow(windowLabel, {
@@ -181,10 +179,11 @@ export class OverfloatModule {
         let result: string = "";
         for (let key in params) {
             if (first) {
-                result = "?" + key + "=" + params[key];
+                result = "?" + key + "=" + encodeURIComponent(params[key]);
                 first = false;
             } else {
-                result = result + "&" + key + "=" + params[key];
+                result =
+                    result + "&" + key + "=" + encodeURIComponent(params[key]);
             }
         }
         return result;
@@ -230,7 +229,7 @@ export class OverfloatModule {
         }
 
         const windowUrl =
-            _LOCAL_URL + this.moduleName + "/" + subwindowName + paramsString;
+            "module/" + this.moduleName + "/" + subwindowName + paramsString;
         const windowLabel =
             "module/" + this.moduleName + "/" + subwindowName + "/" + id;
 
