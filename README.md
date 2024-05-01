@@ -185,7 +185,7 @@ The File-System API exposes the following enums, types and functions for file-sy
 	- Parameters:
 		- content: string - The text to be written into the file.
 		- path: string - Path to the file.
-		- useRelativePath: boolean - If false, the path is considered an absolute path. If true, the path is considered a relative path, starting from the root of the module's directory.
+		- useRelativePath: boolean - If false, the path is considered an absolute path. If true, the path is considered a relative path, at $INSTALLATION_DIRECTORY/overfloat_modules/module_name.
 		- appendMode: boolean - If false, the file is truncated before writing the content. If true, the current content of the file is kept and the text is appended to the end of it.
 	- Returns:
 		- [FSResult](#fsresult) of the operation.
@@ -194,7 +194,7 @@ The File-System API exposes the following enums, types and functions for file-sy
 	- Reads text from a file.
 	- Parameters:
 		- path: string - Path to the file.
-		- useRelativePath: boolean - If false, the path is considered an absolute path. If true, the path is considered a relative path, starting from the root of the module's directory.
+		- useRelativePath: boolean - If false, the path is considered an absolute path. If true, the path is considered a relative path, starting at $INSTALLATION_DIRECTORY/overfloat_modules/module_name.
 	- Returns:
 		- [FSResult](#fsresult) of the operation.
 
