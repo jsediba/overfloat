@@ -1,0 +1,9 @@
+[Desktop Entry]
+Categories=
+Comment=An Overalay system for Windows and Linux(X11)
+Exec=overfloat
+Icon=overfloat
+Name=overfloat
+Terminal=false
+Type=Application
+X-AppImage-Version=51fcfa2e
