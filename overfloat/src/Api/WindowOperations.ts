@@ -154,7 +154,7 @@ function closeSubwindow(label: string = appWindow.label) {
 */
 function isSubwindow(label: string = appWindow.label) {
 
-    const submodule = appWindow.label.replace(/module\/([^/]*)\/?(.*)?/g, "$2");
+    const submodule = label.replace(/module\/([^/]*)\/?(.*)?/g, "$2");
     return submodule.length != 0;
 }
 
@@ -164,7 +164,7 @@ function isSubwindow(label: string = appWindow.label) {
  * @param label Label of the window to be checked, default is the calling window
  */
 function isMainWindow(label: string = appWindow.label) {
-    const subLabel = appWindow.label.replace(/module\/(.*)/g, "$1");
+    const subLabel = label.replace(/module\/(.*)/g, "$1");
     return subLabel.length == 0;
 }
 

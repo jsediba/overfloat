@@ -102,17 +102,17 @@ const EventDisplay: React.FC<EventDisplayProps> = (
                         </div>
                         {event.eventKind == FSEventKind.Rename ? (
                             <div>
-                                <div className="row">
+                                <div className="row text-break">
                                     <div className="col-2">From:</div>
                                     <div className="col">{event.pathOld}</div>
                                 </div>
-                                <div className="row">
+                                <div className="row text-break">
                                     <div className="col-2">To:</div>
                                     <div className="col">{event.path}</div>
                                 </div>
                             </div>
                         ) : (
-                            <div className="row">
+                            <div className="row text-break">
                                 <div className="col-2">
                                     Path:
                                 </div>

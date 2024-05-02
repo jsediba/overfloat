@@ -49,6 +49,20 @@ const OverfloatWindow: React.FC = () => {
     >(new Map<string, OverfloatModule>());
 
     useEffect(() => {
+
+        // Disable refreshing the main window.
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'F5' || (event.ctrlKey && event.key === 'r') || (event.metaKey && event.key === 'r')) {
+              event.preventDefault();
+            }
+        });
+
+        // Disable the context menu in the main window.
+        document.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+        });
+
+
         // Function to update the active modules
         const updateModules = () => {
             setActiveModules(

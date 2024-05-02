@@ -80,7 +80,7 @@ const WriteTester: React.FC = () => {
                                 {result.successful.toString()}
                             </div>
                         </div>
-                        <div className="row">
+                        <div className="row text-break">
                             <div className="col-2">Path:</div>
                             <div className="col">{result.path}</div>
                         </div>

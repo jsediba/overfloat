@@ -4,7 +4,7 @@
  * @Year        : 2024                                                       *
  ****************************************************************************/
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import useStateRef from "react-usestateref";
 import { OverfloatModule } from "../../utils/OverfloatModule";
 import "./css/TrayModule.css";
@@ -15,29 +15,38 @@ interface TrayModuleProps {
     module: OverfloatModule;
 }
 
+/**
+ * React component for displaying a single module in the tray.
+ */
 const TrayModule: React.FC<TrayModuleProps> = (props: TrayModuleProps) => {
     const module = props["module"];
-    const containerName = module.getModuleName() + "-module-container";
+    const containerRef = useRef<HTMLDivElement>(null);
 
-    const [_, setVisible, refVisible] = useStateRef<boolean>(module.getMainWindow().visible);
+    // State for the visibility of the main window, this changes the background color of the button
+    const [_, setVisible, refVisible] = useStateRef<boolean>(
+        module.getMainWindow().visible
+    );
 
     useEffect(() => {
         module.subscribe(() => setVisible(module.getMainWindow().visible));
 
         return () => {
-            module.unsubscribe(() => setVisible(module.getMainWindow().visible));
+            module.unsubscribe(() =>
+                setVisible(module.getMainWindow().visible)
+            );
         };
     }, []);
 
+    // Function to get the path to the module's main window icon
     const getModuleIconPath = () => {
-        return "../overfloat_modules/" + module.getModuleName() + "/icons/icon.png";
-    }
+        return (
+            "../overfloat_modules/" + module.getModuleName() + "/icons/icon.png"
+        );
+    };
 
     return (
-        <div
-            id={containerName}
-            className="module-container"
-            >
+        <div className="module-container" ref={containerRef}>
+            {/* Button representing the module, clicking it toggles the main window */}
             <button
                 className={
                     refVisible.current
@@ -49,9 +58,14 @@ const TrayModule: React.FC<TrayModuleProps> = (props: TrayModuleProps) => {
                     if (refVisible.current) module.hideMainWindow();
                     else module.showMainWindow();
                 }}>
-                <TrayWindowIcon webview={module.getMainWindow().webview} imgPath={getModuleIconPath()} />
+                {/* Icon for the main window of the module */}
+                <TrayWindowIcon
+                    webview={module.getMainWindow().webview}
+                    imgPath={getModuleIconPath()}
+                />
             </button>
-            <TraySubwindows module={module} containerId={containerName}/>
+            {/* Subwindows of the module */}
+            <TraySubwindows module={module} containerRef={containerRef}/>
         </div>
     );
 };

@@ -2065,7 +2065,7 @@ dependencies = [
 
 [[package]]
 name = "overfloat"
-version = "0.0.1"
+version = "1.0.0"
 dependencies = [
  "futures",
  "lazy_static",

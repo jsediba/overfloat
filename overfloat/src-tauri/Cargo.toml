@@ -1,6 +1,6 @@
 [package]
 name = "overfloat"
-version = "0.0.1"
+version = "1.0.0"
 description = "An Overalay system for Windows and Linux(X11)"
 authors = ["Jakub Šediba <xsedib00@stud.fit.vutbr.cz>"]
 edition = "2021"

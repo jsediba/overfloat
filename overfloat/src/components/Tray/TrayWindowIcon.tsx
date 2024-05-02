@@ -15,12 +15,16 @@ type TrayModuleIconProps = {
     webview: WebviewWindow;
 };
 
+/**
+ * React component for the icon of a tray module window.
+ */
 const TrayWindowIcon: React.FC<TrayModuleIconProps> = (
     props: TrayModuleIconProps
 ) => {
     const imgPath = props["imgPath"];
     const webview = props["webview"];
 
+    // State for the title of the window and the icon element
     const [windowTitle, setWindowTitle] = useState<string>(webview.label);
     const [element, setElement] = useState<React.ReactNode>(
         <div title={windowTitle} className="w-100 h-100">
@@ -29,10 +33,11 @@ const TrayWindowIcon: React.FC<TrayModuleIconProps> = (
     );
 
     useEffect(() => {
+        // Update the displayed name of the window to it's title on mount
         webview.title().then((title) => setWindowTitle(title));
 
+        // Load the icon image from resources
         resolveResource(imgPath).then((path) => {
-
             const assetPath = convertFileSrc(path);
 
             const image = new Image();

@@ -1,7 +1,7 @@
 {
   "name": "overfloat",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "An Overalay system for Windows and Linux(X11)",
   "license": "GPL-3.0",
   "author": "Jakub Šediba <xsedib00@stud.fit.vutbr.cz>",

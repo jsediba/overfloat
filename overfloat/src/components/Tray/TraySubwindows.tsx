@@ -1,3 +1,9 @@
+/*****************************************************************************
+ * @FilePath    : src/components/Tray/TraySubwindows.tsx                     *
+ * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
+ * @Year        : 2024                                                       *
+ ****************************************************************************/
+
 import { useEffect } from "react";
 import useStateRef from "react-usestateref";
 import { OverfloatModule } from "../../utils/OverfloatModule";
@@ -8,39 +14,50 @@ import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
 interface TraySubwindowsProps {
     module: OverfloatModule;
-    containerId: string;
+    containerRef: React.RefObject<HTMLDivElement>;
 }
 
+/**
+ * React component for displaying a module's subwindows in the tray.
+ */
 const TraySubwindows: React.FC<TraySubwindowsProps> = (
     props: TraySubwindowsProps
 ) => {
     const module = props["module"];
-    const containerId = props["containerId"];
+    const containerRef = props["containerRef"];
 
-    const [subwindows, setSubwindows, refSubwindows] = useStateRef<Map<string, Window>>(
-        module.getSubwindows()
-    );
+    // State for the subwindows of the module
+    const [subwindows, setSubwindows, refSubwindows] = useStateRef<
+        Map<string, Window>
+    >(module.getSubwindows());
 
+    // State for the visibility of the subwindows
     const [subwindowsVisible, setSubwindowsVisible, refSubwindowsVisible] =
         useStateRef<boolean>(false);
 
+    // Function to update the minimum height of the module container in the tray
     const updateMinHeight = () => {
-        const moduleContainer = document.getElementById(containerId);
-        if (moduleContainer != null) {
-            const height = Array.from(moduleContainer.children).reduce(
-                (height, child) => height + child.clientHeight,
-                0
-            );
-            
-            if(refSubwindows.current.size == 0){
-                moduleContainer.style.minHeight = "56px";
+        if (containerRef.current != null) {
+            // If there are no subwindows, set the minimum height to 56px
+            if (refSubwindows.current.size == 0) {
+                containerRef.current.style.minHeight = "56px";
                 return;
             }
 
+            Array.from(containerRef.current.children).forEach((child) => {
+                console.log(child.clientHeight);
+            });
+
+            // Calculate the minimal height of the module container in the tray
+            const height = Array.from(containerRef.current.children).reduce(
+                (height, child) => height + child.clientHeight,
+                0
+            );
+
             if (refSubwindowsVisible.current) {
-                moduleContainer.style.minHeight = height + "px";
+                containerRef.current.style.minHeight = height + "px";
             } else {
-                moduleContainer.style.minHeight = "76px";
+                containerRef.current.style.minHeight = "76px";
             }
         }
     };
@@ -48,7 +65,6 @@ const TraySubwindows: React.FC<TraySubwindowsProps> = (
     useEffect(() => {
         const updateModuleSubwindows = () => {
             setSubwindows(new Map<string, Window>(module.getSubwindows()));
-            updateMinHeight();
         };
 
         updateModuleSubwindows();
@@ -59,9 +75,11 @@ const TraySubwindows: React.FC<TraySubwindowsProps> = (
         };
     }, []);
 
+    // Update the minimum height of the module container in the tray when the subwindows display
+    // is toggled or a change in the tray container occurs.
     useEffect(() => {
         updateMinHeight();
-    }, [subwindowsVisible]);
+    }, [subwindowsVisible, containerRef]);
 
     if (subwindows.size == 0) {
         return null;
