@@ -109,7 +109,7 @@ function moduleMatch(label: string) {
  * @param label Label of the subwindow to be shown, default is the calling subwindow
  * @note Only subwindows from the same module can be shown this way
  */
-export function showSubwindow(label: string = appWindow.label) {
+function showSubwindow(label: string = appWindow.label) {
     if (!moduleMatch(label)) return;
 
     mainWindow()?.emit("Overfloat://SubwindowModification", {
@@ -123,7 +123,7 @@ export function showSubwindow(label: string = appWindow.label) {
  * @param label Label of the subwindow to be hidden, default is the calling subwindow
  * @note Only subwindows from the same module can be hidden this way
  */
-export function hideSubwindow(label: string = appWindow.label) {
+function hideSubwindow(label: string = appWindow.label) {
     if (!moduleMatch(label)) return;
 
     mainWindow()?.emit("Overfloat://SubwindowModification", {
@@ -138,7 +138,7 @@ export function hideSubwindow(label: string = appWindow.label) {
  * @param label Label of the subwindow to be closed, default is the calling subwindow
  * @note Only subwindows from the same module can be closed this way
  */
-export function closeSubwindow(label: string = appWindow.label) {
+function closeSubwindow(label: string = appWindow.label) {
     if (!moduleMatch(label)) return;
 
     mainWindow()?.emit("Overfloat://SubwindowModification", {
@@ -150,16 +150,39 @@ export function closeSubwindow(label: string = appWindow.label) {
 /**
  * @brief Function for checking whether the window is a subwindow
  * @returns true if the window is a subwindow, false otherwise
- */
-function isSubwindow() {
+ * @param label Label of the window to be checked, default is the calling window
+*/
+function isSubwindow(label: string = appWindow.label) {
+
     const submodule = appWindow.label.replace(/module\/([^/]*)\/?(.*)?/g, "$2");
     return submodule.length != 0;
 }
 
 /**
- * @brief Function for hiding(minimalizing) the current window
+ * @brief Function for checking whether the window is a main window
+ * @returns true if the window is a main window, false otherwise
+ * @param label Label of the window to be checked, default is the calling window
  */
-export function hideWindow() {
+function isMainWindow(label: string = appWindow.label) {
+    const subLabel = appWindow.label.replace(/module\/(.*)/g, "$1");
+    return subLabel.length == 0;
+}
+
+/**
+ * @brief Function for hiding(minimalizing) a window
+ * @param label Label of the window to be hidden, if not pressent the calling window will be hidden
+ */
+export function hideWindow(label?: string) {
+    if(label != undefined) {
+        if(isSubwindow(label)){
+            hideSubwindow(label);
+        }
+        else if(isMainWindow(label) && moduleMatch(label)){
+            hideMainWindow();
+        }
+        return;
+    }
+
     if (isSubwindow()) {
         hideSubwindow();
     } else {
@@ -168,10 +191,44 @@ export function hideWindow() {
 }
 
 /**
- * @brief Function for closing the current window
+ * @brief Function for showing a window
+ * @param label Label of the window to be shown, if not pressent the calling window will be shown
+ */
+export function showWindow(label?: string) {
+    if(label != undefined) {
+        if(isSubwindow(label)){
+            showSubwindow(label);
+        }
+        else if(isMainWindow(label) && moduleMatch(label)){
+            showMainWindow();
+        }
+        return;
+    }
+
+    if (isSubwindow()) {
+        showSubwindow();
+    } else {
+        showMainWindow();
+    }
+}
+
+/**
+ * @brief Function for closing a window
+ * @param label Label of the window to be closed, if not pressent the calling window will be closed
  * @note If the window is a main window, the whole module will be closed
  */
-export function closeWindow() {
+export function closeWindow(label?: string) {    
+    if(label != undefined) {
+        if(isSubwindow(label)){
+            closeSubwindow(label);
+        }
+        else if(isMainWindow(label) && moduleMatch(label)){
+            closeMainWindow();
+        }
+        return;
+    }
+    
+
     if (isSubwindow()) {
         closeSubwindow();
     } else {

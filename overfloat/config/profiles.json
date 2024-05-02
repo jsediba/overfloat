@@ -5,34 +5,37 @@
 			"mainWindow": {
 				"title": "FS_Tester",
 				"isVisible": true,
-				"x": 0,
-				"y": 468,
+				"isTransparent": false,
+				"x": 282,
+				"y": 435,
 				"height": 300,
 				"width": 500,
 				"shortcuts": []
 			},
 			"subwindows": [
 				{
-					"title": "Read Tester",
-					"isVisible": true,
-					"x": 500,
-					"y": 0,
-					"height": 300,
-					"width": 500,
-					"shortcuts": [],
-					"params": {},
-					"componentName": "ReadTester"
-				},
-				{
 					"title": "Write Tester",
 					"isVisible": true,
+					"isTransparent": false,
 					"x": 0,
 					"y": 0,
 					"height": 300,
 					"width": 500,
 					"shortcuts": [],
 					"params": {},
-					"componentName": "WriteTester"
+					"subwindowName": "WriteTester"
+				},
+				{
+					"title": "Read Tester",
+					"isVisible": true,
+					"isTransparent": false,
+					"x": 0,
+					"y": 0,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [],
+					"params": {},
+					"subwindowName": "ReadTester"
 				}
 			]
 		}

@@ -25,8 +25,6 @@ const FSTester: React.FC = () => {
                         onClick={()=>openSubwindow(
                             "ReadTester",
                             "Read Tester",
-                            {},
-                            {transparent: true}
                         )}>
                             Open Read Tester
                         </button>

@@ -1,12 +1,12 @@
 /*****************************************************************************
- * @FilePath    : src/Api/TitleBar.tsx                                       *
+ * @FilePath    : src/Api/ModuleWindow.tsx                                   *
  * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
  * @Year        : 2024                                                       *
  ****************************************************************************/
 
+import "./css/ModuleComponents.css";
 import { appWindow } from "@tauri-apps/api/window";
-import "./css/TitleBar.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import { IconMinus, IconX } from "@tabler/icons-react";
 import {
     closeWindow,
@@ -41,6 +41,30 @@ export const TitleBar: React.FC = () => {
             <button onClick={() => closeWindow()} className="titlebar-button">
                 <IconX size={12} />
             </button>
+        </div>
+    );
+};
+
+
+
+type ModuleWindowProps = {
+    showTitleBar?: boolean;
+    children?: ReactNode;
+}
+
+/**
+ * React component for the display of a module window.
+ */
+export const ModuleWindow: React.FC<ModuleWindowProps> = (props:ModuleWindowProps) => {
+    const showTitleBar = props["showTitleBar"] == undefined ? true : props["showTitleBar"];
+    const children = props["children"];
+    
+    return (
+        <div>
+            {showTitleBar && <TitleBar />}
+            <div className="module-content">
+                {children}
+            </div>
         </div>
     );
 };
