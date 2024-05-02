@@ -1,0 +1,67 @@
+.toggleElementButton {
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.windowControlButton {
+    background-color: rgb(75, 75, 75, 1);
+    border-width: 1px;
+    border-radius: 4px;
+    margin: 2px;
+    color: white;
+}
+
+.windowControlButton:hover {
+    background-color: rgb(125, 125, 125, 1);
+}
+
+.moduleCloseButton {
+    background-color: rgb(175, 50, 50, 1);
+    border-width: 1px;
+    border-radius: 4px;
+    margin: 2px;
+    color: white;
+}
+
+.moduleCloseButton:hover {
+    background-color: rgba(225, 50, 50, 1);
+}
+
+.profileControlButton {
+    background-color: rgb(75, 75, 75, 1);
+    border-width: 1px;
+    border-radius: 4px;
+    margin: 2px;
+    color: white;
+}
+
+.profileControlButton:hover {
+    background-color: rgb(125, 125, 125, 1);
+}
+
+.loadingModalContainer {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.loadingSpinner {
+    animation: spin 2s linear infinite;
+}
+
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+

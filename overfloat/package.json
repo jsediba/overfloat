@@ -1,0 +1,40 @@
+{
+  "name": "overfloat",
+  "private": true,
+  "version": "1.0.0",
+  "description": "An Overalay system for Windows and Linux(X11)",
+  "license": "GPL-3.0",
+  "author": "Jakub Šediba <xsedib00@stud.fit.vutbr.cz>",
+  "type": "module",
+  
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "tauri": "echo Please use yarn tauri:dev or yarn tauri:build instead && exit 1",
+    "tauri:dev": "cross-env TAURI_MODE=development tauri dev",
+    "tauri:build": "cross-env TAURI_MODE=production tauri build",
+    "pwd": "echo $PWD"
+  },
+  "dependencies": {
+    "@tabler/icons-react": "^3.2.0",
+    "@tauri-apps/api": "^1.5.2",
+    "bootstrap": "^5.3.3",
+    "cross-env": "^7.0.3",
+    "react": "^18.2.0",
+    "react-bootstrap": "^2.10.2",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.1",
+    "react-select": "^5.8.0",
+    "react-usestateref": "^1.0.8",
+    "styled-components": "^6.1.8"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^1.5.8",
+    "@types/react": "^18.2.15",
+    "@types/react-dom": "^18.2.7",
+    "@vitejs/plugin-react": "^4.2.1",
+    "typescript": "^5.0.2",
+    "vite": "^5.0.0"
+  }
+}

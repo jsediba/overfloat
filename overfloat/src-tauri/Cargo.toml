@@ -1,0 +1,25 @@
+[package]
+name = "overfloat"
+version = "1.0.0"
+description = "An Overalay system for Windows and Linux(X11)"
+authors = ["Jakub Šediba <xsedib00@stud.fit.vutbr.cz>"]
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[build-dependencies]
+tauri-build = { version = "1.5", features = [] }
+
+[dependencies]
+tauri = { version = "1.5", features = [ "protocol-asset", "path-all", "clipboard-all", "dialog-all", "system-tray", "shell-open", "window-all"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rdev = "0.5.3"
+notify = "6.1.1"
+futures = "0.3.30"
+lazy_static = "1.4.0"
+
+[features]
+# this feature is used for production builds or when `devPath` points to the filesystem
+# DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]

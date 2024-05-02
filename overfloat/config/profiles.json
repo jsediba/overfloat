@@ -1,0 +1,192 @@
+{
+	"FSTester": [
+		{
+			"moduleName": "FS_Tester",
+			"mainWindow": {
+				"title": "FS_Tester",
+				"isVisible": true,
+				"isTransparent": false,
+				"x": 282,
+				"y": 435,
+				"height": 300,
+				"width": 500,
+				"shortcuts": []
+			},
+			"subwindows": [
+				{
+					"title": "Write Tester",
+					"isVisible": true,
+					"isTransparent": false,
+					"x": 0,
+					"y": 0,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [],
+					"params": {},
+					"subwindowName": "WriteTester"
+				},
+				{
+					"title": "Read Tester",
+					"isVisible": true,
+					"isTransparent": false,
+					"x": 0,
+					"y": 0,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [],
+					"params": {},
+					"subwindowName": "ReadTester"
+				}
+			]
+		}
+	],
+	"FSWatchTester": [
+		{
+			"moduleName": "FS_Tester",
+			"mainWindow": {
+				"title": "FS_Tester",
+				"isVisible": true,
+				"isTransparent": false,
+				"x": 290,
+				"y": 431,
+				"height": 300,
+				"width": 500,
+				"shortcuts": []
+			},
+			"subwindows": [
+				{
+					"title": "Write Tester",
+					"isVisible": false,
+					"isTransparent": false,
+					"x": 0,
+					"y": 0,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [],
+					"params": {},
+					"componentName": "WriteTester"
+				},
+				{
+					"title": "Read Tester",
+					"isVisible": true,
+					"isTransparent": true,
+					"x": 947,
+					"y": 517,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [],
+					"params": {},
+					"componentName": "ReadTester"
+				}
+			]
+		},
+		{
+			"moduleName": "FSWatch_Tester",
+			"mainWindow": {
+				"title": "FSWatch_Tester",
+				"isVisible": false,
+				"isTransparent": false,
+				"x": 0,
+				"y": 300,
+				"height": 300,
+				"width": 500,
+				"shortcuts": []
+			},
+			"subwindows": []
+		}
+	],
+	"asdf": [
+		{
+			"moduleName": "Keybind_Tester",
+			"mainWindow": {
+				"title": "Keybind_Tester",
+				"isVisible": true,
+				"x": 187,
+				"y": 180,
+				"height": 300,
+				"width": 500,
+				"shortcuts": [
+					{
+						"id": "spawn_counter",
+						"keybinds": []
+					}
+				]
+			},
+			"subwindows": [
+				{
+					"title": "Counter",
+					"isVisible": true,
+					"x": 143,
+					"y": 447,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [
+						{
+							"id": "count_up",
+							"keybinds": [
+								"A"
+							]
+						}
+					],
+					"params": {},
+					"componentName": "counter"
+				}
+			]
+		}
+	],
+	"PoE Trade": [
+		{
+			"moduleName": "PoE_Trade",
+			"mainWindow": {
+				"title": "PoE_Trade",
+				"isVisible": true,
+				"x": 337,
+				"y": 241,
+				"height": 300,
+				"width": 500,
+				"shortcuts": []
+			},
+			"subwindows": []
+		}
+	],
+	"KeybindTester": [
+		{
+			"moduleName": "Keybind_Tester",
+			"mainWindow": {
+				"title": "Keybind_Tester",
+				"isVisible": true,
+				"x": 187,
+				"y": 180,
+				"height": 300,
+				"width": 500,
+				"shortcuts": [
+					{
+						"id": "spawn_counter",
+						"keybinds": []
+					}
+				]
+			},
+			"subwindows": [
+				{
+					"title": "Counter",
+					"isVisible": true,
+					"x": 143,
+					"y": 447,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [
+						{
+							"id": "count_up",
+							"keybinds": [
+								"X",
+								"A"
+							]
+						}
+					],
+					"params": {},
+					"componentName": "counter"
+				}
+			]
+		}
+	]
+}

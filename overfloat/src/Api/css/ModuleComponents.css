@@ -1,0 +1,61 @@
+html, body {
+    background-color: rgba(0,0,0,0) !important;
+}
+
+body {
+    overflow: hidden;
+}
+
+.titlebar {
+    background-color: rgb(50, 50, 50);
+    color: white;
+    user-select: none;
+    cursor: default;
+    display: flex;
+    justify-content: flex-end;
+    position: fixed;
+    width: 100vw;
+    height: 20px;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+}
+
+.titlebar-title {
+    flex: 1;
+    text-align: center;
+    overflow: hidden;
+}
+
+.titlebar-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+    outline: none;
+    color: white;
+    background-color: transparent;
+    border: none;
+    padding: 0px;
+}
+
+.titlebar-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.button-icon {
+    width: 10px;
+    height: 10px;
+}
+
+.module-content {
+    position: absolute;
+    padding: 4px;
+    top: 20px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    overflow: auto;
+}
