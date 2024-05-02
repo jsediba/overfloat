@@ -1,0 +1,35 @@
+body {
+    user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+}
+
+.control-bar {
+    height: 20px;
+    width: 40px;
+    background-color: rgb(50, 50, 50);
+    color: white;
+}
+
+.control-bar-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 20px;
+    height: 20px;
+    outline: none;
+    color: white;
+    background-color: transparent;
+    border: none;
+    padding: 0px;
+}
+
+.button-icon {
+    width: 10px;
+    height: 10px;
+}
+
+.control-bar-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}

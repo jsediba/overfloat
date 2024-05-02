@@ -62,7 +62,7 @@ export const ModuleWindow: React.FC<ModuleWindowProps> = (props:ModuleWindowProp
     return (
         <div>
             {showTitleBar && <TitleBar />}
-            <div className="module-content">
+            <div className={showTitleBar ? "module-content" : "module-content-no-titlebar"}>
                 {children}
             </div>
         </div>

@@ -59,3 +59,13 @@ body {
     bottom: 0px;
     overflow: auto;
 }
+
+.module-content-no-titlebar {
+    position: absolute;
+    padding: 0px 4px;
+    top: 0px;
+    left: 0px;
+    width: 100vw;
+    height: 100vw;
+    overflow: auto;
+}
