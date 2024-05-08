@@ -12,7 +12,7 @@ import {
     openSubwindow,
     writeFile,
     readFile,
-} from "../../src/api/OverfloatAPI";
+} from "@OverfloatAPI";
 
 /**
  * Main window of the module for trading in Path of Exile.

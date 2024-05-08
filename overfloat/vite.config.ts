@@ -26,7 +26,7 @@ export default defineConfig(async () => ({
         alias: {
             "@OverfloatAPI": path.resolve(
                 __dirname,
-                "./src/Api/OverfloatAPI.ts"
+                "./src/api/OverfloatAPI.ts"
             ),
         },
     },

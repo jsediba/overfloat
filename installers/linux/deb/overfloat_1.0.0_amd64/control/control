@@ -1,7 +1,7 @@
 Package: overfloat
 Version: 1.0.0
 Architecture: amd64
-Installed-Size: 17109
+Installed-Size: 17113
 Maintainer: Jakub Šediba <xsedib00@stud.fit.vutbr.cz>
 Priority: optional
 Depends: libayatana-appindicator3-1, libwebkit2gtk-4.0-37, libgtk-3-0
