@@ -104,6 +104,7 @@ export class OverfloatModule {
         const windowLabel: string = "module/" + this.moduleName;
         const windowUrl: string = "module/" + this.moduleName;
 
+
         // Create main window
         const webview = new WebviewWindow(windowLabel, {
             title: title,

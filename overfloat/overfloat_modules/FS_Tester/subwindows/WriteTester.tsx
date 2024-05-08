@@ -7,6 +7,9 @@
 import { useState } from "react";
 import { ModuleWindow, FSResult, writeFile } from "@OverfloatAPI";
 
+/**
+ * Subwindow for testing the write operation.
+ */
 const WriteTester: React.FC = () => {
     const [result, setResult] = useState<FSResult | undefined>();
     const [content, setContent] = useState<string>("");
@@ -18,6 +21,7 @@ const WriteTester: React.FC = () => {
     return (
         <ModuleWindow>
             <div className="container">
+                {/* Parameter settings */}
                 <div className="row m-2">
                     <input
                         type="text"
@@ -72,6 +76,8 @@ const WriteTester: React.FC = () => {
                     </button>
                 </div>
                 <hr />
+
+                {/* Result display */}
                 {result != undefined && (
                     <div>
                         <div className="row">

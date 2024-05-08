@@ -34,9 +34,6 @@ const ProfileSettings: React.FC = () => {
             setSelectedProfile(ModuleManager.getInstance().getActiveProfile());
         };
 
-        // Initial update
-        updateProfiles();
-
         // Subscribe to the module manager notifications
         ModuleManager.getInstance().subscribe(updateProfiles);
 

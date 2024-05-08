@@ -1,5 +1,5 @@
 /*****************************************************************************
- * @FilePath    : src/Api/WindowOperations.ts                                *
+ * @FilePath    : src/api/WindowOperations.ts                                *
  * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
  * @Year        : 2024                                                       *
  ****************************************************************************/
@@ -130,7 +130,6 @@ function hideSubwindow(label: string = appWindow.label) {
         eventType: WindowEventType.Hide,
         label: label,
     });
-    console.log("Hiding Subwindow: " + label);
 }
 
 /**

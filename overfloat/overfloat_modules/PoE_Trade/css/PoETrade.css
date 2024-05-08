@@ -5,14 +5,32 @@ body {
     -webkit-user-select: none;
 }
 
+.window {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+    right: 0px;
+}
+
+
+
 .control-bar {
+    position: absolute;
+    top: 0px;
+    left: 0px;
     height: 20px;
     width: 40px;
     background-color: rgb(50, 50, 50);
     color: white;
+    overflow: hidden;
 }
 
-.control-bar-button {
+.control-bar:hover{
+    cursor: pointer;
+}
+
+.control-bar-element {
     display: inline-flex;
     justify-content: center;
     align-items: center;
@@ -31,5 +49,65 @@ body {
 }
 
 .control-bar-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.trade-container{
+    position: absolute;
+    top: 20px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    overflow: auto;
+}
+
+.trade-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.trade-container::-webkit-scrollbar-track {
+    width: 8px;
+    background: rgb(75, 75, 75);
+    border-radius: 6px;
+
+}
+
+.trade-container::-webkit-scrollbar-thumb {
+    width: 8px;
+    background: rgb(50, 50, 50);
+    border-radius: 4px;
+}
+
+.button-container-left{
+    display: inline-flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+}
+
+
+.button-container-right{
+    display: inline-flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
+}
+
+.trade-control-button{
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    height: 32px;
+    width: 32px;
+    background-color: rgb(50, 50, 50);
+    color: white;
+    overflow: hidden;
+    background-color: transparent;
+    border-radius: 4px;
+    margin: 2px;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.trade-control-button:hover{
     background: rgba(255, 255, 255, 0.2);
 }

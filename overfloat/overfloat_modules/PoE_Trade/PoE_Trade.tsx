@@ -4,22 +4,24 @@
  * @Year        : 2024                                                       *
  ****************************************************************************/
 
+import { useState, useEffect } from "react";
+import useStateRef from "react-usestateref";
+import { open } from "@tauri-apps/api/dialog";
 import {
     ModuleWindow,
     openSubwindow,
     writeFile,
-} from "../../src/Api/OverfloatAPI";
-import { useState, useEffect } from "react";
-import useStateRef from "react-usestateref";
-import { open } from "@tauri-apps/api/dialog";
-import { readFile } from "../../src/Api/OverfloatAPI";
+    readFile,
+} from "../../src/api/OverfloatAPI";
 
+/**
+ * Main window of the module for trading in Path of Exile.
+ */
 const PoETrade: React.FC = () => {
     const [path, setPath, refPath] = useStateRef<string | null>(null);
-    const [errorMessage, setErrorMessage] = useState<
-        string | null
-    >(null);
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+    // Function to select the client.txt path and save it to the disk.
     const selectClientPath = async () => {
         const selectedFile = await open({
             directory: false,
@@ -39,10 +41,13 @@ const PoETrade: React.FC = () => {
                 "Failed to save Client.txt path to the disk: " +
                     writeResult.path
             );
+        } else {
+            setErrorMessage(null);
         }
     };
 
     useEffect(() => {
+        // Attempt to load the client.txt path from the disk.
         const getClientPath = async () => {
             const readResult = await readFile("ClientPath.txt", true);
 
@@ -52,7 +57,7 @@ const PoETrade: React.FC = () => {
             }
 
             setErrorMessage(
-                "Failed to save Client.txt path to the disk: " +
+                "Failed to load Client.txt path to the disk: " +
                     readResult.message
             );
         };
@@ -76,7 +81,10 @@ const PoETrade: React.FC = () => {
                 )}
                 <hr></hr>
                 <div className="row">
-                    <div className="col">PoE Client Path: {path}</div>
+                    <div className="col">Selected client.txt path:</div>
+                </div>
+                <div className="row">
+                    <div className="col">{path}</div>
                 </div>
                 <div className="row text-center pt-1">
                     <div className="col">
@@ -97,9 +105,14 @@ const PoETrade: React.FC = () => {
                             disabled={refPath.current == null}
                             onClick={() => {
                                 if (refPath.current == null) return;
-                                openSubwindow("TradeWindow", "Trade Window", {
-                                    clientPath: refPath.current,
-                                }, {transparent: true});
+                                openSubwindow(
+                                    "TradeWindow",
+                                    "Trade Window",
+                                    {
+                                        clientPath: refPath.current,
+                                    },
+                                    { transparent: true }
+                                );
                             }}>
                             Open Trading Window
                         </button>
@@ -108,7 +121,6 @@ const PoETrade: React.FC = () => {
             </div>
         </ModuleWindow>
     );
-
 };
 
 export default PoETrade;

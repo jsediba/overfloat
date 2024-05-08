@@ -1,0 +1,136 @@
+{
+	"ClipboardTester": [
+		{
+			"moduleName": "Clipboard_Tester",
+			"mainWindow": {
+				"title": "Clipboard_Tester",
+				"isVisible": true,
+				"isTransparent": false,
+				"x": 1330,
+				"y": 202,
+				"height": 300,
+				"width": 500,
+				"shortcuts": []
+			},
+			"subwindows": []
+		}
+	],
+	"FS_Tester": [
+		{
+			"moduleName": "FS_Tester",
+			"mainWindow": {
+				"title": "FS_Tester",
+				"isVisible": true,
+				"isTransparent": false,
+				"x": 1266,
+				"y": 333,
+				"height": 201,
+				"width": 319,
+				"shortcuts": []
+			},
+			"subwindows": [
+				{
+					"title": "Write Tester",
+					"isVisible": true,
+					"isTransparent": false,
+					"x": 446,
+					"y": 309,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [],
+					"params": {},
+					"subwindowName": "WriteTester"
+				}
+			]
+		}
+	],
+	"Input Simulation": [
+		{
+			"moduleName": "InputSim_Tester",
+			"mainWindow": {
+				"title": "InputSim_Tester",
+				"isVisible": true,
+				"isTransparent": false,
+				"x": 650,
+				"y": 100,
+				"height": 400,
+				"width": 800,
+				"shortcuts": [
+					{
+						"id": "input_sim",
+						"keybinds": []
+					}
+				]
+			},
+			"subwindows": []
+		}
+	],
+	"PoE Trade": [
+		{
+			"moduleName": "PoE_Trade",
+			"mainWindow": {
+				"title": "PoE_Trade",
+				"isVisible": true,
+				"isTransparent": false,
+				"x": 875,
+				"y": 555,
+				"height": 300,
+				"width": 500,
+				"shortcuts": []
+			},
+			"subwindows": [
+				{
+					"title": "Trade Window",
+					"isVisible": true,
+					"isTransparent": true,
+					"x": 1353,
+					"y": 127,
+					"height": 300,
+					"width": 500,
+					"shortcuts": [
+						{
+							"id": "select_next",
+							"keybinds": [
+								"LCtrl+DownArrow"
+							]
+						},
+						{
+							"id": "select_previous",
+							"keybinds": [
+								"LCtrl+UpArrow"
+							]
+						},
+						{
+							"id": "invite_to_party",
+							"keybinds": []
+						},
+						{
+							"id": "initiate_trade",
+							"keybinds": []
+						}
+					],
+					"params": {
+						"clientPath": "C:\\Users\\Urcier\\linuxstuff\\bp\\test\\client.txt"
+					},
+					"subwindowName": "TradeWindow"
+				}
+			]
+		}
+	],
+	"FSWatch": [
+		{
+			"moduleName": "FSWatch_Tester",
+			"mainWindow": {
+				"title": "FSWatch_Tester",
+				"isVisible": true,
+				"isTransparent": false,
+				"x": 488,
+				"y": 114,
+				"height": 445,
+				"width": 448,
+				"shortcuts": []
+			},
+			"subwindows": []
+		}
+	]
+}

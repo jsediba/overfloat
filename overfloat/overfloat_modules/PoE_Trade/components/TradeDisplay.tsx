@@ -4,13 +4,7 @@
  * @Year        : 2024                                                       *
  ****************************************************************************/
 
-import {
-    IconArrowsExchange,
-    IconCircleX,
-    IconMinus,
-    IconPlus,
-    IconUserPlus,
-} from "@tabler/icons-react";
+import { IconArrowsExchange, IconUser } from "@tabler/icons-react";
 
 type TradeDisplayProps = {
     yourItem: string;
@@ -18,8 +12,12 @@ type TradeDisplayProps = {
     theirItem: string;
     theirItemQuantity: string;
     theirName: string;
+    selected: boolean;
 };
 
+/**
+ * A component for displaying a single trade.
+ */
 const TradeDisplay: React.FC<TradeDisplayProps> = (
     props: TradeDisplayProps
 ) => {
@@ -28,41 +26,27 @@ const TradeDisplay: React.FC<TradeDisplayProps> = (
     const theirItem = props["theirItem"];
     const theirItemQuantity = props["theirItemQuantity"];
     const theirName = props["theirName"];
+    const selected = props["selected"];
 
     return (
-        <div className="container bg-secondary rounded text-white mt-2">
-            <div className="row">
-                <div className="col">{theirName}</div>
-            </div>
-            <div className="row pt-3">
-                <div className="col-1 m-auto">
-                    <IconMinus />
-                </div>
-                <div className="col m-auto">{yourItemQuantity + "x " + yourItem}</div>
-                <div className="col-1 m-auto">
-                    <IconArrowsExchange />
-                </div>
-                <div className="col text-end m-auto">{theirItemQuantity + "x " + theirItem}</div>
-                <div className="col-1 m-auto">
-                    <IconPlus />
+        <div
+            className={
+                "container-fluid rounded text-white mt-2" +
+                (selected ? " bg-success" : " bg-secondary")
+            }>
+            <div className="row pt-2 word-break text-end align-items-center">
+                <div className="col">
+                    {theirName} <IconUser />
                 </div>
             </div>
             <hr />
-            <div className="row pb-3">
-                <div className="col-2 text-center">
-                    <button className="btn btn-secondary border">
-                        <IconUserPlus />
-                    </button>
+            <div className="row pb-3 text-center align-items-center">
+                <div className="col">{yourItemQuantity + "x " + yourItem}</div>
+                <div className="col-1">
+                    <IconArrowsExchange />
                 </div>
-                <div className="col-2 text-center">
-                    <button className="btn btn-secondary border">
-                        <IconArrowsExchange />
-                    </button>
-                </div>
-                <div className="col text-end">
-                    <button className="btn btn-secondary border">
-                        <IconCircleX />
-                    </button>
+                <div className="col">
+                    {theirItemQuantity + "x " + theirItem}
                 </div>
             </div>
         </div>

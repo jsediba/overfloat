@@ -38,7 +38,6 @@ const ModuleSettings: React.FC = () => {
             setInactiveModules([
                 ...ModuleManager.getInstance().getInactiveModules(),
             ]);
-            console.log("Updated Modules");
         };
 
         // Subscribe to the module manager notifications

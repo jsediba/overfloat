@@ -9,23 +9,24 @@ import { Routes, Route } from "react-router-dom";
 import OverfloatWindow from "./components/OverfloatWindow/OverfloatWindow";
 
 // Import all module windows based on the file structure
-const ROUTES : Record<string, any> =  import.meta.glob('../overfloat_modules/*/*.tsx', { eager: true});
-const SUB_ROUTES : Record<string, any>= import.meta.glob('../overfloat_modules/*/subwindows/*.tsx', { eager: true});
+const ROUTES : Record<string, any> =  import.meta.glob('../overfloat_modules/*/[a-zA-Z0-9_-]*.[tj]sx', { eager: true});
+const SUB_ROUTES : Record<string, any>= import.meta.glob('../overfloat_modules/*/subwindows/[a-zA-Z0-9_-]*.[tj]sx', { eager: true});
+
 
 // Create routes for main windows of all modules based on the file structure
 const routes = Object.keys(ROUTES).map((route) => {
-  const path = route.replace(/..\/overfloat_modules\/([^/]*)\/.*.tsx/g, '/module/$1');
+  const path = route.replace(/..\/overfloat_modules\/([^/]*)\/.*.[tj]sx/g, '/module/$1');
   return { path, Element: ROUTES[route].default} 
 })
 
 // Export module names so that the app can access them.
 export const MODULE_NAMES = Object.keys(ROUTES).map((route) => {
-  return route.replace(/..\/overfloat_modules\/([^/]*)\/.*.tsx/g, '$1');
+  return route.replace(/..\/overfloat_modules\/([^/]*)\/.*.[tj]sx/g, '$1');
 });
 
 // Create routes for subwindows of all modules based on the file structure
 const subroutes = Object.keys(SUB_ROUTES).map((route) => {
-    const path = route.replace(/..\/overfloat_modules\/([^/]*)\/subwindows\/([^/]*).tsx/g, '/module/$1/$2');
+    const path = route.replace(/..\/overfloat_modules\/([^/]*)\/subwindows\/([^/]*).[tj]sx/g, '/module/$1/$2');
     return {path, Element: SUB_ROUTES[route].default}
 })
 

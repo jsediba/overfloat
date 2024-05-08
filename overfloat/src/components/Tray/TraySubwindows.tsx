@@ -8,7 +8,7 @@ import { useEffect } from "react";
 import useStateRef from "react-usestateref";
 import { OverfloatModule } from "../../utils/OverfloatModule";
 import { Window } from "../../utils/OverfloatModule";
-import "./css/TraySubwindows.css";
+import "./css/Tray.css";
 import TraySubwindow from "./TraySubwindow";
 import { IconCaretDownFilled, IconCaretUpFilled } from "@tabler/icons-react";
 
@@ -43,11 +43,6 @@ const TraySubwindows: React.FC<TraySubwindowsProps> = (
                 containerRef.current.style.minHeight = "56px";
                 return;
             }
-
-            Array.from(containerRef.current.children).forEach((child) => {
-                console.log(child.clientHeight);
-            });
-
             // Calculate the minimal height of the module container in the tray
             const height = Array.from(containerRef.current.children).reduce(
                 (height, child) => height + child.clientHeight,
@@ -77,15 +72,17 @@ const TraySubwindows: React.FC<TraySubwindowsProps> = (
 
     // Update the minimum height of the module container in the tray when the subwindows display
     // is toggled or a change in the tray container occurs.
+    
     useEffect(() => {
         updateMinHeight();
-    }, [subwindowsVisible, containerRef]);
+    }, [subwindowsVisible, containerRef, subwindows]);
+    
 
     if (subwindows.size == 0) {
         return null;
     } else {
         return (
-            <div className="m-0">
+            <>
                 <button
                     className={
                         subwindowsVisible
@@ -95,7 +92,7 @@ const TraySubwindows: React.FC<TraySubwindowsProps> = (
                     onClick={() => {
                         setSubwindowsVisible(true);
                     }}>
-                    <IconCaretDownFilled color="white" size={20} />
+                    <IconCaretDownFilled color="white" size={20}/>
                 </button>
                 <div className={subwindowsVisible ? "" : "d-none"}>
                     {Array.from(subwindows).map(([windowLabel, window]) => (
@@ -114,9 +111,9 @@ const TraySubwindows: React.FC<TraySubwindowsProps> = (
                             : "d-none"
                     }
                     onClick={() => setSubwindowsVisible(false)}>
-                    <IconCaretUpFilled color="white" size={20} />
+                    <IconCaretUpFilled color="white" size={20}/>
                 </button>
-            </div>
+            </>
         );
     }
 };

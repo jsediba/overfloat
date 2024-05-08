@@ -22,7 +22,7 @@
 
     /* Paths */
     "paths": {
-      "@OverfloatAPI": ["./src/Api/OverfloatAPI.ts"],
+      "@OverfloatAPI": ["./src/api/OverfloatAPI.ts"],
     }
   },
   "include": ["src", "src/.tsx", "overfloat_modules", "overfloat_modules/*.tsx"],

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * @FilePath    : src/Api/OverfloatAPI.ts                                    *
+ * @FilePath    : src/api/OverfloatAPI.ts                                    *
  * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
  * @Year        : 2024                                                       *
  ****************************************************************************/

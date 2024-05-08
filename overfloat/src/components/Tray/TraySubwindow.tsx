@@ -6,7 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { OverfloatModule, Window } from "../../utils/OverfloatModule";
-import "./css/TraySubwindow.css"
+import "./css/Tray.css"
 import TrayWindowIcon from "./TrayWindowIcon";
 
 type TraySubwindowProps = {

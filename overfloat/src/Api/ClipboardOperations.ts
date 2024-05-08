@@ -1,5 +1,5 @@
 /*****************************************************************************
- * @FilePath    : src/Api/ClipboardOperations.ts                             *
+ * @FilePath    : src/api/ClipboardOperations.ts                             *
  * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
  * @Year        : 2024                                                       *
  ****************************************************************************/

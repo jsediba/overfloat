@@ -7,45 +7,50 @@
 import { useState } from "react";
 import { clipboardRead, clipboardWrite, ModuleWindow } from "@OverfloatAPI";
 
-
+/**
+ * Main window of the module for testing clipboard read and write operations.
+ */
 const ClipboardTester: React.FC = () => {
     const [targetContent, setTargetContent] = useState<string>("");
     const [clipboardContent, setClipboardContent] = useState<string>("");
 
     return (
         <ModuleWindow>
-            <div className="container text-center">
+            <div className="container-fluid text-center mt-2">
+                {/* clipboardWrite controls */}
                 <div className="row">
-                    <textarea
-                        className="col-10"
-                        onChange={(event) =>
-                            setTargetContent(event.target.value)
-                        }
-                        placeholder="Content to be written into clipboard"
-                        cols={300}
-                        rows={1}
-                    />
+                    <div className="col-12">
+                        <textarea
+                            className="w-100"
+                            onChange={(event) =>
+                                setTargetContent(event.target.value)
+                            }
+                            placeholder="Content to be written into clipboard"
+                            rows={3}
+                        />
                     <button
-                        className="btn btn-primary col-2"
+                        className="btn btn-primary col-12 mt-0"
                         onClick={() => clipboardWrite(targetContent)}>
                         Set
                     </button>
+                    </div>
                 </div>
-                <hr />
-                <div className="row">
-                    <button
-                        className="btn btn-primary col"
-                        onClick={() =>
-                            clipboardRead().then((content) =>
-                                setClipboardContent(content)
-                            )
-                        }>
-                        Get
-                    </button>
-                </div>
-                <div className="row">
-                    <pre>{clipboardContent}</pre>
-                </div>
+                <hr className="m-2" />
+                {/* clipboardRead controls */}
+                <button
+                    className="btn col-auto btn-primary mb-2"
+                    onClick={() =>
+                        clipboardRead().then((content) =>
+                            setClipboardContent(content)
+                        )
+                    }>
+                    Get
+                </button>
+                <pre
+                    className={"text-start border" + (clipboardContent === "" ? " d-none" : "")} 
+                    style={{ minHeight: "10px" }}>
+                    {clipboardContent}
+                </pre>
             </div>
         </ModuleWindow>
     );

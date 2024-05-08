@@ -26,6 +26,7 @@ import {
     inputSimulation,
     ShortcutManager,
 } from "@OverfloatAPI";
+import { IconX } from "@tabler/icons-react";
 
 type KeyValue = {
     value: string;
@@ -42,6 +43,9 @@ type DirectionValue = {
     label: string;
 };
 
+/**
+ * Main window of the module for testing the input simulation.
+ */
 const InputSimTester: React.FC = () => {
     useEffect(() => {
         ShortcutManager.addShortcut(
@@ -55,18 +59,12 @@ const InputSimTester: React.FC = () => {
         );
     }, []);
 
-
-    const [simStr, setSimStr] = useState<string[]>([]);
+    // State for the simulation steps
     const [sim, setSim, refSim] = useStateRef<SimulationStep[]>([]);
+    const [simString, setSimString] = useState<string[]>([]);
 
-    const [keyPress, setKeyPress] = useState<SingleValue<KeyValue> | null>(
-        null
-    );
-    const [keyDown, setKeyDown] = useState<SingleValue<KeyValue> | null>(
-        null
-    );
-    const [keyUp, setKeyUp] = useState<SingleValue<KeyValue> | null>(null);
-
+    // State for the input parameters and select option preparation.
+    const [key, setKey] = useState<SingleValue<KeyValue> | null>(null);
     const keyOptions = Object.keys(Key).map((key: string) => ({
         value: Key[key as keyof typeof Key] as string,
         label: key,
@@ -77,236 +75,259 @@ const InputSimTester: React.FC = () => {
     }));
     const allKeyOptions = keyOptions.concat(modifierKeyOptions);
 
-
-    const [mouseClick, setMouseClick] =
+    const [mouseButton, setMouseButton] =
         useState<SingleValue<MouseButtonValue> | null>(null);
-    const [mouseDown, setMouseDown] = useState<SingleValue<MouseButtonValue> | null>(
-        null
-    );
-    const [mouseUp, setMouseUp] = useState<SingleValue<MouseButtonValue> | null>(
-        null
+    const mouseButtonOptions = Object.values(MouseButton).map(
+        (value: MouseButton) => ({
+            value: value,
+            label: value as string,
+        })
     );
 
-    const mouseButtonOptions = Object.values(MouseButton).map((value: MouseButton) => ({
-        value: value,
-        label: value as string,
-    }));
-
-    const [scroll, setScroll] = useState<SingleValue<DirectionValue> | null>(null);
-    const directionOptions = Object.values(Direction).map((value: Direction) => ({
-        value: value,
-        label: value as string,
-    }));
+    const [scroll, setScroll] = useState<SingleValue<DirectionValue> | null>(
+        null
+    );
+    const directionOptions = Object.values(Direction).map(
+        (value: Direction) => ({
+            value: value,
+            label: value as string,
+        })
+    );
 
     const [x, setX] = useState<number>(0);
     const [y, setY] = useState<number>(0);
 
+    // Functions for adding and removing simulation steps.
     const addSimulationStep = (step: SimulationStep) => {
-        console.log(step);
         setSim((prev) => [...prev, step]);
     };
 
-    const addStepStr = (step: string) => {
-        setSimStr((prev) => [...prev, step]);
+    const addSimulationStepString = (step: string) => {
+        setSimString((prev) => [...prev, step]);
     };
 
-    const getSimulationString = () => {
-        let finalStr = "";
-        simStr.forEach((string) => (finalStr += string + "; "));
-        return finalStr;
+    const removeStep = (index: number) => {
+        if (index < 0 || index >= sim.length) return;
+        setSim((prev) => [...prev.slice(0, index), ...prev.slice(index + 1)]);
+        setSimString((prev) => [
+            ...prev.slice(0, index),
+            ...prev.slice(index + 1),
+        ]);
     };
 
     return (
         <ModuleWindow>
-            <div className="container">
-                <div className="row my-1">
-                    <div className="col-6">Key Press</div>
-                    <Select
-                        className="col-4"
-                        value={keyPress}
-                        onChange={setKeyPress}
-                        options={allKeyOptions}
-                        isSearchable={true}
-                    />
-                    <button
-                        className="btn btn-primary col-2"
-                        onClick={() => {
-                            if (keyPress == null) return;
-                            console.log(keyPress);
-                            addSimulationStep(simKeyPress(keyPress.value as Key|ModifierKey));
-                            addStepStr("KeyPress(" + (keyPress.value + ")"));
-                        }}>
-                        Add
-                    </button>
-                </div>
-                <div className="row my-1">
-                    <div className="col-6">Key Down</div>
-                    <Select
-                        className="col-4"
-                        value={keyDown}
-                        onChange={setKeyDown}
-                        options={allKeyOptions}
-                        isSearchable={true}
-                    />
-                    <button
-                        className="btn btn-primary col-2"
-                        onClick={() => {
-                            if (keyDown == null) return;
-                            addSimulationStep(simKeyDown(keyDown.value as Key|ModifierKey));
-                            addStepStr("KeyDown(" + keyDown.value + ")");
-                        }}>
-                        Add
-                    </button>
-                </div>
-                <div className="row my-1">
-                    <div className="col-6">Key Up</div>
-                    <Select
-                        className="col-4"
-                        value={keyUp}
-                        onChange={setKeyUp}
-                        options={allKeyOptions}
-                        isSearchable={true}
-                    />
-                    <button
-                        className="btn btn-primary col-2"
-                        onClick={() => {
-                            if (keyUp == null) return;
-                            addSimulationStep(simKeyUp(keyUp.value as Key|ModifierKey));
-                            addStepStr("KeyUp(" + keyUp.value + ")");
-                        }}>
-                        Add
-                    </button>
-                </div>
-
-                <div className="row my-1">
-                    <div className="col-6">Mouse Click</div>
-                    <Select
-                        className="col-4"
-                        value={mouseClick}
-                        onChange={setMouseClick}
-                        options={mouseButtonOptions}
-                        isSearchable={true}
-                    />
-                    <button
-                        className="btn btn-primary col-2"
-                        onClick={() => {
-                            if (mouseClick == null) return;
-                            addSimulationStep(simMouseClick(mouseClick.value));
-                            addStepStr("MouseClick(" + mouseClick.value + ")");
-                        }}>
-                        Add
-                    </button>
-                </div>
-
-                <div className="row my-1">
-                    <div className="col-6">Mouse Down</div>
-                    <Select
-                        className="col-4"
-                        value={mouseDown}
-                        onChange={setMouseDown}
-                        options={mouseButtonOptions}
-                        isSearchable={true}
-                    />
-                    <button
-                        className="btn btn-primary col-2"
-                        onClick={() => {
-                            if (mouseDown == null) return;
-                            addSimulationStep(simMouseDown(mouseDown.value));
-                            addStepStr("MouseDown(" + mouseDown.value + ")");
-                        }}>
-                        Add
-                    </button>
-                </div>
-
-                <div className="row my-1">
-                    <div className="col-6">Mouse Up</div>
-                    <Select
-                        className="col-4"
-                        value={mouseUp}
-                        onChange={setMouseUp}
-                        options={mouseButtonOptions}
-                        isSearchable={true}
-                    />
-                    <button
-                        className="btn btn-primary col-2"
-                        onClick={() => {
-                            if (mouseUp == null) return;
-                            addSimulationStep(simMouseUp(mouseUp.value));
-                            addStepStr("MouseUp(" + mouseUp.value + ")");
-                        }}>
-                        Add
-                    </button>
-                </div>
-
-                <div className="row my-1">
-                    <div className="col-6">Scroll</div>
-                    <Select
-                        className="col-4"
-                        value={scroll}
-                        onChange={setScroll}
-                        options={directionOptions}
-                        isSearchable={true}
-                    />
-                    <button
-                        className="btn btn-primary col-2"
-                        onClick={() => {
-                            if (scroll == null) return;
-                            addSimulationStep(simMouseScroll(scroll.value));
-                            addStepStr("MouseScroll(" + scroll.value + ")");
-                        }}>
-                        Add
-                    </button>
-                </div>
-
-                <div className="row my-1">
-                    <div className="col-6">Move Mouse</div>
-                    <div className="col-2">
-                        <input
-                            className="form-control"
-                            type="number"
-                            defaultValue={x}
-                            onChange={(event) =>
-                                setX(event.target.valueAsNumber)
-                            }
+            <div style={{minWidth: "780px"}}>
+                {/* Controls for adding simulation steps */}
+                <div className="container-fluid">
+                    <div className="row my-1">
+                        <div className="col-3">Key</div>
+                        <Select
+                            className="col-3"
+                            value={key}
+                            onChange={setKey}
+                            options={allKeyOptions}
+                            isSearchable={true}
                         />
+                        <div className="btn-group col">
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    if (key == null) return;
+                                    addSimulationStep(
+                                        simKeyPress(
+                                            key.value as Key | ModifierKey
+                                        )
+                                    );
+                                    addSimulationStepString(
+                                        "KeyPress(" + key.value + ")"
+                                    );
+                                }}>
+                                KeyPress
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    if (key == null) return;
+                                    addSimulationStep(
+                                        simKeyDown(
+                                            key.value as Key | ModifierKey
+                                        )
+                                    );
+                                    addSimulationStepString(
+                                        "KeyDown(" + key.value + ")"
+                                    );
+                                }}>
+                                KeyDown
+                            </button>
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    if (key == null) return;
+                                    addSimulationStep(
+                                        simKeyUp(key.value as Key | ModifierKey)
+                                    );
+                                    addSimulationStepString(
+                                        "KeyUp(" + key.value + ")"
+                                    );
+                                }}>
+                                KeyUp
+                            </button>
+                        </div>
                     </div>
-                    <div className="col-2">
-                        <input
-                            className="form-control"
-                            type="number"
-                            defaultValue={y}
-                            onChange={(event) =>
-                                setY(event.target.valueAsNumber)
-                            }
+                    <div className="row my-1">
+                        <div className="col-3">Mouse Button</div>
+                        <Select
+                            className="col-3"
+                            value={mouseButton}
+                            onChange={setMouseButton}
+                            options={mouseButtonOptions}
+                            isSearchable={true}
                         />
+                        <div className="btn-group col">
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    if (mouseButton == null) return;
+                                    addSimulationStep(
+                                        simMouseClick(mouseButton.value)
+                                    );
+                                    addSimulationStepString(
+                                        "MouseClick(" + mouseButton.value + ")"
+                                    );
+                                }}>
+                                MouseClick
+                            </button>
+                            <button
+                                className="btn btn-primary "
+                                onClick={() => {
+                                    if (mouseButton == null) return;
+                                    addSimulationStep(
+                                        simMouseDown(mouseButton.value)
+                                    );
+                                    addSimulationStepString(
+                                        "MouseDown(" + mouseButton.value + ")"
+                                    );
+                                }}>
+                                MouseDown
+                            </button>
+                            <button
+                                className="btn btn-primary "
+                                onClick={() => {
+                                    if (mouseButton == null) return;
+                                    addSimulationStep(
+                                        simMouseUp(mouseButton.value)
+                                    );
+                                    addSimulationStepString(
+                                        "MouseUp(" + mouseButton.value + ")"
+                                    );
+                                }}>
+                                MouseUp
+                            </button>
+                        </div>
                     </div>
-                    <button
-                        className="btn btn-primary col-2"
-                        onClick={() => {
-                            addSimulationStep(simMouseMove(x, y));
-                            addStepStr("MouseMove(" + x + ", " + y + ")");
-                        }}>
-                        Add
-                    </button>
+
+                    <div className="row my-1">
+                        <div className="col-3">Scroll</div>
+                        <Select
+                            className="col-3"
+                            value={scroll}
+                            onChange={setScroll}
+                            options={directionOptions}
+                            isSearchable={true}
+                        />
+                        <div className="btn-group col">
+                            <button
+                                className="btn btn-primary col-2"
+                                onClick={() => {
+                                    if (scroll == null) return;
+                                    addSimulationStep(
+                                        simMouseScroll(scroll.value)
+                                    );
+                                    addSimulationStepString(
+                                        "MouseScroll(" + scroll.value + ")"
+                                    );
+                                }}>
+                                Add
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="row my-1">
+                        <div className="col-3">Move Mouse</div>
+
+                        <div className="col-2">
+                            <input
+                                className="form-control"
+                                type="number"
+                                defaultValue={x}
+                                onChange={(event) =>
+                                    setX(event.target.valueAsNumber)
+                                }
+                            />
+                        </div>
+                        <div className="col-2">
+                            <input
+                                className="form-control"
+                                type="number"
+                                defaultValue={y}
+                                onChange={(event) =>
+                                    setY(event.target.valueAsNumber)
+                                }
+                            />
+                        </div>
+                        <div className="btn-group col">
+                            <button
+                                className="btn btn-primary"
+                                onClick={() => {
+                                    addSimulationStep(simMouseMove(x, y));
+                                    addSimulationStepString(
+                                        "MouseMove(" + x + ", " + y + ")"
+                                    );
+                                }}>
+                                Add
+                            </button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <hr />
-            <div className="container">
-                {<div className="row my-1">{getSimulationString()}</div>}
-                <div className="row my-1">
-                    <button
-                        className="btn btn-primary col-6"
-                        onClick={() => {console.log(sim);inputSimulation(sim)}}>
-                        Execute
-                    </button>
-                    <button
-                        className="btn btn-secondary col-6"
-                        onClick={() => {
-                            setSim([]);
-                            setSimStr([]);
-                        }}>
-                        Clear
-                    </button>
+                <hr />
+                <div className="container-fluid">
+                    {/* Buttons to execute or clear the simulation sequence */}
+                    <div className="row my-1 justify-content-center">
+                        <button
+                            className="btn btn-primary col-3 mx-2"
+                            onClick={() => {
+                                inputSimulation(sim);
+                            }}>
+                            Execute
+                        </button>
+                        <button
+                            className="btn btn-secondary col-3 mx-2"
+                            onClick={() => {
+                                setSim([]);
+                                setSimString([]);
+                            }}>
+                            Clear
+                        </button>
+
+                        {/* List of simulation steps and buttons to remove them */}
+                        <div className="container mt-2">
+                            {simString.map((step, index) => (
+                                <div
+                                    className="row mb-1 align-items-center"
+                                    key={index}>
+                                    <div className="col-1">
+                                        <button
+                                            className="btn btn-danger btn-sm"
+                                            onClick={() => removeStep(index)}>
+                                            <IconX />
+                                        </button>
+                                    </div>
+                                    <div className="col fw-bold">{step}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </ModuleWindow>

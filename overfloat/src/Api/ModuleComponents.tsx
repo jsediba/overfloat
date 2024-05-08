@@ -1,5 +1,5 @@
 /*****************************************************************************
- * @FilePath    : src/Api/ModuleWindow.tsx                                   *
+ * @FilePath    : src/api/ModuleWindow.tsx                                   *
  * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
  * @Year        : 2024                                                       *
  ****************************************************************************/
@@ -56,13 +56,13 @@ type ModuleWindowProps = {
  * React component for the display of a module window.
  */
 export const ModuleWindow: React.FC<ModuleWindowProps> = (props:ModuleWindowProps) => {
-    const showTitleBar = props["showTitleBar"] == undefined ? true : props["showTitleBar"];
+    const showTitleBar = props["showTitleBar"] === undefined ? true : props["showTitleBar"];
     const children = props["children"];
     
     return (
         <div>
             {showTitleBar && <TitleBar />}
-            <div className={showTitleBar ? "module-content" : "module-content-no-titlebar"}>
+            <div className={(showTitleBar ? "module-content" : "module-content-no-titlebar")}>
                 {children}
             </div>
         </div>

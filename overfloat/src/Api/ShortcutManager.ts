@@ -1,5 +1,5 @@
 /*****************************************************************************
- * @FilePath    : src/Api/ShortcutManager.ts                                 *
+ * @FilePath    : src/api/ShortcutManager.ts                                 *
  * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
  * @Year        : 2024                                                       *
  ****************************************************************************/
@@ -104,7 +104,7 @@ export enum Key {
     PageUp = "PgUp",
     PageDown = "PgDown",
     Escape = "Escape",
-    Enter = "Return",
+    Return = "Return",
     Space = "Space",
     Tab = "Tab",
     PrintScreen = "PrintScreen",

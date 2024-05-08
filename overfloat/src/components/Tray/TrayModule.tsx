@@ -7,7 +7,7 @@
 import { useEffect, useRef } from "react";
 import useStateRef from "react-usestateref";
 import { OverfloatModule } from "../../utils/OverfloatModule";
-import "./css/TrayModule.css";
+import "./css/Tray.css";
 import TraySubwindows from "./TraySubwindows";
 import TrayWindowIcon from "./TrayWindowIcon";
 

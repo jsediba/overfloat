@@ -1,5 +1,5 @@
 /*****************************************************************************
- * @FilePath    : src/Api/InputSimulation.ts                                 *
+ * @FilePath    : src/api/InputSimulation.ts                                 *
  * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
  * @Year        : 2024                                                       *
  ****************************************************************************/

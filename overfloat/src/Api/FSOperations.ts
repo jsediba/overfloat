@@ -1,5 +1,5 @@
 /*****************************************************************************
- * @FilePath    : src/Api/FSOperations.ts                                    *
+ * @FilePath    : src/api/FSOperations.ts                                    *
  * @Author      : Jakub Šediba <xsedib00@vutbr.cz>                           *
  * @Year        : 2024                                                       *
  ****************************************************************************/
@@ -121,7 +121,6 @@ function triggerFSEventCallback(
     payload: FSPayload,
     callback: (event: FSEvent) => void
 ) {
-    console.log("Inside trigger API payload is: ", payload);
     let eventKind: FSEventKind;
     switch (payload.kind) {
         case 0:

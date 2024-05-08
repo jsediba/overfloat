@@ -38,7 +38,6 @@ const ShortcutDisplay: React.FC<ShortcutDisplayProps> = (
         // Function to update the bound keys
         const updateBoundKeys = () => {
             setBoundKeys([...shortcut.getBoundKeys()]);
-            console.log("Updating bound keys");
         };
 
         // Initial update
@@ -198,9 +197,9 @@ const ShortcutDisplay: React.FC<ShortcutDisplayProps> = (
                                     key={index}
                                 />
                             ))}
-                            <div className="row">
+                            <div className="row text-center">
                                 {/* Button to add a new keybind */}
-                                <div className="col text-center">
+                                <div className="col-10">
                                     <button
                                         className="addKeybindButton"
                                         onClick={handleShowModal}

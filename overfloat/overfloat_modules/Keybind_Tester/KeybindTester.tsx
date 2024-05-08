@@ -7,12 +7,16 @@
 import { useEffect } from "react";
 import { ModuleWindow, ShortcutManager, openSubwindow, Key, ModifierKey } from "@OverfloatAPI";
 
-const Keybind_Tester = () => {
+/**
+ * Main window of the module for testing the keybinds. 
+ */
+const Keybind_Tester: React.FC = () => {
     useEffect(() => {
+        // Add a shortcut for opening a new counter.
         ShortcutManager.addShortcut(
             "spawn_counter",
             "Spawn Counter",
-            "Spawns a new counter subwindow without a bound key.",
+            "Opens a new counter.",
             () => {
                 openSubwindow("counter", "Counter");
             },
@@ -22,9 +26,9 @@ const Keybind_Tester = () => {
         return () => {};
     }, []);
 
+    // Function for opening a counter with specified keybind.
     const newWindow = (keybind: string) => {
         openSubwindow("counter", `Counter ${keybind}`, { keybind: keybind });
-        console.log("opening new subwindow");
     };
 
     return (
@@ -33,6 +37,7 @@ const Keybind_Tester = () => {
                 <div className="row">
                     <div className="col text-center h2">Keybind Tester</div>
                 </div>
+                {/* Buttons to open counters with specified keybinds */}
                 <div className="row">
                     <div className="col">
                         <button className="btn btn-primary" onClick={() => newWindow("A")}>[A]</button>

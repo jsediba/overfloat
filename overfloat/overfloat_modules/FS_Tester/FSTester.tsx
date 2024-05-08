@@ -4,35 +4,34 @@
  * @Year        : 2024                                                       *
  ****************************************************************************/
 
-
 import { ModuleWindow, openSubwindow } from "@OverfloatAPI";
+
+/**
+ * Main window of the module for testing the FileSystem operations.
+ */
 const FSTester: React.FC = () => {
-    return(
+    return (
         <ModuleWindow>
-            <div className="container text-center">
+            <div className="container text-center mt-2">
                 <div className="row">
-                    <div className="col">
-                        <button className="btn btn-primary"
-                        onClick={()=>openSubwindow(
-                            "WriteTester",
-                            "Write Tester"
-                        )}>
-                            Open Write Tester
-                        </button>
-                    </div>
-                    <div className="col">
-                        <button className="btn btn-primary"
-                        onClick={()=>openSubwindow(
-                            "ReadTester",
-                            "Read Tester",
-                        )}>
-                            Open Read Tester
-                        </button>
-                    </div>
+                    <button
+                        className="btn btn-primary col m-2"
+                        onClick={() =>
+                            openSubwindow("WriteTester", "Write Tester")
+                        }>
+                        Open Write Tester
+                    </button>
+                    <button
+                        className="btn btn-primary col m-2"
+                        onClick={() =>
+                            openSubwindow("ReadTester", "Read Tester")
+                        }>
+                        Open Read Tester
+                    </button>
                 </div>
             </div>
         </ModuleWindow>
-    )
-}
+    );
+};
 
 export default FSTester;

@@ -310,7 +310,7 @@ The shortcut API exposes following enums and types related to keys and key combi
         -   PageUp
         -   PageDown
         -   Escape
-        -   Enter
+        -   Return
         -   Space
         -   Tab
         -   PrintScreen

@@ -46,22 +46,26 @@ const GlobalStyle = createGlobalStyle`body{background-color: rgb(75,75,75);
 const OverfloatWindow: React.FC = () => {
     const [activeModules, setActiveModules] = useState<
         Map<string, OverfloatModule>
-    >(new Map<string, OverfloatModule>());
+    >(new Map<string, OverfloatModule>(ModuleManager.getInstance().getActiveModules()));
 
     useEffect(() => {
-
         // Disable refreshing the main window.
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'F5' || (event.ctrlKey && event.key === 'r') || (event.metaKey && event.key === 'r')) {
-              event.preventDefault();
+        
+        document.addEventListener("keydown", function (event) {
+            if (
+                event.key === "F5" ||
+                (event.ctrlKey && event.key === "r") ||
+                (event.metaKey && event.key === "r")
+            ) {
+                event.preventDefault();
             }
         });
-
+        
+                
         // Disable the context menu in the main window.
-        document.addEventListener('contextmenu', function(event) {
+        document.addEventListener("contextmenu", function (event) {
             event.preventDefault();
         });
-
 
         // Function to update the active modules
         const updateModules = () => {
@@ -77,27 +81,33 @@ const OverfloatWindow: React.FC = () => {
 
         // Setup the window
         const setupWindow = async () => {
-            await appWindow.setSize(new PhysicalSize(60, 600));
-            await appWindow.setMinSize(new PhysicalSize(60, 600));
-            await appWindow.setMaxSize(new PhysicalSize(60, 600));
+            if(refShownSubmenu.current == Submenu.None){
+                await appWindow.setSize(new PhysicalSize(60, 600));
+                await appWindow.setMinSize(new PhysicalSize(60, 600));
+                await appWindow.setMaxSize(new PhysicalSize(60, 600));
+            } else {
+                await appWindow.setSize(new PhysicalSize(1000, 600));
+                await appWindow.setMinSize(new PhysicalSize(1000, 600));
+                await appWindow.setMaxSize(new PhysicalSize(1000, 600));
+            }
+
             appWindow.show();
         };
 
+        
         // Subscribe to the module manager and keybind manager notifications
         WindowEventHandler.getInstance();
         ModuleManager.getInstance().subscribe(updateModules);
         KeybindEventHandler.getInstance();
         KeybindManager.getInstance().subscribe(updateModules);
-
+        
         // Initialize the modules and setup the window
-        updateModules();
         setupWindow();
 
         // Unsubscribe from the module manager and keybind manager notifications on unmount
         return () => {
             ModuleManager.getInstance().unsubscribe(updateModules);
             KeybindManager.getInstance().unsubscribe(updateModules);
-            ModuleManager.getInstance().closeAllModules();
         };
     }, []);
 
@@ -110,12 +120,12 @@ const OverfloatWindow: React.FC = () => {
         const shownSubmenu = refShownSubmenu.current;
 
         // Increase the size of the window when the submenu is shown and wasn't shown before
-        if (shownSubmenu == Submenu.None) {
+        if (shownSubmenu == Submenu.None && submenu != Submenu.None) {
             await appWindow.setSize(new PhysicalSize(1000, 600));
             await appWindow.setMinSize(new PhysicalSize(1000, 600));
             await appWindow.setMaxSize(new PhysicalSize(1000, 600));
             setShownSubmenu(submenu);
-        
+
         // Only show the taskbar when the already shwon submenu is clicked
         } else if (shownSubmenu == submenu) {
             setShownSubmenu(Submenu.None);
@@ -145,7 +155,7 @@ const OverfloatWindow: React.FC = () => {
                                     : "tray-button tray-button-inactive"
                             }
                             onClick={() => toggleSubmenu(Submenu.Modules)}>
-                            <IconApps color="white" size={48}/>
+                            <IconApps color="white" size={48} />
                         </button>
                         <button
                             className={
@@ -154,10 +164,10 @@ const OverfloatWindow: React.FC = () => {
                                     : "tray-button tray-button-inactive"
                             }
                             onClick={() => toggleSubmenu(Submenu.Shortcuts)}>
-                            <IconKeyboard color="white" size={48}/>
+                            <IconKeyboard color="white" size={48} />
                         </button>
                         <div className="separator" />
-                        
+
                         {/* Tray displays of active modules */}
                         {Array.from(activeModules).map(
                             ([moduleName, module]) => (
