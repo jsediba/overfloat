@@ -134,14 +134,14 @@ const TradeWindow: React.FC = () => {
 
     // Functions to invite to party and initiate trade.
     const inviteToParty = async () => {
-        if(refSelectedTrade.current < 0 || refSelectedTrade.current >= trades.length) return;
-
+        if(refSelectedTrade.current < 0 || refSelectedTrade.current >=  refTrades.current.length) return;
+        
         await clipboardWrite("/invite " + refTrades.current[refSelectedTrade.current].theirName);
         pasteClipboardToChat();
     };
 
     const initiateTrade = async () => {
-        if(refSelectedTrade.current < 0 || refSelectedTrade.current >= trades.length) return;
+        if(refSelectedTrade.current < 0 || refSelectedTrade.current >=  refTrades.current.length) return;
 
         await clipboardWrite("/tradewith " + refTrades.current[refSelectedTrade.current].theirName);
         pasteClipboardToChat();
